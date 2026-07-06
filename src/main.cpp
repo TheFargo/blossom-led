@@ -51,7 +51,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 
         body {
             font-family: 'Fredoka', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3d53b8 0%, #4e306b 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -72,10 +72,10 @@ const char index_html[] PROGMEM = R"rawliteral(
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ffffff;
-            border: 4px solid #1e1e1e;
+            background-color: #EAD8C1;
+            border: 3px solid #83786bc2;
             border-radius: 15px;
-            box-shadow: 8px 8px 0px #5c3a7e;
+            box-shadow: 8px 8px 0px #3b2b188a;
             filter: url('#wriggly-container');
             transform: rotate(0.5deg);
             z-index: -1;
@@ -85,7 +85,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             font-family: 'Gluten', Arial, sans-serif;
             color: #1e1e1e;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             font-size: 2.5rem;
             font-weight: 700;
             text-shadow: 2px 2px 0px #667eea;
@@ -106,10 +106,10 @@ const char index_html[] PROGMEM = R"rawliteral(
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #f8f9fa;
-            border: 3px solid #1e1e1e;
+            background-color: #e9dfd3;
+            border: 3px solid #83786bc2;
             border-radius: 12px;
-            box-shadow: 4px 4px 0px #1e1e1e;
+            box-shadow: -2px -2px 0px #3b2b188a;
             filter: url('#wriggly-table');
             transform: rotate(-0.3deg);
             z-index: -1;
@@ -290,7 +290,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             transform: translateY(-1px);
         }
 
-        /* --- Torn Paper Status Message --- */
+        /* --- Status Message Stamp --- */
         .status {
             position: relative;
             text-align: center;
@@ -307,10 +307,9 @@ const char index_html[] PROGMEM = R"rawliteral(
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #e8f5e9;
-            border: 3px solid #4caf50;
+            background-color: #EAD8C1;
+            border: 3px solid #2e7d32;
             border-radius: 10px;
-            box-shadow: 3px 3px 0px #2e7d32;
             filter: url('#wriggly-status');
             transform: rotate(-0.5deg);
             z-index: -1;

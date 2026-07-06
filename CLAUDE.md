@@ -9,8 +9,8 @@ Raspberry Pi Pico 2W networked lighting display with WiFi provisioning portal.
 **IMPORTANT**: Before marking any code changes complete, **ALWAYS run a build** to check for compilation errors.
 
 **Build Command:**
-```bash
-cmd //c "C:\Users\fargo\.platformio\penv\Scripts\platformio.exe run 2>&1"
+```powershell
+C:\Users\fargo\.platformio\penv\Scripts\platformio.exe run
 ```
 
 - If build fails, fix errors before proceeding
@@ -18,13 +18,18 @@ cmd //c "C:\Users\fargo\.platformio\penv\Scripts\platformio.exe run 2>&1"
 - Only report work as complete after successful compilation
 
 ### Upload to Device
-```bash
-cmd //c "C:\Users\fargo\.platformio\penv\Scripts\platformio.exe run --target upload"
+```powershell
+C:\Users\fargo\.platformio\penv\Scripts\platformio.exe run --target upload
+```
+
+### Upload Filesystem
+```powershell
+C:\Users\fargo\.platformio\penv\Scripts\platformio.exe run --target uploadfs
 ```
 
 ### Serial Monitor
-```bash
-cmd //c "C:\Users\fargo\.platformio\penv\Scripts\platformio.exe device monitor"
+```powershell
+C:\Users\fargo\.platformio\penv\Scripts\platformio.exe device monitor
 ```
 
 ## Platform Details

@@ -36,6 +36,13 @@ const char index_html[] PROGMEM = R"rawliteral(
             font-style: normal;
         }
 
+        @font-face {
+            font-family: 'Fredoka';
+            src: url('/fonts/Fredoka.ttf') format('truetype');
+            font-weight: 300 700;
+            font-style: normal;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -43,51 +50,80 @@ const char index_html[] PROGMEM = R"rawliteral(
         }
 
         body {
-            font-family: 'Gluten', Arial, sans-serif;
+            font-family: 'Fredoka', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            font-variation-settings: 'slnt' -5;
         }
 
+        /* --- Torn Paper Container --- */
         .container {
-            background: white;
-            padding: 20px;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            padding: 30px;
             max-width: 500px;
             width: 100%;
+            z-index: 1;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ffffff;
+            border: 4px solid #1e1e1e;
+            border-radius: 15px;
+            box-shadow: 8px 8px 0px #5c3a7e;
+            filter: url('#wriggly-container');
+            transform: rotate(0.5deg);
+            z-index: -1;
         }
 
         h1 {
-            color: #667eea;
+            font-family: 'Gluten', Arial, sans-serif;
+            color: #1e1e1e;
             text-align: center;
             margin-bottom: 30px;
             font-size: 2.5rem;
             font-weight: 700;
+            text-shadow: 2px 2px 0px #667eea;
             font-variation-settings: 'wght' 700, 'slnt' -10;
         }
 
+        /* --- Torn Paper Network Table --- */
         .network-table {
+            position: relative;
             width: 100%;
             margin-bottom: 20px;
             border-collapse: separate;
             border-spacing: 0;
-            background: #f8f9fa;
+            z-index: 1;
+        }
+
+        .network-table::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #f8f9fa;
+            border: 3px solid #1e1e1e;
             border-radius: 12px;
-            overflow: hidden;
+            box-shadow: 4px 4px 0px #1e1e1e;
+            filter: url('#wriggly-table');
+            transform: rotate(-0.3deg);
+            z-index: -1;
         }
 
         .network-table tr {
+            position: relative;
             cursor: pointer;
             transition: background 0.2s;
+            z-index: 1;
         }
 
         .network-table tr:hover {
-            background: #e9ecef;
+            background: #ffffff;
         }
 
         .network-table tr.selected {
@@ -109,8 +145,9 @@ const char index_html[] PROGMEM = R"rawliteral(
         }
 
         .network-table td:nth-child(2) {
+            font-family: 'Fredoka', Arial, sans-serif;
             font-size: 16px;
-            color: #333;
+            color: #1e1e1e;
             font-weight: 500;
         }
 
@@ -166,77 +203,125 @@ const char index_html[] PROGMEM = R"rawliteral(
         .controls {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
             margin-top: 20px;
         }
 
+        /* --- Torn Paper Button Base --- */
         button {
-            padding: 14px 24px;
-            border: none;
-            border-radius: 10px;
-            font-family: 'Gluten', Arial, sans-serif;
-            font-size: 16px;
+            position: relative;
+            font-family: 'Fredoka', Arial, sans-serif;
             font-weight: 600;
+            font-size: 16px;
+            color: #1e1e1e;
+            background: transparent;
+            border: 0;
+            padding: 14px 24px;
             cursor: pointer;
-            transition: all 0.2s;
-            font-variation-settings: 'slnt' -5;
+            transition: transform 0.15s ease;
+            z-index: 1;
         }
 
-        button.refresh {
-            background: #e9ecef;
-            color: #495057;
+        button::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #6bf1a4; /* Default mint color */
+            border: 3px solid #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 4px 4px 0px #1e1e1e;
+            z-index: -1;
+            transition: background-color 0.2s ease;
         }
 
-        button.refresh:hover {
-            background: #dee2e6;
+        button.refresh::before {
+            filter: url('#wriggly-btn-1');
+            transform: rotate(0.8deg);
+            background-color: #cca4ff; /* Lavender */
         }
 
         button.connect {
-            background: #667eea;
-            color: white;
             padding: 16px 24px;
             font-size: 18px;
+            font-weight: 700;
         }
 
-        button.connect:hover {
-            background: #5568d3;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        button.connect::before {
+            filter: url('#wriggly-btn-2');
+            transform: rotate(-1deg);
+            background-color: #ff858d; /* Coral */
         }
 
+        button:hover {
+            transform: scale(1.05) translateY(-2px);
+        }
+
+        button:hover::before {
+            background-color: #ffffff;
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+        }
+
+        button:active::before {
+            box-shadow: 2px 2px 0px #1e1e1e;
+        }
+
+        /* --- Torn Paper Password Input --- */
         input[type="password"] {
+            position: relative;
             width: 100%;
             padding: 14px;
-            border: 2px solid #e0e0e0;
+            border: 3px solid #1e1e1e;
             border-radius: 10px;
-            font-family: 'Gluten', Arial, sans-serif;
+            font-family: 'Fredoka', Arial, sans-serif;
             font-size: 16px;
-            transition: border-color 0.2s;
-            font-variation-settings: 'slnt' -5;
+            background-color: #ffffff;
+            transition: all 0.2s;
+            box-shadow: 3px 3px 0px #1e1e1e;
+            z-index: 1;
         }
 
         input[type="password"]:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 5px 5px 0px #667eea;
+            transform: translateY(-1px);
         }
 
+        /* --- Torn Paper Status Message --- */
         .status {
+            position: relative;
             text-align: center;
             padding: 12px;
-            background: #e8f5e9;
-            border: 2px solid #4caf50;
             color: #2e7d32;
-            border-radius: 10px;
             margin-bottom: 20px;
+            font-family: 'Fredoka', Arial, sans-serif;
             font-weight: 600;
             display: none;
+            z-index: 1;
+        }
+
+        .status::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #e8f5e9;
+            border: 3px solid #4caf50;
+            border-radius: 10px;
+            box-shadow: 3px 3px 0px #2e7d32;
+            filter: url('#wriggly-status');
+            transform: rotate(-0.5deg);
+            z-index: -1;
         }
 
         .loading {
             text-align: center;
             padding: 40px;
-            color: #999;
-            font-style: italic;
+            color: #666;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-weight: 400;
         }
     </style>
 </head>
@@ -357,6 +442,36 @@ const char index_html[] PROGMEM = R"rawliteral(
             alert('Connect functionality coming next!\\nNetwork: ' + selectedNetwork);
         }
     </script>
+
+    <!-- SVG Filters for Torn Paper Effect -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <defs>
+            <filter id="wriggly-container">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="99" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            
+            <filter id="wriggly-table">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="42" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            
+            <filter id="wriggly-btn-1">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="12" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            
+            <filter id="wriggly-btn-2">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="78" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            
+            <filter id="wriggly-status">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="33" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
 </body>
 </html>
 )rawliteral";
@@ -366,8 +481,19 @@ void handleRoot() {
 }
 
 void handleFont() {
-  // Serve font file from LittleFS
+  // Serve Gluten font file from LittleFS
   File file = LittleFS.open("/fonts/Gluten.ttf", "r");
+  if (file) {
+    server.streamFile(file, "font/ttf");
+    file.close();
+  } else {
+    server.send(404, "text/plain", "Font not found");
+  }
+}
+
+void handleFredokaFont() {
+  // Serve Fredoka font file from LittleFS
+  File file = LittleFS.open("/fonts/Fredoka.ttf", "r");
   if (file) {
     server.streamFile(file, "font/ttf");
     file.close();
@@ -515,6 +641,7 @@ void setup() {
   // Configure web server routes
   server.on("/", handleRoot);
   server.on("/fonts/Gluten.ttf", handleFont);
+  server.on("/fonts/Fredoka.ttf", handleFredokaFont);
   server.on("/api/scan", handleScan);  // WiFi scan endpoint
   server.onNotFound(handleNotFound);
 

@@ -1,52 +1,157 @@
-# Raspberry Pi Pico 2W - PlatformIO Project
+# Project Name: **Blossom** Ambient Light Display
 
-## Setup Instructions
+## Functional Requirements Document
 
-### 1. Install PlatformIO Extension
-If not already installed:
-- Open VS Code Extensions (Ctrl+Shift+X)
-- Search for "PlatformIO IDE"
-- Install it and reload VS Code
+## Target Platform: Raspberry Pi Pico 2 W (Pico C SDK / Earle Philhower Core)
 
-### 2. First Build
-- Open this folder in VS Code
-- PlatformIO will detect `platformio.ini` and initialize the project
-- Click the PlatformIO icon in the left sidebar
-- Under "PROJECT TASKS" → "pico2w" → "General" → click "Build"
+## Document Version: 1.1
 
-### 3. Upload to Pico 2W
+### 1. System Overview
 
-**Method 1: Automatic Upload (Recommended)**
-1. Connect Pico 2W via USB
-2. Click the Upload button (→) in the PlatformIO toolbar at the bottom
-3. PlatformIO will automatically handle reboot and flash
+Blossom is a network-attached, programmable ambient light display built into a translucent lotus-blossom art piece. The system leverages the Raspberry Pi Pico 2 W (powered by an RP2350 microcontroller) to serve as a headless, Wi-Fi-enabled peripheral. It exposes a local REST API that allows external clients (such as local AI agents, VS Code extensions, 
+or mobile applications) to trigger pre-configured or math-scripted illumination patterns.
 
-**Method 2: Manual Bootloader Mode**
-If automatic upload fails:
-1. Hold BOOTSEL button on Pico 2W
-2. Connect USB (or press reset while holding BOOTSEL)
-3. Release BOOTSEL when drive appears
-4. Click Upload in PlatformIO
+### 2. Hardware & Electrical Requirements
 
-### 4. Monitor Serial Output
-- Click the Serial Monitor plug icon in the bottom toolbar
-- Set baud rate to 115200
-- You should see "LED ON" and "LED OFF" messages
+#### 2.1 Power Architecture
 
-## Configuration Details
+Input Voltage: 5V DC via a Micro-USB connector.
+LED Power Rail: The NeoPixel RGBW LED ring must be powered directly from the VBUS pin (5V line straight from USB power) to support peak current draws up to 1A at full brightness.
+Microcontroller Power Rail: The Pico W will be powered via its internal regulator connected to VSYS.
 
-- **Board**: Raspberry Pi Pico 2W (RP2350)
-- **Framework**: Arduino (Earle Philhower's core)
-- **Platform**: Custom RP2350-enabled platform
-- **LED Pin**: GPIO 25 (built-in)
+#### 2.2 Logic Level Shifting
 
-## Troubleshooting
+The Pico W operates on a 3.3V logic level. Because NeoPixel LEDs require a data signal of at least 70% of their supply voltage (3.5V when supplied with 5V), a hardware logic level shifter (e.g., 74AHCT125 or a dedicated N-channel MOSFET circuit) must be implemented between the Pico's GPIO output pin and the NeoPixel data input line.
 
-If upload fails with "No device found":
-- Install picotool: `pip install picotool`
-- Or use bootloader mode (Method 2 above)
+#### 2.3 Physical Escape Hatch (Factory Reset)
 
-If LED doesn't blink:
-- Check Serial Monitor for debug messages
-- Verify USB connection provides power
-- Try pressing the reset button
+The enclosure must feature a precision pinhole perfectly aligned with the Pico's native BOOTSEL button (or a dedicated hardware reset pin).
+Behavior: Holding this button down via a paperclip for 5 seconds during power-on will clear all stored network configurations from non-volatile memory and force the device back into provisioning mode.
+
+### 3. Firmware Architecture & State Machine
+
+The firmware will be written in C/C++ using the native Raspberry Pi Pico SDK and the lwIP (Lightweight IP) stack. To ensure smooth, stutter-free animations, the dual-core architecture of the RP2350 will be utilized.
+
+#### 3.1 Core Allocation
+
+Core 0: Runs the lwIP TCP/IP stack, handles Wi-Fi connections, manages the background HTTP/DNS servers, and parses incoming JSON network packets.
+Core 1: Runs the math-based animation execution engine and feeds data to the PIO (Programmable I/O) state machines driving the NeoPixels.
+Inter-Core Communication: Thread-safe communication will be handled using the Pico SDK’s hardware FIFO queues (pico/util/queue.h) to pass lighting state changes from Core 0 to Core 1.
+
+#### 3.2 System State Machine
+
+The firmware must gracefully cycle through the following operational states:
+
+- UNPROVISIONED:
+  No Wi-Fi credentials found in flash storage.
+  Slow, amber breathing pattern.
+- PROVISIONING:
+  Soft-AP portal is active; waiting for user setup.
+  Rotating yellow pulse.
+- CONNECTING:
+  Attempting to join the stored Wi-Fi network.
+  Blinking blue pattern.
+- ACTIVE / IDLE
+  Connected to Wi-Fi; awaiting local network packets.
+  Subtle, low-brightness default ambient glow.
+- ERROR / FAILOVER
+  Connection lost. Retries for 60s before spinning up AP again.
+  Blinking dark red pattern.
+
+### 4. Headless Wi-Fi Setup & Provisioning Portal
+
+When the device cannot find valid Wi-Fi credentials in its local storage, it must automatically host a local captive portal setup experience.
+
+#### 4.1 Access Point (AP) Mode
+
+The Pico W will initialize the CYW43439 wireless chip in Access Point mode.
+SSID: Blossom_Setup_XXXX (where XXXX represents the last 4 digits of the chip's unique MAC address).
+Security: Open (No password required for initial setup).
+Local IP Configuration: Gateway set statically to 192.168.4.1.
+
+#### 4.2 Rogue DNS Server (Captive Portal Enforcement)
+
+A lightweight UDP server must listen on Port 53.
+Behavior: The server must intercept all incoming DNS lookups generated by the connecting smartphone or operating system (e.g., Apple's captive network assistant tests) and return 192.168.4.1 as the resolved IP address. This forces the client device to automatically pop open the configuration webpage.
+
+#### 4.3 HTTP Provisioning Web Server
+
+An HTTP server must listen on TCP Port 80.
+A catch-all route must serve a single, highly optimized HTML/CSS/JS page embedded directly inside the firmware flash memory as a static byte array.
+
+The page must:
+Trigger an async scan of local Wi-Fi networks and display them in a dropdown.
+Provide a secure password text field.
+Issue an HTTP POST request back to the Pico containing the chosen SSID and Password.
+
+#### 4.4 Non-Volatile Storage (Credentials)
+
+Upon receiving valid credentials, the firmware will write the SSID and password to a dedicated 4KB sector at the upper boundary of the Pico's flash memory using the hardware flash programming APIs (hardware/flash.h).
+
+Once written, the system will execute a software reboot (watchdog_reboot) to spin up into the CONNECTING state.
+
+### 5. Network Services & Local Discovery (mDNS)
+
+To eliminate the need for users to discover the device's IP address through their router settings, Blossom must support zero-configuration networking.
+
+mDNS Daemon: The firmware must compile and initialize the lwIP mDNS app layer.
+Local Hostname: The device will register on the local network as blossom.local.
+Service Broadcasting: It will broadcast an _http._tcp service on port 80, allowing local discovery applications, IDE extensions, or agent scripts to automatically resolve its IP address over the network.
+
+### 6. REST API & Interoperability Specification
+
+Once active on the local network, the HTTP server on Core 0 will process incoming commands. All endpoints must parse and return standard JSON payloads.
+
+#### 6.1 CORS (Cross-Origin Resource Sharing) Compliance
+
+To allow web-based dashboards or browser extensions to communicate directly with Blossom, the HTTP response parser must include the following headers in every response, including handling the pre-flight HTTP OPTIONS method:
+
+HTTP
+```
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: POST, GET, OPTIONS
+Access-Control-Allow-Headers: Content-Type
+```
+
+#### 6.2 API Endpoints
+
+- POST /api/effect
+Triggers an immediate, non-blocking visual effect.
+Payload Schema:
+JSON
+```
+{
+  "effect": "string",       // Name of the preset handler (e.g., "pulse", "wave", "sparkle")
+  "color": "string",        // Hexadecimal string for GRBW values (e.g., "FF000000" for Red)
+  "speed": 0.00,            // Floating point modifier for time increments / frequencies
+  "duration": 0             // Optional millisecond cutoff (0 for infinite loop until next command)
+}
+```
+Success Response: 200 OK with JSON {"status": "success", "playing": "effect_name"}
+
+- POST /api/save
+Saves a custom parameter packet to the internal file storage (using a lightweight library like LittleFS embedded in flash) so it can be referenced later by a custom keyword.
+Payload Schema:
+JSON
+```
+{
+  "name": "string",         // Keyword to register the effect
+  "config": {               // Custom math parameters passed to the engine
+    "frequency": 0.33,
+    "amplitude": 1.00,
+    "wave_type": "sine"
+  }
+}
+```
+Success Response: 201 Created
+
+- GET /api/status
+Returns the current health, network strength (RSSI), and active lighting pattern of the device.
+Success Response: 200 OK with system statistics.
+
+### 7. Lighting Control Engine (High-Level Placeholder)
+
+Animation Player: Core 1 will monitor a shared state structure populated by the REST API.
+
+Math-Scripting Interpreter: When a command is received, Core 1 will use the provided parameters (frequency, wave type, speed modifiers) to compute individual LED brightness matrices on the fly, feeding them continuously into the PIO hardware buffers at a target framerate of 60 FPS. Network calls will not block or hitch these frame calculations.
+

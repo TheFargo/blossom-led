@@ -102,21 +102,33 @@
 
         /* Interactive Torn Paper Buttons */
         .torn-btn {
+            position: relative;
             font-family: 'Fredoka', sans-serif;
             font-weight: 600;
             font-size: 1.1rem;
-            background-color: #ffdf65; /* Sunny yellow */
-            color: #1e1e1e;
-            border: 3px solid #1e1e1e;
+            background-color: #ffffff; 
+            border: 0; /* Remove default border */
             padding: 12px 20px;
             cursor: pointer;
-            box-shadow: 4px 4px 0px #1e1e1e;
-            
-            /* Flattened but uneven border radius for buttons */
-            border-radius: 120px 15px 100px 15px / 15px 100px 15px 120px;
-            
             transition: all 0.15s ease;
             text-align: center;
+            z-index: 1; /* Ensure the text stays on top of the background */
+        }
+
+        .torn-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ffdf65;
+            border: 3px solid #1e1e1e;
+            border-radius: 15px; /* Curved corners */
+            box-shadow: 4px 4px 0px #555555;
+            filter: url('#wriggly-line');
+            transform: rotate(1.0deg); /* Slight tilt for hand-drawn feel */
+            z-index: -1; /* Ensure this layer falls behind Text */
         }
 
         /* Interactive Wobbly Elements (Buttons / Controls) */
@@ -149,14 +161,13 @@
         .wobbly-btn.mint { background-color: #6bf1a4; }
         .wobbly-btn.lavender { background-color: #cca4ff; }
         .wobbly-btn.coral { background-color: #ff858d; }
-        .torn-btn.mint { background-color: #6bf1a4; }
-        .torn-btn.lavender { background-color: #cca4ff; }
-        .torn-btn.coral { background-color: #ff858d; }
+        .torn-btn::before.mint { background-color: #6bf1a4; }
+        .torn-btn::before.lavender { background-color: #cca4ff; }
+        .torn-btn::before.coral { background-color: #ff858d; }
 
         /* Playful Interaction States */
         .torn-btn:hover {
             transform: scale(1.03) rotate(-1.5deg);
-            background-color: #1e1e1e;
             color: #ffffff;
         }
 

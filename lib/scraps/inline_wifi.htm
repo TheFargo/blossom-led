@@ -1,0 +1,41 @@
+<style>
+  .wifi-icon {
+    width: 20px;
+    height: 20px;
+    fill: #333; /* Change to match your text color */
+    display: inline-block;
+    vertical-align: middle;
+  }
+</style>
+
+<!-- I love the idea here, but in practice these look awful! -->
+
+<!-- Strength: 1 Bar -->
+<svg class="wifi-icon" viewBox="0 0 24 24"><path d="M12 21l-4-4h8l-4 4z" opacity="0.3"/><path d="M12 21l-4-4h8l-4 4z"/></svg>
+
+<!-- Strength: 2 Bars -->
+<svg class="wifi-icon" viewBox="0 0 24 24"><path d="M4.8 9.8l1.4 1.4C8.1 9.3 10 8.5 12 8.5s3.9.8 5.8 2.7l1.4-1.4C16.9 7.5 14.5 6.5 12 6.5s-4.9 1-7.2 3.3z" opacity="0.3"/><path d="M12 21l-4-4h8l-4 4zM7.7 12.7l1.4 1.4c1.1-.9 2.4-1.5 3.9-1.5s2.8.6 3.9 1.5l1.4-1.4c-1.4-1.4-3.3-2.1-5.3-2.1s-3.9.7-5.3 2.1z"/></svg>
+
+<!-- Strength: 3 Bars -->
+<svg class="wifi-icon" viewBox="0 0 24 24"><path d="M12 3c-4.3 0-8.2 1.7-11.1 4.4l1.4 1.4C4.7 6.4 8.2 5 12 5s7.3 1.4 9.7 3.8l1.4-1.4C20.2 4.7 16.3 3 12 3z" opacity="0.3"/><path d="M12 21l-4-4h8l-4 4zM7.7 12.7l1.4 1.4c1.1-.9 2.4-1.5 3.9-1.5s2.8.6 3.9 1.5l1.4-1.4c-1.4-1.4-3.3-2.1-5.3-2.1s-3.9.7-5.3 2.1zm-2.9-2.9l1.4 1.4C8.1 9.3 10 8.5 12 8.5s3.9.8 5.8 2.7l1.4-1.4C16.9 7.5 14.5 6.5 12 6.5s-4.9 1-7.2 3.3z"/></svg>
+
+<!-- Strength: 4 Bars (Full) -->
+<svg class="wifi-icon" viewBox="0 0 24 24"><path d="M12 21l-4-4h8l-4 4zm-4.3-8.3l1.4 1.4c1.1-.9 2.4-1.5 3.9-1.5s2.8.6 3.9 1.5l1.4-1.4c-1.4-1.4-3.3-2.1-5.3-2.1s-3.9.7-5.3 2.1zm-2.9-2.9l1.4 1.4C8.1 9.3 10 8.5 12 8.5s3.9.8 5.8 2.7l1.4-1.4C16.9 7.5 14.5 6.5 12 6.5s-4.9 1-7.2 3.3zm-2.9-2.9l1.4 1.4C6.2 5.4 9 4.5 12 4.5s5.8.9 8.7 2.8l1.4-1.4C19.2 3.6 15.7 2.5 12 2.5S4.8 3.6 2.1 5.9z"/></svg>
+
+<div class="wifi-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64">
+    <!-- Base dot at the bottom -->
+    <circle class="wifi-bar" cx="12" cy="20" r="1.5" />
+    
+    <!-- Inner arc -->
+    <path class="wifi-bar" d="M9 16 A 4.5 4.5 0 0 1 15 16" fill="none" stroke-width="1.5" stroke-linecap="round" />
+    
+    <!-- Middle arc -->
+    <path class="wifi-bar" d="M6 12 A 9 9 0 0 1 18 12" fill="none" stroke-width="1.5" stroke-linecap="round" />
+    
+    <!-- Outer arc -->
+    <path class="wifi-bar" d="M3 8 A 13.5 13.5 0 0 1 21 8" fill="none" stroke-width="1.5" stroke-linecap="round" />
+  </svg>
+</div>
+
+

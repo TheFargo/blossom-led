@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torn Paper & Playful Font Demo</title>
+    <!-- Loading Gluten and Fredoka fonts from Google Fonts for immediate preview -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Gluten:wght@100..900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Styling & Theme */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #1e1e1e;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Gluten', sans-serif;
+            font-weight: 700;
+            font-size: 2.8rem;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #1e1e1e; 
+            text-shadow: 2px 2px 0px  #667eea;
+        }
+
+        p.subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: #242424;
+        }
+
+        h2 {
+            font-family: 'Gluten', sans-serif;
+            font-weight: 600;
+            font-size: 1.6rem;
+            margin-top: 0;
+            color: #35a7ff; /* Vibrant sky blue */
+        }
+
+        /* --- THE WOBBLY BOXES --- */
+        
+        /* Card Type 1: Tilted Left, Specific Corner Wobble */
+        .wobbly-card-1 {
+            background-color: #ffffff;
+            border: 4px solid #1e1e1e;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 6px 6px 0px #1e1e1e;
+            
+            /* Magic 8-value border-radius: horizontal / vertical radii */
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            
+            /* Slight manual tilt to look imperfect */
+            transform: rotate(-0.6deg);
+            transition: transform 0.2s ease;
+        }
+
+        .torn-paper-card {
+            position: relative; /* Establishes a boundary for the background layer */
+            padding: 30px;
+            color: #1e1e1e;
+            z-index: 1; /* Ensure the text stays on top of the background */
+        }
+
+        /* Background Layer for Torn Paper Effect */
+        .torn-paper-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ffffff;
+            border: 4px solid #1e1e1e;
+            border-radius: 15px; /* Curved corners */
+            box-shadow: 6px 6px 0px #5c3a7e;
+            filter: url('#wriggly-line');
+            transform: rotate(1.0deg); /* Slight tilt for hand-drawn feel */
+            z-index: -1; /* Ensure this layer falls behind Text */
+        }
+
+        /* Interactive Torn Paper Buttons */
+        .torn-btn {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            background-color: #ffdf65; /* Sunny yellow */
+            color: #1e1e1e;
+            border: 3px solid #1e1e1e;
+            padding: 12px 20px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #1e1e1e;
+            
+            /* Flattened but uneven border radius for buttons */
+            border-radius: 120px 15px 100px 15px / 15px 100px 15px 120px;
+            
+            transition: all 0.15s ease;
+            text-align: center;
+        }
+
+        /* Interactive Wobbly Elements (Buttons / Controls) */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .wobbly-btn {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            background-color: #ffdf65; /* Sunny yellow */
+            color: #1e1e1e;
+            border: 3px solid #1e1e1e;
+            padding: 12px 20px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #1e1e1e;
+            
+            /* Flattened but uneven border radius for buttons */
+            border-radius: 120px 15px 100px 15px / 15px 100px 15px 120px;
+            
+            transition: all 0.15s ease;
+            text-align: center;
+        }
+
+        /* Button Variations */
+        .wobbly-btn.mint { background-color: #6bf1a4; }
+        .wobbly-btn.lavender { background-color: #cca4ff; }
+        .wobbly-btn.coral { background-color: #ff858d; }
+        .torn-btn.mint { background-color: #6bf1a4; }
+        .torn-btn.lavender { background-color: #cca4ff; }
+        .torn-btn.coral { background-color: #ff858d; }
+
+        /* Playful Interaction States */
+        .torn-btn:hover {
+            transform: scale(1.03) rotate(-1.5deg);
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+
+        .wobbly-btn:hover {
+            transform: scale(1.03) rotate(-1.5deg);
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+
+        .torn-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #1e1e1e;
+        }
+
+        .wobbly-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #1e1e1e;
+        }
+
+    </style>
+</head>
+<body>
+
+    <svg style="position: absolute; width: 0; height: 0;">
+        <defs>
+            <filter id="wriggly-line">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="container">
+        <h1>🪷 Blossom Styles Test Page 🪷</h1>
+        <p class="subtitle">A pure CSS demo of the "torn-paper" effect paired with the <strong>Gluten</strong> font.</p>
+
+        <!-- Card 1 - Torn Paper Card -->
+        <div class="torn-paper-card">
+            <h2>Torn Paper Card</h2>
+            <p>This card uses a pseudo-element to create a torn paper effect. The SVG filter adds a wobbly, hand-drawn look to the edges.</p>
+            <!-- Interactive Torn Buttons -->
+            <div class="control-grid">
+                <button class="torn-btn coral">Neon Sunset</button>
+                <button class="torn-btn mint">Cyber Punk</button>
+                <button class="torn-btn lavender">Acid Rain</button>
+                <button class="torn-btn">Electric Jam</button>
+            </div>
+        </div>
+
+        <br><br>
+
+        <!-- Card 2 - Wobbly Card 1 -->
+        <div class="wobbly-card-1">
+            <h2>Current Animation Preset</h2>
+            <p>This box uses a specific asymmetry combo paired with a slight negative rotation (-0.6deg). It feels like it was drawn quickly with a heavy felt-tip marker.</p>
+            
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wobbly Box & Playful Font Demo</title>
+    <!-- Loading Gluten and Fredoka fonts from Google Fonts for immediate preview -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Gluten:wght@100..900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Styling & Theme */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: #f7f4eb; /* Warm, soft cream sketchpad background */
+            color: #1e1e1e;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Gluten', sans-serif;
+            font-weight: 700;
+            font-size: 2.8rem;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #ff5964; /* Fun, energetic coral red */
+            text-shadow: 2px 2px 0px #1e1e1e;
+        }
+
+        p.subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: #555;
+        }
+
+        h2 {
+            font-family: 'Gluten', sans-serif;
+            font-weight: 600;
+            font-size: 1.6rem;
+            margin-top: 0;
+            color: #35a7ff; /* Vibrant sky blue */
+        }
+
+        /* --- THE WOBBLY BOXES --- */
+        
+        /* Card Type 1: Tilted Left, Specific Corner Wobble */
+        .wobbly-card-1 {
+            background-color: #ffffff;
+            border: 4px solid #1e1e1e;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 6px 6px 0px #1e1e1e;
+            
+            /* Magic 8-value border-radius: horizontal / vertical radii */
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            
+            /* Slight manual tilt to look imperfect */
+            transform: rotate(-0.6deg);
+            transition: transform 0.2s ease;
+        }
+
+        /* Card Type 2: Tilted Right, Inverse Corner Wobble */
+        .wobbly-card-2 {
+            background-color: #ffffff;
+            border: 4px solid #1e1e1e;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 6px 6px 0px #1e1e1e;
+            
+            /* Distinct wobble values from Card 1 so they don't look cloned */
+            border-radius: 20px 320px 20px 280px / 280px 20px 320px 20px;
+            
+            transform: rotate(0.8deg);
+            transition: transform 0.2s ease;
+        }
+
+        /* Experiments in Squiggly Line Filters */
+        .sketchy-card {
+            background-color: #ffffff;
+            border: 4px solid #1e1e1e;
+            padding: 25px;
+            box-shadow: 6px 6px 0px #1e1e1e;
+            /* Apply the SVG filter defined at the top of the html body */
+            filter: url('#wriggly-line');
+            /* Optional: Mix it with a gentle border-radius for maximum hand-drawn vibes */
+            border-radius: 10px; 
+        }
+
+        .torn-paper-card {
+            position: relative; /* Establishes a boundary for the background layer */
+            padding: 30px;
+            color: #1e1e1e;
+            z-index: 1; /* Ensure the text stays on top of the background */
+        }
+
+        /* Background Layer for Torn Paper Effect */
+        .torn-paper-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ffffff;
+            border: 4px solid #1e1e1e;
+            border-radius: 15px; /* Curved corners */
+            box-shadow: 6px 6px 0px #1e1e1e;
+            filter: url('#wriggly-line');
+            transform: rotate(1.0deg); /* Slight tilt for hand-drawn feel */
+            z-index: -1; /* Ensure this layer falls behind Text */
+        }
+
+        /* Interactive Wobbly Elements (Buttons / Controls) */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .wobbly-btn {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            background-color: #ffdf65; /* Sunny yellow */
+            color: #1e1e1e;
+            border: 3px solid #1e1e1e;
+            padding: 12px 20px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #1e1e1e;
+            
+            /* Flattened but uneven border radius for buttons */
+            border-radius: 120px 15px 100px 15px / 15px 100px 15px 120px;
+            
+            transition: all 0.15s ease;
+            text-align: center;
+        }
+
+        /* Button Variations */
+        .wobbly-btn.mint { background-color: #6bf1a4; }
+        .wobbly-btn.lavender { background-color: #cca4ff; }
+        .wobbly-btn.coral { background-color: #ff858d; }
+
+        /* Playful Interaction States */
+        .wobbly-btn:hover {
+            transform: scale(1.03) rotate(-1.5deg);
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+
+        .wobbly-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #1e1e1e;
+        }
+
+        /* Inline Code Callout Box */
+        .code-box {
+            background-color: #f1f1f1;
+            border: 2px dashed #888;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin-top: 15px;
+            color: #333;
+        }
+
+        /* Matrix / LED Art Preview simulator just for fun */
+        .led-preview {
+            width: 100%;
+            height: 60px;
+            background-color: #111;
+            border: 4px solid #1e1e1e;
+            border-radius: 30px 10px 25px 12px / 12px 25px 10px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 10px;
+            margin-top: 15px;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ff5964;
+            box-shadow: 0 0 8px #ff5964;
+            animation: pulse 1.5s infinite alternate;
+        }
+        .dot:nth-child(even) {
+            background-color: #6bf1a4;
+            box-shadow: 0 0 8px #6bf1a4;
+            animation-delay: 0.5s;
+        }
+        .dot:nth-child(3n) {
+            background-color: #ffdf65;
+            box-shadow: 0 0 8px #ffdf65;
+            animation-delay: 1s;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(0.8); opacity: 0.5; }
+            to { transform: scale(1.2); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <svg style="position: absolute; width: 0; height: 0;">
+        <defs>
+            <filter id="wriggly-line">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="container">
+        <h1>LED Art Controller</h1>
+        <p class="subtitle">A pure CSS demonstration of the hand-drawn "wobbly box" aesthetic paired with the <strong>Gluten</strong> font.</p>
+
+        <!-- CARD 1 -->
+        <div class="wobbly-card-1">
+            <h2>Current Animation Preset</h2>
+            <p>This box uses a specific asymmetry combo paired with a slight negative rotation (-0.6deg). It feels like it was drawn quickly with a heavy felt-tip marker.</p>
+            
+            <div class="led-preview">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+
+            <div class="code-box">
+                border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;<br>
+                transform: rotate(-0.6deg);
+            </div>
+        </div>
+
+        <!-- Sketchy Card -->
+        <div class="sketchy-card">
+            <h2>Sketchy Card</h2>
+            <p>This card uses an SVG filter to create a hand-drawn, wobbly line effect. It's perfect for adding a playful, artistic touch to your UI elements.</p>
+            <div class="code-box">
+                div class = sketchy-card
+            </div>
+        </div>
+
+        <br><br>
+
+        <!-- Torn Paper Card -->
+        <div class="torn-paper-card">
+            <h2>Torn Paper Card</h2>
+            <p>This card uses a pseudo-element to create a torn paper effect. The SVG filter adds a wobbly, hand-drawn look to the edges.</p>
+        </div>
+
+        <br><br>
+
+        <!-- CARD 2 -->
+        <div class="wobbly-card-2">
+            <h2>Change Color Palette</h2>
+            <p>This box swaps the radius weights and tilts positive (+0.8deg). Alternating these settings keeps your UI elements from looking like predictable clones of one another.</p>
+            
+            <!-- Interactive Wobbly Buttons -->
+            <div class="control-grid">
+                <button class="wobbly-btn coral">Neon Sunset</button>
+                <button class="wobbly-btn mint">Cyber Punk</button>
+                <button class="wobbly-btn lavender">Acid Rain</button>
+                <button class="wobbly-btn">Electric Jam</button>
+            </div>
+
+            <div class="code-box">
+                border-radius: 20px 320px 20px 280px / 280px 20px 320px 20px;<br>
+                transform: rotate(0.8deg);
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

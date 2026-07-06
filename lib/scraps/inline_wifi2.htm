@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wi-Fi Signal Strength Showcase</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --inactive: #475569;
+      --excellent: #10b981;
+      --good: #34d399;
+      --fair: #f59e0b;
+      --weak: #ef4444;
+    }
+
+    body {
+      margin: 0;
+      padding: 40px 20px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 2rem;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      margin-bottom: 40px;
+    }
+
+    .container {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+
+    .label {
+      margin-top: 16px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Core SVG Styles */
+    .wifi-icon svg {
+      width: 64px;
+      height: 64px;
+    }
+
+    .wifi-icon .bar {
+      fill: none;
+      stroke: var(--inactive);
+      stroke-width: 2;
+      stroke-linecap: round;
+      transition: stroke 0.2s ease;
+    }
+    
+    .wifi-icon .dot {
+      fill: var(--inactive);
+      transition: fill 0.2s ease;
+    }
+
+    /* --- Signal Strength States --- */
+
+    /* Level 0: Disconnected */
+    .strength-0 .dot, .strength-0 .bar { stroke: var(--inactive); fill: none; }
+    .strength-0 .dot { fill: var(--inactive); }
+
+    /* Level 1: Weak */
+    .strength-1 .dot { fill: var(--weak); }
+
+    /* Level 2: Fair */
+    .strength-2 .dot { fill: var(--fair); }
+    .strength-2 .bar-1 { stroke: var(--fair); }
+
+    /* Level 3: Good */
+    .strength-3 .dot { fill: var(--good); }
+    .strength-3 .bar-1 { stroke: var(--good); }
+    .strength-3 .bar-2 { stroke: var(--good); }
+
+    /* Level 4: Excellent */
+    .strength-4 .dot { fill: var(--excellent); }
+    .strength-4 .bar-1 { stroke: var(--excellent); }
+    .strength-4 .bar-2 { stroke: var(--excellent); }
+    .strength-4 .bar-3 { stroke: var(--excellent); }
+  </style>
+</head>
+<body>
+
+  <h1>Wi-Fi Signal Levels</h1>
+  <p class="subtitle">Pure SVG paths driven completely by CSS states</p>
+
+  <div class="container">
+    
+    <!-- These look tremendous, even scaled up or down. -->
+
+    <!-- 0 Bars / Disconnected -->
+    <div class="card">
+      <div class="wifi-icon strength-0">
+        <svg viewBox="0 0 24 24" xmlns="http://w3.org">
+          <circle class="dot" cx="12" cy="20" r="1.5" />
+          <path class="bar bar-1" d="M9 16 A 4.5 4.5 0 0 1 15 16" />
+          <path class="bar bar-2" d="M6 12 A 9 9 0 0 1 18 12" />
+          <path class="bar bar-3" d="M3 8 A 13.5 13.5 0 0 1 21 8" />
+        </svg>
+      </div>
+      <div class="label">Disconnected</div>
+    </div>
+
+    <!-- 1 Bar / Weak -->
+    <div class="card">
+      <div class="wifi-icon strength-1">
+        <svg viewBox="0 0 24 24" xmlns="http://w3.org">
+          <circle class="dot" cx="12" cy="20" r="1.5" />
+          <path class="bar bar-1" d="M9 16 A 4.5 4.5 0 0 1 15 16" />
+          <path class="bar bar-2" d="M6 12 A 9 9 0 0 1 18 12" />
+          <path class="bar bar-3" d="M3 8 A 13.5 13.5 0 0 1 21 8" />
+        </svg>
+      </div>
+      <div class="label">Weak</div>
+    </div>
+
+    <!-- 2 Bars / Fair -->
+    <div class="card">
+      <div class="wifi-icon strength-2">
+        <svg viewBox="0 0 24 24" xmlns="http://w3.org">
+          <circle class="dot" cx="12" cy="20" r="1.5" />
+          <path class="bar bar-1" d="M9 16 A 4.5 4.5 0 0 1 15 16" />
+          <path class="bar bar-2" d="M6 12 A 9 9 0 0 1 18 12" />
+          <path class="bar bar-3" d="M3 8 A 13.5 13.5 0 0 1 21 8" />
+        </svg>
+      </div>
+      <div class="label">Fair</div>
+    </div>
+
+    <!-- 3 Bars / Good -->
+    <div class="card">
+      <div class="wifi-icon strength-3">
+        <svg viewBox="0 0 24 24" xmlns="http://w3.org">
+          <circle class="dot" cx="12" cy="20" r="1.5" />
+          <path class="bar bar-1" d="M9 16 A 4.5 4.5 0 0 1 15 16" />
+          <path class="bar bar-2" d="M6 12 A 9 9 0 0 1 18 12" />
+          <path class="bar bar-3" d="M3 8 A 13.5 13.5 0 0 1 21 8" />
+        </svg>
+      </div>
+      <div class="label">Good</div>
+    </div>
+
+    <!-- 4 Bars / Excellent -->
+    <div class="card">
+      <div class="wifi-icon strength-4">
+        <svg viewBox="0 0 24 24" xmlns="http://w3.org">
+          <circle class="dot" cx="12" cy="20" r="1.5" />
+          <path class="bar bar-1" d="M9 16 A 4.5 4.5 0 0 1 15 16" />
+          <path class="bar bar-2" d="M6 12 A 9 9 0 0 1 18 12" />
+          <path class="bar bar-3" d="M3 8 A 13.5 13.5 0 0 1 21 8" />
+        </svg>
+      </div>
+      <div class="label">Excellent</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

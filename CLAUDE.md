@@ -55,10 +55,20 @@ json += "more";
 ### WiFi Access Point Configuration
 - IP configuration (`WiFi.softAPConfig()`) must happen **before** `WiFi.softAP()`
 - Open network: use `WiFi.softAP(ssid)` with NO password parameter
-- **CRITICAL**: Provisioning mode must use `WIFI_AP_STA` mode (not `WIFI_AP`)
-  - This allows testing WiFi credentials while keeping the AP alive
-  - Without this, switching to STA mode disconnects the client before HTTP response is sent
-  - Client sees "Connection failed" even though connection succeeds and device reboots
+- **CRITICAL**: Use pure `WIFI_AP` mode during provisioning — do NOT use `WIFI_AP_STA`
+  - The CYW43439 is a single-radio chip; AP+STA mode causes AP dropouts during authentication
+  - This means you cannot reliably test credentials while the AP is running
+  - Any attempt to call `WiFi.begin()` in AP mode will disrupt existing client connections
+
+### Provisioning Pattern (Industry Standard)
+The correct pattern for single-radio chips — do not try to be clever with AP+STA:
+1. Device in pure `WIFI_AP` mode — fully stable, no radio contention
+2. User submits credentials via captive portal
+3. Device **saves credentials to flash** and sends HTTP 200 response
+4. Device **defers reboot** (~1.5s) via a flag checked in `loop()` — never call `rp2040.reboot()` directly inside a handler, as it kills the TCP stack before the response flushes
+5. Device reboots into pure `WIFI_STA` mode and tests credentials
+6. On failure: clears credentials, falls back to provisioning AP mode
+7. On success: starts mDNS, serves connected page
 
 ### WiFi Status Constants
 - `WL_WRONG_PASSWORD` is not available in the Earle Philhower core
@@ -95,16 +105,16 @@ On boot, the system:
 **Provisioning Mode:**
 - `GET /` - Serves provisioning HTML page
 - `GET /api/scan` - Returns JSON list of WiFi networks
-- `POST /api/connect` - Accepts `{ssid, password}`, attempts connection, reboots on success
+- `POST /api/connect` - Accepts `{ssid, password}`, saves credentials to flash, schedules deferred reboot
 
 **Connected Mode:**
 - `GET /` - Serves "Hello World" status page
 - `GET /api/status` - Returns JSON with `{status, ssid, ip, rssi}`
 
 ### Reboot Behavior
-- After successful WiFi connection, device reboots using `rp2040.reboot()`
-- This ensures clean state transition from AP mode to Station mode
-- 1 second delay before reboot allows HTTP response to be sent
+- **Never call `rp2040.reboot()` inside an HTTP handler** — the TCP stack shuts down before the response flushes
+- Use a deferred reboot instead: set `rebootPending = true` and `rebootAt = millis() + 1500` in the handler, check in `loop()`
+- This guarantees the HTTP 200 response reaches the browser before the AP disappears
 
 ### Factory Reset
 - Hold BOOTSEL button for 5 seconds at any time to trigger factory reset

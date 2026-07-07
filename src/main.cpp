@@ -3,6 +3,7 @@
 #include <WebServer.h>
 #include <DNSServer.h>
 #include <LittleFS.h>
+#include <LEAmDNS.h>
 
 // Access Point configuration
 const char* AP_SSID = "Blossom_Setup";
@@ -19,6 +20,26 @@ const byte DNS_PORT = 53;
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 25
 #endif
+
+// Credential storage
+const char* CRED_FILE = "/wifi_creds.txt";
+
+// Operation modes
+enum SystemMode {
+  MODE_PROVISIONING,
+  MODE_CONNECTED
+};
+
+SystemMode currentMode = MODE_PROVISIONING;
+
+// Deferred reboot - lets HTTP response flush before AP goes down
+bool rebootPending = false;
+unsigned long rebootAt = 0;
+
+// Factory reset button tracking
+unsigned long bootselPressStart = 0;
+bool bootselPressedLastLoop = false;
+const unsigned long FACTORY_RESET_HOLD_TIME = 5000;  // 5 seconds
 
 // HTML page with beautiful redesign
 const char index_html[] PROGMEM = R"rawliteral(
@@ -474,14 +495,37 @@ const char index_html[] PROGMEM = R"rawliteral(
 
         function connectWiFi() {
             const password = document.getElementById('wifi-password').value;
+            const statusEl = document.getElementById('status-message');
 
             if (!selectedNetwork) {
-                alert('Please select a network first');
+                statusEl.style.display = 'block';
+                statusEl.style.borderColor = '#d32f2f';
+                statusEl.style.color = '#d32f2f';
+                statusEl.textContent = '✗ Please select a network first';
                 return;
             }
 
-            // TODO: Send credentials to device
-            alert('Connect functionality coming next!\\nNetwork: ' + selectedNetwork);
+            statusEl.style.display = 'block';
+            statusEl.style.borderColor = '#1976d2';
+            statusEl.style.color = '#1976d2';
+            statusEl.textContent = '⟳ Saving credentials...';
+
+            fetch('/api/connect', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ssid: selectedNetwork, password: password })
+            })
+            .then(r => r.json())
+            .then(data => {
+                statusEl.style.borderColor = '#2e7d32';
+                statusEl.style.color = '#2e7d32';
+                statusEl.textContent = '✓ Saved! Device is rebooting to connect...';
+            })
+            .catch(() => {
+                statusEl.style.borderColor = '#d32f2f';
+                statusEl.style.color = '#d32f2f';
+                statusEl.textContent = '✗ Could not reach device - please try again';
+            });
         }
     </script>
 
@@ -528,8 +572,176 @@ const char index_html[] PROGMEM = R"rawliteral(
 </html>
 )rawliteral";
 
+// Connected mode HTML - simple Hello World page
+const char connected_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blossom</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 {
+            color: #764ba2;
+            margin: 0 0 20px 0;
+            font-size: 2.5rem;
+        }
+        p {
+            color: #555;
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+        .status {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .status strong {
+            color: #2e7d32;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🪷 Blossom 🪷</h1>
+        <p>Your ambient light display is connected!</p>
+        <div class="status">
+            <strong>✓ Status:</strong> Online<br>
+            <strong>📡 Network:</strong> <span id="ssid">Loading...</span><br>
+            <strong>🌐 IP:</strong> <span id="ip">Loading...</span><br>
+            <strong>🔗 Hostname:</strong> <code>blossom.local</code>
+        </div>
+        <p style="color: #888; font-size: 0.9rem;">API endpoint: <code>http://blossom.local/api/effect</code></p>
+    </div>
+    <script>
+        fetch('/api/status')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('ssid').textContent = data.ssid || 'Unknown';
+                document.getElementById('ip').textContent = data.ip || 'Unknown';
+            })
+            .catch(e => console.error('Status fetch failed:', e));
+    </script>
+</body>
+</html>
+)rawliteral";
+
+// Helper: Save WiFi credentials to LittleFS
+bool saveCredentials(const String& ssid, const String& password) {
+  File file = LittleFS.open(CRED_FILE, "w");
+  if (!file) {
+    Serial.println("✗ Failed to open credentials file for writing");
+    return false;
+  }
+  
+  file.println(ssid);
+  file.println(password);
+  file.close();
+  
+  Serial.println("✓ Credentials saved to flash");
+  return true;
+}
+
+// Helper: Load WiFi credentials from LittleFS
+bool loadCredentials(String& ssid, String& password) {
+  if (!LittleFS.exists(CRED_FILE)) {
+    Serial.println("No credentials file found");
+    return false;
+  }
+  
+  File file = LittleFS.open(CRED_FILE, "r");
+  if (!file) {
+    Serial.println("✗ Failed to open credentials file for reading");
+    return false;
+  }
+  
+  ssid = file.readStringUntil('\n');
+  password = file.readStringUntil('\n');
+  file.close();
+  
+  // Trim whitespace/newlines
+  ssid.trim();
+  password.trim();
+  
+  if (ssid.length() == 0) {
+    Serial.println("✗ Invalid credentials in file");
+    return false;
+  }
+  
+  Serial.println("✓ Credentials loaded from flash");
+  return true;
+}
+
+// Helper: Clear stored credentials
+void clearCredentials() {
+  if (LittleFS.exists(CRED_FILE)) {
+    LittleFS.remove(CRED_FILE);
+    Serial.println("✓ Credentials cleared");
+  }
+}
+
+// Helper: Attempt to connect to WiFi (blocking - used at boot time only)
+bool connectToWiFi(const String& ssid, const String& password, int timeoutSeconds = 15) {
+  Serial.print("Connecting to WiFi: ");
+  Serial.println(ssid);
+  Serial.print("Password: ");
+  for (int i = 0; i < password.length(); i++) {
+    Serial.print("*");
+  }
+  Serial.println();
+  
+  WiFi.mode(WIFI_STA);  // Boot-time: pure STA, no AP needed
+  WiFi.begin(ssid.c_str(), password.c_str());
+  
+  unsigned long startTime = millis();
+  while (WiFi.status() != WL_CONNECTED) {
+    if (millis() - startTime > timeoutSeconds * 1000) {
+      Serial.println("\n✗ Connection timeout");
+      return false;
+    }
+    delay(500);
+    Serial.print(".");
+  }
+  
+  Serial.println("\n✓ WiFi connected!");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+  
+  return true;
+}
+
 void handleRoot() {
-  server.send(200, "text/html", index_html);
+  if (currentMode == MODE_PROVISIONING) {
+    server.send(200, "text/html", index_html);
+  } else {
+    server.send(200, "text/html", connected_html);
+  }
 }
 
 void handleFont() {
@@ -552,6 +764,65 @@ void handleFredokaFont() {
   } else {
     server.send(404, "text/plain", "Font not found");
   }
+}
+
+void handleConnect() {
+  if (!server.hasArg("plain")) {
+    server.send(400, "application/json", "{\"error\":\"No data received\"}");
+    return;
+  }
+  
+  String body = server.arg("plain");
+  
+  // Simple JSON parsing
+  int ssidStart = body.indexOf("\"ssid\":\"") + 8;
+  int ssidEnd = body.indexOf("\"", ssidStart);
+  int passStart = body.indexOf("\"password\":\"") + 12;
+  int passEnd = body.indexOf("\"", passStart);
+  
+  if (ssidStart < 8 || ssidEnd < 0 || passStart < 12 || passEnd < 0) {
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(400, "application/json", "{\"error\":\"Invalid JSON format\"}");
+    return;
+  }
+  
+  String ssid = body.substring(ssidStart, ssidEnd);
+  String password = body.substring(passStart, passEnd);
+  
+  Serial.print("Connect request - SSID: ");
+  Serial.println(ssid);
+  Serial.print("Password: ");
+  for (int i = 0; i < password.length(); i++) Serial.print("*");
+  Serial.println();
+  
+  // Save credentials now while AP is fully up (no radio contention)
+  saveCredentials(ssid, password);
+  
+  // Respond immediately - AP is still alive so response is guaranteed to arrive
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "application/json", "{\"status\":\"saved\"}");
+  
+  // Defer the reboot so loop() can finish flushing the TCP response first
+  rebootPending = true;
+  rebootAt = millis() + 1500;
+  Serial.println("Credentials saved. Rebooting in 1.5s to test connection...");
+}
+
+void handleStatus() {
+  String json = "{";
+  json += "\"status\":\"connected\",";
+  json += "\"ssid\":\"";
+  json += WiFi.SSID();
+  json += "\",";
+  json += "\"ip\":\"";
+  json += WiFi.localIP().toString();
+  json += "\",";
+  json += "\"rssi\":";
+  json += String(WiFi.RSSI());
+  json += "}";
+  
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "application/json", json);
 }
 
 void handleScan() {
@@ -639,27 +910,76 @@ void setup() {
   delay(1000);
 
   Serial.println("\n\n=================================");
-  Serial.println("Blossom - WiFi Setup Portal");
+  Serial.println("Blossom - Programmable Light Display");
   Serial.println("=================================\n");
 
   // Initialize LED
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 
-  // Initialize LittleFS for font file
+  // Initialize LittleFS
   if (!LittleFS.begin()) {
-    Serial.println("⚠ LittleFS mount failed - font won't load");
+    Serial.println("⚠ LittleFS mount failed");
     Serial.println("  Run: pio run --target uploadfs");
   } else {
     Serial.println("✓ LittleFS mounted");
   }
 
-  // Start Access Point
-  Serial.println("Starting Access Point...");
+  // Check for stored credentials
+  String savedSSID, savedPassword;
+  bool hasCredentials = loadCredentials(savedSSID, savedPassword);
+
+  if (hasCredentials) {
+    // Try to connect to saved network
+    Serial.println("Found saved credentials, attempting connection...");
+    
+    if (connectToWiFi(savedSSID, savedPassword, 20)) {
+      // Successfully connected!
+      currentMode = MODE_CONNECTED;
+      digitalWrite(LED_BUILTIN, HIGH);
+      
+      // Initialize mDNS
+      if (MDNS.begin("blossom")) {
+        Serial.println("✓ mDNS responder started");
+        Serial.println("  Hostname: blossom.local");
+        MDNS.addService("http", "tcp", 80);
+      } else {
+        Serial.println("✗ mDNS setup failed");
+      }
+      
+      // Configure web server for connected mode
+      server.on("/", handleRoot);
+      server.on("/api/status", handleStatus);
+      server.onNotFound(handleNotFound);
+      
+      server.begin();
+      Serial.println("✓ Web server started (connected mode)");
+      Serial.println("\n=================================");
+      Serial.println("✓ CONNECTED TO WIFI");
+      Serial.print("Network: ");
+      Serial.println(WiFi.SSID());
+      Serial.print("IP: ");
+      Serial.println(WiFi.localIP());
+      Serial.println("Hostname: blossom.local");
+      Serial.println("=================================\n");
+      
+      return;  // Skip provisioning setup
+    } else {
+      // Connection failed, clear bad credentials and fall through to provisioning
+      Serial.println("✗ Saved credentials failed, clearing and starting provisioning");
+      clearCredentials();
+    }
+  } else {
+    Serial.println("No saved credentials found");
+  }
+
+  // Start provisioning mode
+  currentMode = MODE_PROVISIONING;
+  Serial.println("Starting Provisioning Mode...");
   Serial.print("SSID: ");
   Serial.println(AP_SSID);
 
-  // Set WiFi mode
+  // Pure AP mode - no radio contention with STA during provisioning
   WiFi.mode(WIFI_AP);
 
   // Configure AP IP address BEFORE starting AP
@@ -690,11 +1010,12 @@ void setup() {
   dnsServer.start(DNS_PORT, "*", IP);
   Serial.println("✓ DNS server started (captive portal active)");
 
-  // Configure web server routes
+  // Configure web server routes for provisioning mode
   server.on("/", handleRoot);
   server.on("/fonts/Gluten.ttf", handleFont);
   server.on("/fonts/Fredoka.ttf", handleFredokaFont);
-  server.on("/api/scan", handleScan);  // WiFi scan endpoint
+  server.on("/api/scan", handleScan);
+  server.on("/api/connect", HTTP_POST, handleConnect);
   server.onNotFound(handleNotFound);
 
   // Start web server
@@ -707,16 +1028,95 @@ void setup() {
 }
 
 void loop() {
-  // Process DNS requests (for captive portal)
-  dnsServer.processNextRequest();
-
-  // Handle web server requests
-  server.handleClient();
-
-  // Optional: Blink LED to show we're alive
-  static unsigned long lastBlink = 0;
-  if (millis() - lastBlink > 2000) {
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    lastBlink = millis();
+  // Factory reset: Check BOOTSEL button
+  bool bootselPressed = BOOTSEL;
+  
+  if (bootselPressed && !bootselPressedLastLoop) {
+    // Button just pressed - start timer
+    bootselPressStart = millis();
+    Serial.println("\nBOOTSEL button pressed - hold for 5 seconds to factory reset...");
   }
+  
+  if (bootselPressed && bootselPressedLastLoop) {
+    // Button is being held - check duration
+    unsigned long holdDuration = millis() - bootselPressStart;
+    
+    // Rapid LED blink during hold to give feedback
+    digitalWrite(LED_BUILTIN, (millis() / 100) % 2);
+    
+    // Print countdown every second
+    static unsigned long lastCountdown = 0;
+    if (millis() - lastCountdown > 1000) {
+      int secondsLeft = (FACTORY_RESET_HOLD_TIME - holdDuration) / 1000;
+      if (secondsLeft >= 0) {
+        Serial.print("Factory reset in ");
+        Serial.print(secondsLeft + 1);
+        Serial.println(" seconds...");
+      }
+      lastCountdown = millis();
+    }
+    
+    if (holdDuration >= FACTORY_RESET_HOLD_TIME) {
+      // Factory reset triggered!
+      Serial.println("\n=================================");
+      Serial.println("FACTORY RESET TRIGGERED");
+      Serial.println("=================================");
+      
+      // Flash LED rapidly to confirm
+      for (int i = 0; i < 10; i++) {
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(50);
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(50);
+      }
+      
+      // Clear credentials
+      clearCredentials();
+      
+      Serial.println("Rebooting to provisioning mode...");
+      delay(500);
+      rp2040.reboot();
+    }
+  }
+  
+  if (!bootselPressed && bootselPressedLastLoop) {
+    // Button released before 5 seconds
+    unsigned long holdDuration = millis() - bootselPressStart;
+    if (holdDuration < FACTORY_RESET_HOLD_TIME) {
+      Serial.println("BOOTSEL button released - factory reset cancelled");
+    }
+  }
+  
+  bootselPressedLastLoop = bootselPressed;
+
+  // Deferred reboot - fires after HTTP response has had time to flush
+  if (rebootPending && millis() >= rebootAt) {
+    rp2040.reboot();
+  }
+
+  // Normal operation based on mode
+  if (currentMode == MODE_PROVISIONING) {
+    // Process DNS requests (for captive portal)
+    dnsServer.processNextRequest();
+    
+    // Blink LED in provisioning mode (unless BOOTSEL is pressed)
+    if (!bootselPressed) {
+      static unsigned long lastBlink = 0;
+      if (millis() - lastBlink > 2000) {
+        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+        lastBlink = millis();
+      }
+    }
+  } else {
+    // Connected mode - update mDNS
+    MDNS.update();
+    
+    // Keep LED solid on when connected (unless BOOTSEL is pressed)
+    if (!bootselPressed) {
+      digitalWrite(LED_BUILTIN, HIGH);
+    }
+  }
+
+  // Handle web server requests (both modes)
+  server.handleClient();
 }

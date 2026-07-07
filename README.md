@@ -26,7 +26,7 @@ The Pico W operates on a 3.3V logic level. Because NeoPixel LEDs require a data 
 #### 2.3 Physical Escape Hatch (Factory Reset)
 
 The enclosure must feature a precision pinhole perfectly aligned with the Pico's native BOOTSEL button (or a dedicated hardware reset pin).
-Behavior: Holding this button down via a paperclip for 5 seconds during power-on will clear all stored network configurations from non-volatile memory and force the device back into provisioning mode.
+Behavior: Holding this button down via a paperclip for 5 seconds during operation will clear all stored network configurations from non-volatile memory and reboot the device back into provisioning mode.
 
 ### 3. Firmware Architecture & State Machine
 

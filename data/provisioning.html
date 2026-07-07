@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blossom Setup</title>
+    <style>
+        @font-face {
+            font-family: 'Gluten';
+            src: url('/fonts/Gluten.ttf') format('truetype');
+            font-weight: 100 900;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Fredoka';
+            src: url('/fonts/Fredoka.ttf') format('truetype');
+            font-weight: 300 700;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fredoka', Arial, sans-serif;
+            background: linear-gradient(135deg, #3d53b8 0%, #4e306b 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* --- Torn Paper Container --- */
+        .container {
+            position: relative;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #EAD8C1;
+            border: 3px solid #83786bc2;
+            border-radius: 15px;
+            box-shadow: 8px 8px 0px #3b2b188a;
+            filter: url('#wriggly-container');
+            transform: rotate(0.5deg);
+            z-index: -1;
+        }
+
+        h1 {
+            font-family: 'Gluten', Arial, sans-serif;
+            color: #1e1e1e;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 0px #667eea;
+            font-variation-settings: 'wght' 700, 'slnt' -10;
+        }
+
+        /* --- Torn Paper Network Table Wrapper --- */
+        .network-table-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 8px; /* Inset content from border */
+            z-index: 1;
+        }
+
+        .network-table-wrapper::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #e9dfd3;
+            border: 3px solid #83786bc2;
+            border-radius: 12px;
+            box-shadow: -2px -2px 0px #3b2b188a;
+            filter: url('#wriggly-table');
+            transform: rotate(-0.3deg);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .network-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: transparent;
+        }
+
+        .network-table tr {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .network-table tr:hover {
+            background: #e3e4c0;
+        }
+
+        .network-table tr.selected {
+            background: #ece7e0;
+        }
+
+        .network-table td {
+            padding: 12px;
+        }
+
+        .network-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .network-table tr:first-child td:first-child {
+            border-radius: 8px 0 0 0; /* Round top-left on first row */
+        }
+
+        .network-table tr:first-child td:last-child {
+            border-radius: 0 8px 0 0; /* Round top-right on first row */
+        }
+
+        .network-table tr:last-child td:first-child {
+            border-radius: 0 0 0 8px; /* Round bottom-left on last row */
+        }
+
+        .network-table tr:last-child td:last-child {
+            border-radius: 0 0 8px 0; /* Round bottom-right on last row */
+        }
+
+        .network-table td:first-child {
+            width: 40px;
+            text-align: center;
+            filter: url('#wriggly-radio'); /* Hand-drawn radio buttons */
+        }
+
+        .network-table td:nth-child(2) {
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-size: 16px;
+            color: #1e1e1e;
+            font-weight: 500;
+        }
+
+        .network-table td:last-child {
+            width: 50px;
+            text-align: center;
+        }
+
+        input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #1e1e1e;
+        }
+
+        .wifi-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+        }
+
+        .wifi-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .wifi-icon .bar {
+            fill: none;
+            stroke: #cbd5e1;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        .wifi-icon .dot {
+            fill: #cbd5e1;
+        }
+
+        /* Signal strength colors */
+        .strength-excellent .dot { fill: #10b981; }
+        .strength-excellent .bar-1,
+        .strength-excellent .bar-2,
+        .strength-excellent .bar-3 { stroke: #10b981; }
+
+        .strength-good .dot { fill: #34d399; }
+        .strength-good .bar-1,
+        .strength-good .bar-2 { stroke: #34d399; }
+
+        .strength-fair .dot { fill: #f59e0b; }
+        .strength-fair .bar-1 { stroke: #f59e0b; }
+
+        .strength-weak .dot { fill: #ef4444; }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        /* --- Torn Paper Button Base --- */
+        button {
+            position: relative;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            color: #1e1e1e;
+            background: transparent;
+            border: 0;
+            padding: 14px 24px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+            z-index: 1;
+        }
+
+        button::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #6bf1a4; /* Default mint color */
+            border: 3px solid #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 4px 4px 0px #1e1e1e;
+            z-index: -1;
+            transition: background-color 0.2s ease;
+        }
+
+        button.refresh::before {
+            filter: url('#wriggly-btn-1');
+            transform: rotate(0.8deg);
+            background-color: #cca4ff; /* Lavender */
+        }
+
+        button.connect {
+            padding: 16px 24px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        button.connect::before {
+            filter: url('#wriggly-btn-2');
+            transform: rotate(-1deg);
+            background-color: #ff858d; /* Coral */
+        }
+
+        button:hover {
+            transform: scale(1.05) translateY(-2px);
+        }
+
+        button:hover::before {
+            background-color: #ffffff;
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+        }
+
+        button:active::before {
+            box-shadow: 2px 2px 0px #1e1e1e;
+        }
+
+        /* --- Torn Paper Password Input Wrapper --- */
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-wrapper::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ece7e0;
+            border: 3px solid #83786bc2;
+            border-radius: 10px;
+            box-shadow: -2px -2px 0px #3b2b188a;
+            filter: url('#wriggly-input');
+            transform: rotate(-0.2deg);
+            z-index: -1;
+            pointer-events: none;
+            transition: all 0.2s;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 14px;
+            border: 0;
+            background: transparent;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-size: 16px;
+            color: #1e1e1e;
+            transition: all 0.2s;
+        }
+
+        input[type="password"]:focus {
+            outline: none;
+        }
+
+        .input-wrapper:focus-within::before {
+            box-shadow: -3px -3px 0px #3b2b188a;
+            transform: rotate(-0.2deg) translateY(-1px);
+        }
+
+        /* --- Status Message Stamp --- */
+        .status {
+            position: relative;
+            text-align: center;
+            padding: 12px;
+            color: #2e7d32;
+            margin-bottom: 20px;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-weight: 600;
+            display: none;
+            z-index: 1;
+        }
+
+        .status::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ead8c100; /* Transparent */
+            border: 3px solid #2e7d32;
+            border-radius: 10px;
+            filter: url('#wriggly-status');
+            transform: rotate(-0.5deg);
+            z-index: -1;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🪷 Blossom 🪷</h1>
+
+        <div class="status" id="status-message"></div>
+
+        <div class="network-table-wrapper">
+            <table class="network-table" id="network-table">
+                <tbody id="network-list">
+                    <tr>
+                        <td colspan="3" class="loading">Scanning networks...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="controls">
+            <button class="refresh" onclick="refreshNetworks()">Refresh Networks</button>
+            <div class="input-wrapper">
+                <input type="password" id="wifi-password" placeholder="Network Password">
+            </div>
+            <button class="connect" onclick="connectWiFi()">Connect to Network</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedNetwork = null;
+
+        // Get WiFi icon SVG based on signal strength
+        function getWiFiIcon(rssi) {
+            let strengthClass = 'strength-weak';
+            if (rssi >= -50) strengthClass = 'strength-excellent';
+            else if (rssi >= -60) strengthClass = 'strength-good';
+            else if (rssi >= -70) strengthClass = 'strength-fair';
+
+            return `
+                <div class="wifi-icon ${strengthClass}">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <circle class="dot" cx="12" cy="20" r="1.5" />
+                        <path class="bar bar-1" d="M9 16 A 4.5 4.5 0 0 1 15 16" />
+                        <path class="bar bar-2" d="M6 12 A 9 9 0 0 1 18 12" />
+                        <path class="bar bar-3" d="M3 8 A 13.5 13.5 0 0 1 21 8" />
+                    </svg>
+                </div>
+            `;
+        }
+
+        // Scan for WiFi networks on page load
+        window.onload = function() {
+            scanNetworks();
+        };
+
+        function refreshNetworks() {
+            selectedNetwork = null;
+            document.getElementById('network-list').innerHTML =
+                '<tr><td colspan="3" class="loading">Scanning networks...</td></tr>';
+            scanNetworks();
+        }
+
+        function scanNetworks() {
+            fetch('/api/scan')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('network-list');
+                    tbody.innerHTML = '';
+
+                    if (data.networks && data.networks.length > 0) {
+                        data.networks.forEach((network, index) => {
+                            const row = document.createElement('tr');
+                            row.onclick = () => selectNetwork(network.ssid, row);
+
+                            row.innerHTML = `
+                                <td><input type="radio" name="network" value="${network.ssid}" id="net-${index}"></td>
+                                <td><label for="net-${index}" style="cursor: pointer;">${network.ssid}</label></td>
+                                <td>${getWiFiIcon(network.rssi)}</td>
+                            `;
+
+                            tbody.appendChild(row);
+                        });
+
+                        document.getElementById('status-message').style.display = 'block';
+                        document.getElementById('status-message').textContent =
+                            `✓ Found ${data.networks.length} network(s)`;
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="3" class="loading">No networks found</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Scan error:', error);
+                    document.getElementById('network-list').innerHTML =
+                        '<tr><td colspan="3" class="loading">Scan failed - click refresh</td></tr>';
+                });
+        }
+
+        function selectNetwork(ssid, row) {
+            selectedNetwork = ssid;
+
+            // Remove selected class from all rows
+            document.querySelectorAll('.network-table tr').forEach(r => {
+                r.classList.remove('selected');
+            });
+
+            // Add selected class to clicked row
+            row.classList.add('selected');
+
+            // Check the radio button
+            row.querySelector('input[type="radio"]').checked = true;
+        }
+
+        function connectWiFi() {
+            const password = document.getElementById('wifi-password').value;
+            const statusEl = document.getElementById('status-message');
+
+            if (!selectedNetwork) {
+                statusEl.style.display = 'block';
+                statusEl.style.borderColor = '#d32f2f';
+                statusEl.style.color = '#d32f2f';
+                statusEl.textContent = '✗ Please select a network first';
+                return;
+            }
+
+            statusEl.style.display = 'block';
+            statusEl.style.borderColor = '#1976d2';
+            statusEl.style.color = '#1976d2';
+            statusEl.textContent = '⟳ Saving credentials...';
+
+            fetch('/api/connect', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ssid: selectedNetwork, password: password })
+            })
+            .then(r => r.json())
+            .then(data => {
+                statusEl.style.borderColor = '#2e7d32';
+                statusEl.style.color = '#2e7d32';
+                statusEl.textContent = '✓ Saved! Blossom will now restart...';
+            })
+            .catch(() => {
+                statusEl.style.borderColor = '#d32f2f';
+                statusEl.style.color = '#d32f2f';
+                statusEl.textContent = '✗ Could not reach device - please try again';
+            });
+        }
+    </script>
+
+    <!-- SVG Filters for Torn Paper Effect -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <defs>
+            <filter id="wriggly-container">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="99" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            
+            <filter id="wriggly-table">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="42" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            
+            <filter id="wriggly-btn-1">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="12" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            
+            <filter id="wriggly-btn-2">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="78" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            
+            <filter id="wriggly-status">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="33" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            
+            <filter id="wriggly-radio">
+                <feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves="2" seed="87" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            
+            <filter id="wriggly-input">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="55" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
+</body>
+</html>

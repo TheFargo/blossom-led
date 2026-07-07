@@ -113,7 +113,8 @@ On boot, the system:
 
 ### Reboot Behavior
 - **Never call `rp2040.reboot()` inside an HTTP handler** — the TCP stack shuts down before the response flushes
-- Use a deferred reboot instead: set `rebootPending = true` and `rebootAt = millis() + 1500` in the handler, check in `loop()`
+- Call `scheduleReboot(1500)` instead — this is a function defined in `main.cpp` that sets `rebootPending = true` and a future timestamp; `loop()` fires it after the TCP stack has had time to flush
+- `scheduleReboot()` is declared in `web_handlers.h` (consumed there) and defined in `main.cpp`
 - This guarantees the HTTP 200 response reaches the browser before the AP disappears
 
 ### Factory Reset
@@ -125,9 +126,93 @@ On boot, the system:
 - Uses `BOOTSEL` constant to read button state (Earle Philhower core)
 
 ## Development Workflow
-1. Make code changes
-2. **Run build test** (see command above)
-3. Fix any compilation errors
-4. Upload to device
-5. Test via serial monitor and web interface
-6. Only then mark task complete
+
+There are now **two independent upload workflows** — use only the one that matches what changed:
+
+### C++ code changed (any .cpp / .h file)
+1. Run build: `platformio.exe run`
+2. Fix any errors
+3. Upload firmware: `platformio.exe run --target upload`
+4. Test via serial monitor
+
+### HTML/CSS/JS changed (data/provisioning.html or data/connected.html)
+1. Upload filesystem only: `platformio.exe run --target uploadfs`
+2. No recompile or firmware upload needed
+3. Reload the page in the browser
+
+### Both changed
+Run `uploadfs` first, then `upload`.
+
+## Code Architecture
+
+The firmware is split into focused modules. `main.cpp` is the state machine only — ~190 lines.
+
+```
+include/                    src/
+  credentials.h    <-->       credentials.cpp     save/load/clearCredentials, CRED_FILE
+  wifi_manager.h   <-->       wifi_manager.cpp    connectToWiFi(), startProvisioningAP()
+  web_handlers.h   <-->       web_handlers.cpp    all HTTP handlers + setupProvisioningRoutes/setupConnectedRoutes
+  led_controller.h <-->       led_controller.cpp  initLEDs(), setEffect(), updateLEDs() [STUB]
+                              main.cpp            setup(), loop(), setup1(), loop1()
+
+data/
+  provisioning.html           WiFi setup page — served from LittleFS
+  connected.html              Status page — served from LittleFS
+  fonts/Gluten.ttf
+  fonts/Fredoka.ttf
+```
+
+### Cross-file dependency pattern
+`WebServer server(80)` and `DNSServer dnsServer` are defined as globals in `main.cpp`. Modules that need them use `extern` declarations in their header:
+```cpp
+// web_handlers.h
+extern WebServer server;
+```
+All HTTP handler functions in `web_handlers.cpp` are `static` (file-local) — only the two route-setup functions are public API.
+
+### HTML pages are served from LittleFS
+Both pages live in `data/` and are streamed with `server.streamFile()`. The PROGMEM approach has been retired. To update a page: edit the HTML file, run `uploadfs`. No recompile.
+
+### scheduleReboot()
+Defined in `main.cpp`, declared in `web_handlers.h`. Handlers call this instead of touching raw globals:
+```cpp
+scheduleReboot(1500);  // 1.5 second delay before rp2040.reboot() fires in loop()
+```
+
+## LED Implementation
+
+The LED controller stub is ready in `include/led_controller.h` and `src/led_controller.cpp`.
+
+### Dual-core entry points (Earle Philhower Arduino)
+`setup1()` and `loop1()` are defined at the bottom of `main.cpp`. Core 1 starts automatically after Core 0's `setup()` completes. When LED work begins:
+1. Uncomment `initLEDs()` in `setup1()`
+2. Uncomment `updateLEDs()` in `loop1()`
+
+### LED controller interface
+```cpp
+void initLEDs();
+void setEffect(const char* name, uint32_t color, float speed, unsigned long duration);
+void updateLEDs();  // called from loop1() at ~60 FPS
+```
+- `color` is a packed `uint32_t` (e.g. GRBW format for NeoPixels)
+- `duration` in milliseconds, 0 = loop until next command
+- `speed` is a float modifier (1.0 = normal rate)
+
+### Hardware notes for LED wiring
+- NeoPixel ring powered from **VBUS (5V)** — not 3.3V
+- Pico GPIO is 3.3V; NeoPixels need ≥3.5V signal — a **logic level shifter** (74AHCT125 or equivalent) is **required** between GPIO and LED data line
+- LED data GPIO pin: TBD — pick a free GPIO and define `LED_PIN` in `led_controller.cpp`
+- LED count: TBD — define `LED_COUNT` in `led_controller.cpp`
+
+### Inter-core communication
+Effect commands arrive on Core 0 (HTTP handler) and must reach Core 1 (animation engine). Use the Pico SDK hardware FIFO queue — **do not use a plain global struct without a mutex**:
+```cpp
+#include <pico/util/queue.h>
+queue_t effectQueue;  // initialized in initLEDs(), push from setEffect(), pop in updateLEDs()
+```
+
+### NeoPixel library decision
+Library not yet chosen. Options:
+- **Adafruit_NeoPixel** — simple, well-documented, single-file
+- **FastLED** — more animation primitives, wider community
+- **PIO direct** — maximum control and performance, but requires writing PIO assembly

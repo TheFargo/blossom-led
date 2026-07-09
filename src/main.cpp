@@ -19,10 +19,13 @@
 WebServer server(80);
 DNSServer dnsServer;
 
+// LED state tracking (exposed to web_handlers.cpp via extern)
+bool ledState = true;
+
 // System state
 enum SystemMode {
-  MODE_PROVISIONING,
-  MODE_CONNECTED
+  MODE_PROVISIONING,  // AP mode: no credentials, auth failure, or network unavailable
+  MODE_CONNECTED      // STA mode: fully on WiFi, WebServer running
 };
 SystemMode currentMode = MODE_PROVISIONING;
 
@@ -87,8 +90,20 @@ void setup() {
       return;
     }
 
-    Serial.println("x Saved credentials failed -- clearing and starting provisioning");
-    clearCredentials();
+    // Distinguish why the connection failed before deciding what to do with credentials.
+    // WL_CONNECT_FAILED means the password was rejected — credentials are definitively wrong.
+    // Any other failure (timeout, WL_NO_SSID_AVAIL) means the network was unreachable —
+    // could be temporary outage OR a new location.  Keep credentials either way: a power
+    // cycle will retry automatically, and the provisioning AP lets the user reconfigure
+    // immediately without needing to know about stored credentials.
+    if (WiFi.status() == WL_CONNECT_FAILED) {
+      Serial.println("x Authentication failed -- clearing credentials");
+      clearCredentials();
+    } else {
+      Serial.println("x Network unreachable -- credentials preserved, starting provisioning AP");
+      Serial.println("  (Power cycle will retry stored credentials automatically)");
+    }
+    // fall through to start the provisioning AP in both cases
   } else {
     Serial.println("No saved credentials found");
   }
@@ -164,11 +179,31 @@ void loop() {
         lastBlink = millis();
       }
     }
-  } else {
+  } else {  // MODE_CONNECTED
     MDNS.update();
 
+    // WiFi watchdog: if the connection drops (e.g. router reboot, brief outage),
+    // the WebServer and lwIP stack won't recover on their own.  After a 30-second
+    // grace period we reboot — the device reconnects in ~10 s and re-advertises
+    // blossom.local via mDNS.  Core 1 / LEDs are unaffected during the wait.
+    static bool          wifiWasLost = false;
+    static unsigned long wifiLostAt  = 0;
+    if (WiFi.status() != WL_CONNECTED) {
+      if (!wifiWasLost) {
+        wifiWasLost = true;
+        wifiLostAt  = millis();
+        Serial.println("! WiFi disconnected -- will reboot in 30 s if not restored");
+      } else if (millis() - wifiLostAt >= 30000UL) {
+        Serial.println("! WiFi lost for 30 s -- rebooting to reconnect");
+        delay(100);
+        rp2040.reboot();
+      }
+    } else {
+      wifiWasLost = false;
+    }
+
     if (!bootselPressed) {
-      digitalWrite(LED_BUILTIN, HIGH);
+      digitalWrite(LED_BUILTIN, ledState ? HIGH : LOW);
     }
   }
 
@@ -179,12 +214,10 @@ void loop() {
 
 void setup1() {
   // Core 1 starts here — LED controller initialization
-  // TODO: Uncomment when led_controller is implemented
-  // initLEDs();
+  initLEDs();
 }
 
 void loop1() {
-  // Core 1 main loop — runs animation engine at ~60 FPS independently of Core 0
-  // TODO: Uncomment when led_controller is implemented
-  // updateLEDs();
+  // Core 1 main loop — runs animation engine at ~30 FPS independently of Core 0
+  updateLEDs();
 }

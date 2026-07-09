@@ -1,5 +1,6 @@
 #include "web_handlers.h"
 #include "credentials.h"
+#include "led_controller.h"
 #include <LittleFS.h>
 #include <WiFi.h>
 
@@ -87,6 +88,31 @@ static void handleStatus() {
   server.send(200, "application/json", json);
 }
 
+static void handleLedStatus() {
+  String json = "{\"led\":";
+  json += ledState ? "true" : "false";
+  json += "}";
+
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "application/json", json);
+}
+
+static void handleLedToggle() {
+  ledState = !ledState;
+  digitalWrite(LED_BUILTIN, ledState ? HIGH : LOW);
+  setLedsEnabled(ledState);
+
+  Serial.print("LED toggled: ");
+  Serial.println(ledState ? "ON" : "OFF");
+
+  String json = "{\"led\":";
+  json += ledState ? "true" : "false";
+  json += "}";
+
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "application/json", json);
+}
+
 static void handleScan() {
   Serial.println("WiFi scan requested...");
 
@@ -159,7 +185,11 @@ void setupProvisioningRoutes() {
 
 void setupConnectedRoutes() {
   server.on("/", handleConnectedRoot);
+  server.on("/fonts/Gluten.ttf",  handleGlutenFont);
+  server.on("/fonts/Fredoka.ttf", handleFredokaFont);
   server.on("/api/status", handleStatus);
+  server.on("/api/led", HTTP_GET, handleLedStatus);
+  server.on("/api/led/toggle", HTTP_POST, handleLedToggle);
   server.onNotFound(handleNotFound);
   server.begin();
   Serial.println("✓ Web server started (connected mode)");

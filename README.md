@@ -40,23 +40,28 @@ Inter-Core Communication: Thread-safe communication will be handled using the Pi
 
 #### 3.2 System State Machine
 
-The firmware must gracefully cycle through the following operational states:
+The firmware operates in two runtime modes:
 
-- UNPROVISIONED:
-  No Wi-Fi credentials found in flash storage.
-  Slow, amber breathing pattern.
-- PROVISIONING:
-  Soft-AP portal is active; waiting for user setup.
-  Rotating yellow pulse.
-- CONNECTING:
-  Attempting to join the stored Wi-Fi network.
-  Blinking blue pattern.
-- ACTIVE / IDLE
-  Connected to Wi-Fi; awaiting local network packets.
-  Subtle, low-brightness default ambient glow.
-- ERROR / FAILOVER
-  Connection lost. Retries for 60s before spinning up AP again.
-  Blinking dark red pattern.
+- **MODE_PROVISIONING**
+  Active when: no stored credentials, authentication failure, or network unreachable at boot.
+  Behavior: Hosts a captive portal Access Point (Blossom_Setup). Onboard LED blinks slowly. Credentials stored in LittleFS are preserved unless the failure was an explicit authentication rejection (`WL_CONNECT_FAILED`).
+
+- **MODE_CONNECTED**
+  Active when: device successfully joins the stored network.
+  Behavior: Runs WebServer on port 80, mDNS at blossom.local, and the NeoPixel animation engine.
+
+**Boot sequence:**
+1. Load credentials from LittleFS.
+2. If credentials exist, attempt connection (20-second timeout).
+3. On success → MODE_CONNECTED.
+4. On authentication failure (`WL_CONNECT_FAILED`) → clear credentials → MODE_PROVISIONING.
+5. On network unreachable (timeout, SSID not found) → **keep credentials** → MODE_PROVISIONING. A subsequent power cycle will retry the stored credentials automatically.
+
+**WiFi watchdog (MODE_CONNECTED only):**
+If `WiFi.status()` leaves `WL_CONNECTED`, the device reboots after a 30-second grace period, which resets the lwIP stack cleanly and re-enters the boot sequence above. Core 1 (NeoPixel animation) is unaffected during the wait.
+
+**Factory reset:**
+Holding the BOOTSEL button for 5 seconds at any time clears stored credentials and reboots to MODE_PROVISIONING.
 
 ### 4. Headless Wi-Fi Setup & Provisioning Portal
 
@@ -86,9 +91,14 @@ Issue an HTTP POST request back to the Pico containing the chosen SSID and Passw
 
 #### 4.4 Non-Volatile Storage (Credentials)
 
-Upon receiving valid credentials, the firmware will write the SSID and password to a dedicated 4KB sector at the upper boundary of the Pico's flash memory using the hardware flash programming APIs (hardware/flash.h).
+Wi-Fi credentials (SSID and password) are stored in LittleFS at `/wifi_creds.txt` (SSID on line 1, password on line 2). LittleFS occupies a dedicated 2 MB partition of the Pico's flash.
 
-Once written, the system will execute a software reboot (watchdog_reboot) to spin up into the CONNECTING state.
+Credential lifecycle:
+- Written when the user submits the provisioning form.
+- Read on every boot to attempt automatic reconnection.
+- **Cleared only on explicit authentication failure** (`WL_CONNECT_FAILED`) or factory reset — never on a simple network-unavailable failure, so a device that loses its network connection temporarily will reconnect automatically on its next boot without requiring the user to re-enter credentials.
+
+Once credentials are saved, the device executes a deferred software reboot (~1.5 s) to transition into the connecting sequence.
 
 ### 5. Network Services & Local Discovery (mDNS)
 

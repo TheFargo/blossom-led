@@ -19,6 +19,12 @@
             font-style: normal;
         }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Fredoka', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -29,14 +35,29 @@
             margin: 0;
             padding: 20px;
         }
+
         .container {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            text-align: center;
+            position: relative;
+            padding: 30px;
             max-width: 500px;
+            width: 100%;
+            text-align: center;
+            z-index: 1;
         }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #EAD8C1;
+            border: 3px solid #83786bc2;
+            border-radius: 15px;
+            box-shadow: 8px 8px 0px #3b2b188a;
+            filter: url('#wriggly-container');
+            transform: rotate(0.5deg);
+            z-index: -1;
+        }
+
         h1 {
             font-family: 'Gluten', Arial, sans-serif;
             color: #1e1e1e;
@@ -47,27 +68,139 @@
             text-shadow: 2px 2px 0px #667eea;
             font-variation-settings: 'wght' 700, 'slnt' -10;
         }
+
         p {
             font-family: 'Fredoka', Arial, sans-serif;
             color: #555;
             font-size: 1.1rem;
             margin: 10px 0;
         }
+
         .status {
-            background: #e8f5e9;
-            border-left: 4px solid #4caf50;
-            padding: 15px;
+            position: relative;
             margin: 20px 0;
+            padding: 15px;
             text-align: left;
+            z-index: 1;
         }
+
+        .status::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #e9dfd3;
+            border: 3px solid #4caf50;
+            border-radius: 12px;
+            box-shadow: -2px -2px 0px #3b2b188a;
+            filter: url('#wriggly-table');
+            transform: rotate(-0.3deg);
+            z-index: -1;
+            pointer-events: none;
+        }
+
         .status strong {
             color: #2e7d32;
         }
+
         code {
             background: #f5f5f5;
             padding: 2px 6px;
             border-radius: 3px;
             font-family: monospace;
+        }
+
+        /* LED Control Section */
+        .led-control {
+            position: relative;
+            margin: 20px 0;
+            padding: 20px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .led-control::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #f7f4eb;
+            border: 3px solid #ff9800;
+            border-radius: 15px;
+            box-shadow: 4px 4px 0px #3b2b188a;
+            filter: url('#wriggly-button');
+            transform: rotate(-0.5deg);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .led-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .led-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #666;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .led-dot.on {
+            background-color: #4caf50;
+            box-shadow: 0 0 15px #4caf50, 0 0 30px #4caf50;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(0.95); opacity: 0.8; }
+            to { transform: scale(1.05); opacity: 1; }
+        }
+
+        .toggle-button {
+            position: relative;
+            display: inline-block;
+            padding: 12px 30px;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e1e1e;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 1;
+            transition: transform 0.15s ease;
+        }
+
+        .toggle-button::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ffdf65;
+            border: 3px solid #1e1e1e;
+            border-radius: 120px 15px 100px 15px / 15px 100px 15px 120px;
+            box-shadow: 4px 4px 0px #1e1e1e;
+            filter: url('#wriggly-button');
+            transform: rotate(0.3deg);
+            z-index: -1;
+            transition: all 0.15s ease;
+        }
+
+        .toggle-button:hover::before {
+            background-color: #ff9800;
+            transform: rotate(-0.5deg) scale(1.02);
+        }
+
+        .toggle-button:active {
+            transform: translate(2px, 2px);
+        }
+
+        .toggle-button:active::before {
+            box-shadow: 2px 2px 0px #1e1e1e;
         }
     </style>
 </head>
@@ -81,9 +214,38 @@
             <strong>🌐 IP:</strong> <span id="ip">Loading...</span><br>
             <strong>🔗 Hostname:</strong> <code>blossom.local</code>
         </div>
-        <p style="color: #888; font-size: 0.9rem;">API endpoint: <code>http://blossom.local/api/effect</code></p>
+        <div class="led-control">
+            <div class="led-indicator">
+                <div class="led-dot" id="ledDot"></div>
+                <span id="ledStatus">LED: Loading...</span>
+            </div>
+            <button class="toggle-button" id="toggleBtn">Toggle LED</button>
+        </div>
+        <p style="color: #888; font-size: 0.9rem;">API endpoint: <br>http://blossom.local/api/effect</p>
     </div>
     <script>
+        function updateLedStatus(isOn) {
+            const dot = document.getElementById('ledDot');
+            const status = document.getElementById('ledStatus');
+            
+            if (isOn) {
+                dot.classList.add('on');
+                status.textContent = 'LED: ON';
+            } else {
+                dot.classList.remove('on');
+                status.textContent = 'LED: OFF';
+            }
+        }
+
+        function fetchLedStatus() {
+            fetch('/api/led')
+                .then(r => r.json())
+                .then(data => {
+                    updateLedStatus(data.led);
+                })
+                .catch(e => console.error('LED status fetch failed:', e));
+        }
+
         fetch('/api/status')
             .then(r => r.json())
             .then(data => {
@@ -91,6 +253,35 @@
                 document.getElementById('ip').textContent = data.ip || 'Unknown';
             })
             .catch(e => console.error('Status fetch failed:', e));
+
+        fetchLedStatus();
+
+        document.getElementById('toggleBtn').addEventListener('click', function() {
+            fetch('/api/led/toggle', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    updateLedStatus(data.led);
+                })
+                .catch(e => console.error('LED toggle failed:', e));
+        });
     </script>
+
+    <!-- SVG Filters for Torn Paper Effect -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <defs>
+            <filter id="wriggly-container">
+                <feTurbulence baseFrequency="0.015" numOctaves="3" seed="10" result="turbulence" />
+                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="4" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-table">
+                <feTurbulence baseFrequency="0.02" numOctaves="2" seed="20" result="turbulence" />
+                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="3" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-button">
+                <feTurbulence baseFrequency="0.018" numOctaves="2" seed="30" result="turbulence" />
+                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="3" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
 </body>
 </html>

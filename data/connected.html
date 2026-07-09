@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blossom</title>
+    <title>Blossom Controls</title>
     <style>
         @font-face {
             font-family: 'Gluten';
@@ -27,21 +27,24 @@
 
         body {
             font-family: 'Fredoka', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3d53b8 0%, #4e306b 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
             padding: 20px;
         }
 
+        /* --- Main Container --- */
+        .main-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- Torn Paper Container Base --- */
         .container {
             position: relative;
-            padding: 30px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
+            padding: 25px;
             z-index: 1;
         }
 
@@ -52,234 +55,869 @@
             background-color: #EAD8C1;
             border: 3px solid #83786bc2;
             border-radius: 15px;
-            box-shadow: 8px 8px 0px #3b2b188a;
-            filter: url('#wriggly-container');
-            transform: rotate(0.5deg);
+            box-shadow: 6px 6px 0px #3b2b188a;
             z-index: -1;
         }
 
+        /* Container variations */
+        .container.c1::before { filter: url('#wriggly-c1'); transform: rotate(0.5deg); }
+        .container.c2::before { filter: url('#wriggly-c2'); transform: rotate(-0.3deg); background-color: #e9dfd3; }
+        .container.c3::before { filter: url('#wriggly-c3'); transform: rotate(0.4deg); background-color: #e9dfd3; }
+        .container.c4::before { filter: url('#wriggly-c4'); transform: rotate(-0.2deg); background-color: #f5f0e8; }
+        .container.c5::before { filter: url('#wriggly-c5'); transform: rotate(0.3deg); background-color: #f5f0e8; }
+        .container.c6::before { filter: url('#wriggly-c6'); transform: rotate(-0.4deg); background-color: #f5f0e8; }
+
+        /* --- Nested Cutout Container --- */
+        .cutout-container {
+            position: relative;
+            padding: 20px;
+            margin-top: 15px;
+            z-index: 1;
+        }
+
+        .cutout-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #d9cfc0;
+            border: 3px solid #83786bc2;
+            border-radius: 12px;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.15);
+            filter: url('#wriggly-cutout');
+            transform: rotate(-0.2deg);
+            z-index: -1;
+        }
+
+        /* --- Headers --- */
         h1 {
             font-family: 'Gluten', Arial, sans-serif;
             color: #1e1e1e;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-size: 2.5rem;
             font-weight: 700;
             text-shadow: 2px 2px 0px #667eea;
             font-variation-settings: 'wght' 700, 'slnt' -10;
         }
 
-        p {
-            font-family: 'Fredoka', Arial, sans-serif;
-            color: #555;
-            font-size: 1.1rem;
-            margin: 10px 0;
-        }
-
-        .status {
-            position: relative;
-            margin: 20px 0;
-            padding: 15px;
-            text-align: left;
-            z-index: 1;
-        }
-
-        .status::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #e9dfd3;
-            border: 3px solid #4caf50;
-            border-radius: 12px;
-            box-shadow: -2px -2px 0px #3b2b188a;
-            filter: url('#wriggly-table');
-            transform: rotate(-0.3deg);
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .status strong {
-            color: #2e7d32;
-        }
-
-        code {
-            background: #f5f5f5;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: monospace;
-        }
-
-        /* LED Control Section */
-        .led-control {
-            position: relative;
-            margin: 20px 0;
-            padding: 20px;
-            text-align: center;
-            z-index: 1;
-        }
-
-        .led-control::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #f7f4eb;
-            border: 3px solid #ff9800;
-            border-radius: 15px;
-            box-shadow: 4px 4px 0px #3b2b188a;
-            filter: url('#wriggly-button');
-            transform: rotate(-0.5deg);
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .led-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-            color: #333;
-        }
-
-        .led-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #666;
-            box-shadow: 0 0 5px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-        }
-
-        .led-dot.on {
-            background-color: #4caf50;
-            box-shadow: 0 0 15px #4caf50, 0 0 30px #4caf50;
-            animation: pulse 1.5s infinite alternate;
-        }
-
-        @keyframes pulse {
-            from { transform: scale(0.95); opacity: 0.8; }
-            to { transform: scale(1.05); opacity: 1; }
-        }
-
-        .toggle-button {
-            position: relative;
-            display: inline-block;
-            padding: 12px 30px;
-            font-family: 'Fredoka', Arial, sans-serif;
-            font-size: 1.1rem;
+        h2 {
+            font-family: 'Gluten', Arial, sans-serif;
+            color: #1e1e1e;
+            font-size: 1.5rem;
             font-weight: 600;
+            margin: 0;
+            text-align: center;
+            font-variation-settings: 'wght' 600, 'slnt' -10;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #4a4a4a;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* --- Header with Paper Scraps --- */
+        .header-with-papers {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            min-height: 35px;
+        }
+
+        .paper-scrap {
+            width: 50px;
+            height: 35px;
+            border: 3px solid #83786bc2;
+            border-radius: 8px;
+            box-shadow: 3px 3px 0px #3b2b188a;
+            transition: transform 0.3s ease;
+        }
+
+        .paper-scrap.left {
+            filter: url('#wriggly-paper-left');
+        }
+
+        .paper-scrap.right {
+            filter: url('#wriggly-paper-right');
+        }
+
+        /* --- Mode Button --- */
+        .mode-button {
+            position: relative;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-weight: 600;
+            font-size: 16px;
             color: #1e1e1e;
             background: transparent;
-            border: none;
+            border: 0;
+            padding: 12px 20px;
             cursor: pointer;
-            z-index: 1;
             transition: transform 0.15s ease;
+            z-index: 1;
+            width: 100%;
+            margin-top: 10px;
         }
 
-        .toggle-button::before {
+        .mode-button::before {
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ffdf65;
+            background-color: #ffd89b;
             border: 3px solid #1e1e1e;
-            border-radius: 120px 15px 100px 15px / 15px 100px 15px 120px;
+            border-radius: 10px;
             box-shadow: 4px 4px 0px #1e1e1e;
-            filter: url('#wriggly-button');
-            transform: rotate(0.3deg);
+            filter: url('#wriggly-btn');
+            transform: rotate(0.5deg);
             z-index: -1;
-            transition: all 0.15s ease;
         }
 
-        .toggle-button:hover::before {
-            background-color: #ff9800;
-            transform: rotate(-0.5deg) scale(1.02);
+        .mode-button:hover {
+            transform: scale(1.02) translateY(-1px);
         }
 
-        .toggle-button:active {
+        .mode-button:hover::before {
+            background-color: #ffe4b5;
+        }
+
+        /* --- Control Group --- */
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #2a2a2a;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        /* --- Custom Slider --- */
+        .slider-container {
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .slider-value {
+            display: inline-block;
+            min-width: 40px;
+            text-align: right;
+            font-weight: 600;
+            color: #1e1e1e;
+            font-size: 0.9rem;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            filter: url('#wriggly-slider');
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #83786bc2;
+            outline: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+            border: 0;
+        }
+
+        input[type="range"]:hover {
+            opacity: 1;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 3px solid #1e1e1e;
+            box-shadow: 2px 2px 0px #1e1e1e;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 3px solid #1e1e1e;
+            box-shadow: 2px 2px 0px #1e1e1e;
+        }
+
+        /* --- Radio Button Group --- */
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .radio-option input[type="radio"] {
+            filter: url('#wriggly-radio');
+        }
+
+        input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        /* --- Checkbox Group --- */
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+            justify-content: center;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        /* --- Apply Button --- */
+        .apply-button {
+            position: relative;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: #1e1e1e;
+            background: transparent;
+            border: 0;
+            padding: 16px 24px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+            z-index: 1;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .apply-button::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #6bf1a4;
+            border: 3px solid #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 5px 5px 0px #1e1e1e;
+            filter: url('#wriggly-apply');
+            transform: rotate(-0.5deg);
+            z-index: -1;
+        }
+
+        .apply-button:hover {
+            transform: scale(1.05) translateY(-2px);
+        }
+
+        .apply-button:hover::before {
+            background-color: #8fffc0;
+        }
+
+        .apply-button:active {
             transform: translate(2px, 2px);
         }
 
-        .toggle-button:active::before {
-            box-shadow: 2px 2px 0px #1e1e1e;
+        .apply-button:active::before {
+            box-shadow: 3px 3px 0px #1e1e1e;
+        }
+
+        /* --- LED Toggle Switch --- */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .toggle-label {
+            font-weight: 600;
+            color: #2a2a2a;
+            font-size: 0.95rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background-color: #ccc;
+            border-radius: 15px;
+            border: 3px solid #83786bc2;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 2px 2px 0px #3b2b188a;
+        }
+
+        .toggle-switch.on {
+            background-color: #6bf1a4;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border-radius: 50%;
+            border: 2px solid #1e1e1e;
+            transition: transform 0.3s;
+            box-shadow: 1px 1px 0px #1e1e1e;
+        }
+
+        .toggle-switch.on .toggle-slider {
+            transform: translateX(30px);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🪷 Blossom 🪷</h1>
-        <p>Your ambient light display is connected!</p>
-        <div class="status">
-            <strong>✓ Status:</strong> Online<br>
-            <strong>📡 Network:</strong> <span id="ssid">Loading...</span><br>
-            <strong>🌐 IP:</strong> <span id="ip">Loading...</span><br>
-            <strong>🔗 Hostname:</strong> <code>blossom.local</code>
-        </div>
-        <div class="led-control">
-            <div class="led-indicator">
-                <div class="led-dot" id="ledDot"></div>
-                <span id="ledStatus">LED: Loading...</span>
+    <div class="main-container">
+        <!-- Container 1: Logo and Mode -->
+        <div class="container c1">
+            <h1>🪷 Blossom 🪷</h1>
+            <div class="subtitle">Now Playing:</div>
+            <button class="mode-button">Custom</button>
+            <div class="toggle-container">
+                <span class="toggle-label">LEDs:</span>
+                <div class="toggle-switch on" id="led-toggle" onclick="toggleLEDs()">
+                    <div class="toggle-slider"></div>
+                </div>
             </div>
-            <button class="toggle-button" id="toggleBtn">Toggle LED</button>
         </div>
-        <p style="color: #888; font-size: 0.9rem;">API endpoint: <br>http://blossom.local/api/effect</p>
-    </div>
-    <script>
-        function updateLedStatus(isOn) {
-            const dot = document.getElementById('ledDot');
-            const status = document.getElementById('ledStatus');
+
+        <!-- Container 2: Color Channel -->
+        <div class="container c2">
+            <div class="header-with-papers">
+                <div class="paper-scrap left" id="color-paper-left"></div>
+                <h2>Color</h2>
+                <div class="paper-scrap right" id="color-paper-right"></div>
+            </div>
             
+            <div class="control-group">
+                <label>Primary <span class="slider-value" id="color-primary-val">128</span></label>
+                <div class="slider-wrapper">
+                    <input type="range" id="color-primary" min="0" max="255" value="128">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Spread <span class="slider-value" id="color-spread-val">50</span></label>
+                <div class="slider-wrapper">
+                    <input type="range" id="color-spread" min="0" max="255" value="50">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Brightness <span class="slider-value" id="color-brightness-val">200</span></label>
+                <div class="slider-wrapper">
+                    <input type="range" id="color-brightness" min="0" max="255" value="200">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Color Spread</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="color-mode" value="0" checked>
+                        Random
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="color-mode" value="1">
+                        Ordered
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="color-mode" value="2">
+                        Looping
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Container 3: White Channel (Sparkles) -->
+        <div class="container c3">
+            <div class="header-with-papers">
+                <div class="paper-scrap left" id="sparkle-paper-left" style="background: #ccc;"></div>
+                <h2>Sparkles</h2>
+                <div class="paper-scrap right" id="sparkle-paper-right" style="background: #f5f5f5;"></div>
+            </div>
+            
+            <div class="control-group">
+                <label>Brightness <span class="slider-value" id="sparkles-brightness-val">100</span></label>
+                <div class="slider-wrapper">
+                    <input type="range" id="sparkles-brightness" min="0" max="255" value="100">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Spread <span class="slider-value" id="sparkles-spread-val">80</span></label>
+                <div class="slider-wrapper">
+                    <input type="range" id="sparkles-spread" min="0" max="255" value="80">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Sparkle Spread</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="sparkles-mode" value="0" checked>
+                        Random
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="sparkles-mode" value="1">
+                        Ordered
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="sparkles-mode" value="2">
+                        Looping
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Container 4: Flicker Animation -->
+        <div class="container c4">
+            <h2>Flicker</h2>
+            
+            <div class="control-group">
+                <label>Apply To:</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="flicker-color" checked>
+                        Color
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="flicker-sparkles" checked>
+                        Sparkles
+                    </label>
+                </div>
+            </div>
+
+            <div class="cutout-container">
+                <div class="control-group">
+                    <label>Speed <span class="slider-value" id="flicker-speed-val">60</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="flicker-speed" min="0" max="255" value="60">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Amplitude <span class="slider-value" id="flicker-amplitude-val">120</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="flicker-amplitude" min="0" max="255" value="120">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Synchronicity</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="flicker-mode" value="0" checked>
+                            Random
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="flicker-mode" value="1">
+                            Ordered
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="flicker-mode" value="2">
+                            Looping
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Container 5: Pulse Animation -->
+        <div class="container c5">
+            <h2>Pulse</h2>
+            
+            <div class="control-group">
+                <label>Apply To:</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="pulse-color" checked>
+                        Color
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="pulse-sparkles">
+                        Sparkles
+                    </label>
+                </div>
+            </div>
+
+            <div class="cutout-container">
+                <div class="control-group">
+                    <label>Speed <span class="slider-value" id="pulse-speed-val">30</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="pulse-speed" min="0" max="255" value="30">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Amplitude <span class="slider-value" id="pulse-amplitude-val">80</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="pulse-amplitude" min="0" max="255" value="80">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Synchronicity II</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="pulse-mode" value="0">
+                            Random
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="pulse-mode" value="1">
+                            Ordered
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="pulse-mode" value="2" checked>
+                            Looping
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Container 6: Spin Animation -->
+        <div class="container c6">
+            <h2>Spin</h2>
+            
+            <div class="control-group">
+                <label>Apply To:</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="spin-color">
+                        Color
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="spin-sparkles">
+                        Sparkles
+                    </label>
+                </div>
+            </div>
+
+            <div class="cutout-container">
+                <div class="control-group">
+                    <label>Speed <span class="slider-value" id="spin-speed-val">0</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="spin-speed" min="-128" max="127" value="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Preset Button -->
+        <div class="container c1">
+            <button class="apply-button">Save Preset</button>
+        </div>
+    </div>
+
+    <script>
+        // Update all slider value displays
+        const sliders = [
+            'color-primary', 'color-spread', 'color-brightness',
+            'sparkles-brightness', 'sparkles-spread',
+            'flicker-speed', 'flicker-amplitude',
+            'pulse-speed', 'pulse-amplitude',
+            'spin-speed'
+        ];
+
+        sliders.forEach(id => {
+            const slider = document.getElementById(id);
+            const valueDisplay = document.getElementById(id + '-val');
+            slider.oninput = function() {
+                valueDisplay.textContent = this.value;
+                if (id.includes('color-')) {
+                    updateColorPreview();
+                }
+                if (id.includes('sparkles-')) {
+                    updateSparklePreview();
+                }
+            };
+        });
+
+        // HSV to RGB conversion for color preview
+        function hsvToRgb(h, s, v) {
+            h = h / 255 * 360; // Map 0-255 to 0-360
+            s = s / 255;
+            v = v / 255;
+            
+            let c = v * s;
+            let x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+            let m = v - c;
+            let r, g, b;
+
+            if (h < 60) { r = c; g = x; b = 0; }
+            else if (h < 120) { r = x; g = c; b = 0; }
+            else if (h < 180) { r = 0; g = c; b = x; }
+            else if (h < 240) { r = 0; g = x; b = c; }
+            else if (h < 300) { r = x; g = 0; b = c; }
+            else { r = c; g = 0; b = x; }
+
+            r = Math.round((r + m) * 255);
+            g = Math.round((g + m) * 255);
+            b = Math.round((b + m) * 255);
+
+            return 'rgb(' + r + ', ' + g + ', ' + b + ')';
+        }
+
+        // Update color preview boxes and paper scraps
+        function updateColorPreview() {
+            const primary = parseInt(document.getElementById('color-primary').value);
+            const spread = parseInt(document.getElementById('color-spread').value);
+            const brightness = parseInt(document.getElementById('color-brightness').value);
+
+            // Calculate hue range
+            const minHue = Math.max(0, primary - spread / 2);
+            const maxHue = Math.min(255, primary + spread / 2);
+
+            const minColor = hsvToRgb(minHue, 255, brightness);
+            const maxColor = hsvToRgb(maxHue, 255, brightness);
+            
+            // Update paper scraps with slight rotation wiggle
+            const leftPaper = document.getElementById('color-paper-left');
+            const rightPaper = document.getElementById('color-paper-right');
+            leftPaper.style.backgroundColor = minColor;
+            rightPaper.style.backgroundColor = maxColor;
+            
+            const leftRotation = (Math.random() - 0.5) * 8;
+            const rightRotation = (Math.random() - 0.5) * 8;
+            leftPaper.style.transform = 'rotate(' + leftRotation + 'deg)';
+            rightPaper.style.transform = 'rotate(' + rightRotation + 'deg)';
+        }
+
+        // Update sparkle preview papers
+        function updateSparklePreview() {
+            const brightness = parseInt(document.getElementById('sparkles-brightness').value);
+            const spread = parseInt(document.getElementById('sparkles-spread').value);
+
+            // Calculate greyscale range
+            const minBrightness = Math.max(0, brightness - spread / 2);
+            const maxBrightness = Math.min(255, brightness + spread / 2);
+
+            const minGrey = 'rgb(' + minBrightness + ', ' + minBrightness + ', ' + minBrightness + ')';
+            const maxGrey = 'rgb(' + maxBrightness + ', ' + maxBrightness + ', ' + maxBrightness + ')';
+
+            const leftPaper = document.getElementById('sparkle-paper-left');
+            const rightPaper = document.getElementById('sparkle-paper-right');
+            leftPaper.style.backgroundColor = minGrey;
+            rightPaper.style.backgroundColor = maxGrey;
+            
+            const leftRotation = (Math.random() - 0.5) * 8;
+            const rightRotation = (Math.random() - 0.5) * 8;
+            leftPaper.style.transform = 'rotate(' + leftRotation + 'deg)';
+            rightPaper.style.transform = 'rotate(' + rightRotation + 'deg)';
+        }
+
+        // Initialize previews on load
+        updateColorPreview();
+        updateSparklePreview();
+
+        // LED toggle control
+        function toggleLEDs() {
+            const toggle = document.getElementById('led-toggle');
+            const isOn = toggle.classList.contains('on');
+            
+            // Toggle the switch visually
             if (isOn) {
-                dot.classList.add('on');
-                status.textContent = 'LED: ON';
+                toggle.classList.remove('on');
             } else {
-                dot.classList.remove('on');
-                status.textContent = 'LED: OFF';
+                toggle.classList.add('on');
+            }
+            
+            // Send update to device immediately
+            fetch('/api/leds', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 'enabled': !isOn })
+            })
+            .catch(function(err) {
+                console.error('LED toggle error:', err);
+                // Revert on error
+                if (isOn) {
+                    toggle.classList.add('on');
+                } else {
+                    toggle.classList.remove('on');
+                }
+            });
+        }
+
+        // Get selected radio value
+        function getRadioValue(name) {
+            const radio = document.querySelector('input[name="' + name + '"]:checked');
+            return radio ? parseInt(radio.value) : 0;
+        }
+
+        // Live update: track previous state and auto-send changes
+        let previousState = null;
+        let updatePending = false;
+        let lastUpdateTime = 0;
+        const UPDATE_INTERVAL = 500; // ms between updates
+
+        function getCurrentState() {
+            return JSON.stringify({
+                'color.primary': parseInt(document.getElementById('color-primary').value),
+                'color.spread': parseInt(document.getElementById('color-spread').value),
+                'color.brightness': parseInt(document.getElementById('color-brightness').value),
+                'color.mode': getRadioValue('color-mode'),
+                'sparkles.brightness': parseInt(document.getElementById('sparkles-brightness').value),
+                'sparkles.spread': parseInt(document.getElementById('sparkles-spread').value),
+                'sparkles.mode': getRadioValue('sparkles-mode'),
+                'flicker.apply_to_color': document.getElementById('flicker-color').checked,
+                'flicker.apply_to_sparkles': document.getElementById('flicker-sparkles').checked,
+                'flicker.speed': parseInt(document.getElementById('flicker-speed').value),
+                'flicker.amplitude': parseInt(document.getElementById('flicker-amplitude').value),
+                'flicker.mode': getRadioValue('flicker-mode'),
+                'pulse.apply_to_color': document.getElementById('pulse-color').checked,
+                'pulse.apply_to_sparkles': document.getElementById('pulse-sparkles').checked,
+                'pulse.speed': parseInt(document.getElementById('pulse-speed').value),
+                'pulse.amplitude': parseInt(document.getElementById('pulse-amplitude').value),
+                'pulse.mode': getRadioValue('pulse-mode'),
+                'spin.apply_to_color': document.getElementById('spin-color').checked,
+                'spin.apply_to_sparkles': document.getElementById('spin-sparkles').checked,
+                'spin.speed': parseInt(document.getElementById('spin-speed').value)
+            });
+        }
+
+        function checkForChanges() {
+            const currentState = getCurrentState();
+            if (currentState !== previousState) {
+                previousState = currentState;
+                const now = Date.now();
+                if (now - lastUpdateTime >= UPDATE_INTERVAL && !updatePending) {
+                    applyAnimation();
+                    lastUpdateTime = now;
+                }
             }
         }
 
-        function fetchLedStatus() {
-            fetch('/api/led')
-                .then(r => r.json())
-                .then(data => {
-                    updateLedStatus(data.led);
-                })
-                .catch(e => console.error('LED status fetch failed:', e));
-        }
+        // Poll for changes every 100ms (checks frequently, but sends max every 500ms)
+        setInterval(checkForChanges, 100);
 
-        fetch('/api/status')
+        // Also attach listeners to all inputs to mark state as changed immediately
+        document.querySelectorAll('input[type="range"], input[type="radio"], input[type="checkbox"]').forEach(input => {
+            input.addEventListener('change', function() {
+                checkForChanges();
+            });
+        });
+
+        // Apply animation configuration
+        function applyAnimation() {
+            if (updatePending) return; // Prevent concurrent requests
+            updatePending = true;
+            
+            const config = JSON.parse(getCurrentState());
+
+            fetch('/api/animation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            })
             .then(r => r.json())
             .then(data => {
-                document.getElementById('ssid').textContent = data.ssid || 'Unknown';
-                document.getElementById('ip').textContent = data.ip || 'Unknown';
+                updatePending = false;
             })
-            .catch(e => console.error('Status fetch failed:', e));
-
-        fetchLedStatus();
-
-        document.getElementById('toggleBtn').addEventListener('click', function() {
-            fetch('/api/led/toggle', { method: 'POST' })
-                .then(r => r.json())
-                .then(data => {
-                    updateLedStatus(data.led);
-                })
-                .catch(e => console.error('LED toggle failed:', e));
-        });
+            .catch(function(err) {
+                console.error('Update error:', err);
+                updatePending = false;
+            });
+        }
     </script>
 
     <!-- SVG Filters for Torn Paper Effect -->
     <svg style="position: absolute; width: 0; height: 0;">
         <defs>
-            <filter id="wriggly-container">
-                <feTurbulence baseFrequency="0.015" numOctaves="3" seed="10" result="turbulence" />
-                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="4" xChannelSelector="R" yChannelSelector="G" />
+            <filter id="wriggly-c1">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="99" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" />
             </filter>
-            <filter id="wriggly-table">
-                <feTurbulence baseFrequency="0.02" numOctaves="2" seed="20" result="turbulence" />
-                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="3" xChannelSelector="R" yChannelSelector="G" />
+            <filter id="wriggly-c2">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="42" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
             </filter>
-            <filter id="wriggly-button">
-                <feTurbulence baseFrequency="0.018" numOctaves="2" seed="30" result="turbulence" />
-                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="3" xChannelSelector="R" yChannelSelector="G" />
+            <filter id="wriggly-c3">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="17" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-c4">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="63" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-c5">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="88" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-c6">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="25" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-cutout">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="47" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-btn">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="12" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-apply">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="78" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-slider">
+                <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="2" seed="91" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-radio">
+                <feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves="2" seed="87" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-paper-left">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="34" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-paper-right">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="56" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
             </filter>
         </defs>
     </svg>

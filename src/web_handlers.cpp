@@ -1,6 +1,7 @@
 #include "web_handlers.h"
 #include "credentials.h"
 #include "led_controller.h"
+#include "animation_config.h"
 #include <LittleFS.h>
 #include <WiFi.h>
 
@@ -113,6 +114,123 @@ static void handleLedToggle() {
   server.send(200, "application/json", json);
 }
 
+// ── JSON parsing helpers for BlossomConfig ────────────────────────────────────
+static uint8_t parseUint8(const String& body, const char* key) {
+  String search = String("\"") + key + "\":";
+  int start = body.indexOf(search);
+  if (start < 0) return 0;
+  start += search.length();
+  int end = start;
+  while (end < body.length() && isdigit(body[end])) end++;
+  return (uint8_t)body.substring(start, end).toInt();
+}
+
+static int8_t parseInt8(const String& body, const char* key) {
+  String search = String("\"") + key + "\":";
+  int start = body.indexOf(search);
+  if (start < 0) return 0;
+  start += search.length();
+  int end = start;
+  if (body[end] == '-') end++;
+  while (end < body.length() && isdigit(body[end])) end++;
+  return (int8_t)body.substring(start, end).toInt();
+}
+
+static bool parseBool(const String& body, const char* key) {
+  String search = String("\"") + key + "\":";
+  int start = body.indexOf(search);
+  if (start < 0) return false;
+  return body.substring(start).startsWith(search + "true");
+}
+
+static DistributionMode parseMode(const String& body, const char* key) {
+  uint8_t val = parseUint8(body, key);
+  if (val > 2) return DistributionMode::RANDOM;
+  return (DistributionMode)val;
+}
+
+static void handleLeds() {
+  if (!server.hasArg("plain")) {
+    server.send(400, "application/json", "{\"error\":\"No data received\"}");
+    return;
+  }
+
+  String body = server.arg("plain");
+  
+  // Parse "enabled" field from JSON
+  bool enabled = parseBool(body, "enabled");
+  
+  ledState = enabled;
+  digitalWrite(LED_BUILTIN, ledState ? HIGH : LOW);
+  setLedsEnabled(ledState);
+
+  Serial.print("LEDs set: ");
+  Serial.println(ledState ? "ON" : "OFF");
+
+  String json = "{\"enabled\":";
+  json += ledState ? "true" : "false";
+  json += "}";
+
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "application/json", json);
+}
+
+static void handleAnimation() {
+  if (!server.hasArg("plain")) {
+    server.send(400, "application/json", "{\"error\":\"No data received\"}");
+    return;
+  }
+
+  String body = server.arg("plain");
+  
+  // Parse BlossomConfig from JSON
+  BlossomConfig config;
+  
+  // Color settings
+  config.color.primary    = parseUint8(body, "color.primary");
+  config.color.spread     = parseUint8(body, "color.spread");
+  config.color.brightness = parseUint8(body, "color.brightness");
+  config.color.mode       = parseMode(body, "color.mode");
+  
+  // Sparkle settings
+  config.sparkles.brightness = parseUint8(body, "sparkles.brightness");
+  config.sparkles.spread     = parseUint8(body, "sparkles.spread");
+  config.sparkles.mode       = parseMode(body, "sparkles.mode");
+  
+  // Flicker animation
+  config.flicker.apply_to_color    = parseBool(body, "flicker.apply_to_color");
+  config.flicker.apply_to_sparkles = parseBool(body, "flicker.apply_to_sparkles");
+  config.flicker.speed             = parseUint8(body, "flicker.speed");
+  config.flicker.amplitude         = parseUint8(body, "flicker.amplitude");
+  config.flicker.mode              = parseMode(body, "flicker.mode");
+  
+  // Pulse animation
+  config.pulse.apply_to_color    = parseBool(body, "pulse.apply_to_color");
+  config.pulse.apply_to_sparkles = parseBool(body, "pulse.apply_to_sparkles");
+  config.pulse.speed             = parseUint8(body, "pulse.speed");
+  config.pulse.amplitude         = parseUint8(body, "pulse.amplitude");
+  config.pulse.mode              = parseMode(body, "pulse.mode");
+  
+  // Spin animation
+  config.spin.apply_to_color    = parseBool(body, "spin.apply_to_color");
+  config.spin.apply_to_sparkles = parseBool(body, "spin.apply_to_sparkles");
+  config.spin.speed             = parseInt8(body, "spin.speed");
+  
+  // Apply configuration to LED controller
+  setAnimationConfig(config);
+  
+  Serial.println("Animation config updated:");
+  Serial.print("  Color: primary=");
+  Serial.print(config.color.primary);
+  Serial.print(" spread=");
+  Serial.print(config.color.spread);
+  Serial.print(" brightness=");
+  Serial.println(config.color.brightness);
+  
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "application/json", "{\"status\":\"success\"}");
+}
+
 static void handleScan() {
   Serial.println("WiFi scan requested...");
 
@@ -190,6 +308,8 @@ void setupConnectedRoutes() {
   server.on("/api/status", handleStatus);
   server.on("/api/led", HTTP_GET, handleLedStatus);
   server.on("/api/led/toggle", HTTP_POST, handleLedToggle);
+  server.on("/api/leds", HTTP_POST, handleLeds);
+  server.on("/api/animation", HTTP_POST, handleAnimation);
   server.onNotFound(handleNotFound);
   server.begin();
   Serial.println("✓ Web server started (connected mode)");

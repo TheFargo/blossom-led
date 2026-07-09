@@ -1,4 +1,5 @@
 #include "led_controller.h"
+#include "animation_config.h"
 #include <hardware/pio.h>
 #include <hardware/clocks.h>
 #include <pico/util/queue.h>
@@ -38,6 +39,12 @@ static uint _sm  = 0;
 // Core 1 pops it inside updateLEDs().
 static queue_t _commandQueue;
 static bool    _ledsEnabled = true;  // Core 1 local state
+
+// ── Shared animation configuration ────────────────────────────────────────────
+// Core 0 writes via setAnimationConfig(), Core 1 reads in updateLEDs().
+// Simple copy-on-read, no mutex needed (single writer, single reader).
+static BlossomConfig _currentConfig;
+static volatile bool _configUpdated = false;
 
 // ── PIO state machine initialisation ──────────────────────────────────────────
 static void ws2812_sm_init(PIO pio, uint sm, uint offset, uint pin) {
@@ -112,6 +119,8 @@ void initLEDs() {
     ws2812_sm_init(_pio, _sm, offset, LED_PIN);
 
     _ledsEnabled = true;
+    _currentConfig = getDefaultConfig();  // Start with Warm Flame preset
+    _configUpdated = true;
 }
 
 void setLedsEnabled(bool enabled) {
@@ -121,6 +130,11 @@ void setLedsEnabled(bool enabled) {
 
 void setEffect(const char* /*name*/, uint32_t /*color*/, float /*speed*/, unsigned long /*duration*/) {
     // Effect system placeholder — rainbow is the active effect for now
+}
+
+void setAnimationConfig(const BlossomConfig& config) {
+    _currentConfig = config;
+    _configUpdated = true;
 }
 
 void updateLEDs() {
@@ -148,6 +162,12 @@ void updateLEDs() {
     if (now - lastFrameMs < 17u) return;
     lastFrameMs = now;
 
+    // TODO: Replace rainbow with full BlossomConfig animation pipeline:
+    //   1. Apply base color/sparkle settings from _currentConfig
+    //   2. Layer flicker (noise) animation if enabled
+    //   3. Layer pulse (sine) animation if enabled
+    //   4. Apply spin (pixel rotation) if enabled
+    //   For now, rainbow serves as placeholder
     send_rainbow_frame(phase);
     phase = (uint16_t)((phase + 2u) % 360u);
 }

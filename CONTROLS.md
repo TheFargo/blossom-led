@@ -60,7 +60,7 @@ The Flicker animation will use a randomized noise track to move a pixel between 
 
 1. Label: Flicker
 2. Checkbox: Color (Applies animation to the color pixels)
-3. Checkbox: White (Applies animation to the white pixels)
+3. Checkbox: Sparkles (Applies animation to the white pixels)
 4. Slider: Speed (255 positions, representing flicker speed)
 5. Slider: Amplitude (255 positions, representing noise amplitude)
   At low amplitudes, pixels will stay close the the primary color/brightness.
@@ -77,7 +77,7 @@ The Pulse animation uses a sine-wave track to smoothly cycle a pixel between the
 
 1. Label: Pulse
 2. Checkbox: Color (Applies animation to the color pixels)
-3. Checkbox: White (Applies animation to the white pixels)
+3. Checkbox: Sparkles (Applies animation to the white pixels)
 4. Slider: Speed (255 positions, representing Pulse speed)
 5. Slider: Amplitude (255 positions, representing noise amplitude)
   At the halfway point, the pixel will animate exactly from one extreme to another.
@@ -94,5 +94,5 @@ After all other effects are applied to the pixels in order, the pixels can be "s
 
 1. Label: Spin
 2. Checkbox: Color (Applies animation to the color pixels)
-3. Checkbox: White (Applies animation to the white pixels)
+3. Checkbox: Sparkles (Applies animation to the white pixels)
 4. Slider: Speed (255 positions, from -128 to 128, representing spin speed and direction)

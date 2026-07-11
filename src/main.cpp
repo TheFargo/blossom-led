@@ -1,4 +1,12 @@
-﻿#include <Arduino.h>
+﻿// ###########################################################################
+//                                  BLOSSOM
+//                         Programmable Light Display
+//                         A Dave "Fargo" Kosak Joint
+//                                July,  2026
+//       AI Models Consulted: Gemini 3.5 Thinking, Claude Sonnet 4.5-4.6
+// ###########################################################################
+
+#include <Arduino.h>
 #include <WiFi.h>
 #include <WebServer.h>
 #include <DNSServer.h>

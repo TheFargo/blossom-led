@@ -520,11 +520,11 @@
                 <label>Apply To:</label>
                 <div class="checkbox-group">
                     <label class="checkbox-option">
-                        <input type="checkbox" id="flicker-color" checked>
+                        <input type="checkbox" id="flicker-color">
                         Color
                     </label>
                     <label class="checkbox-option">
-                        <input type="checkbox" id="flicker-sparkles" checked>
+                        <input type="checkbox" id="flicker-sparkles">
                         Sparkles
                     </label>
                 </div>
@@ -573,7 +573,7 @@
                 <label>Apply To:</label>
                 <div class="checkbox-group">
                     <label class="checkbox-option">
-                        <input type="checkbox" id="pulse-color" checked>
+                        <input type="checkbox" id="pulse-color">
                         Color
                     </label>
                     <label class="checkbox-option">
@@ -792,7 +792,7 @@
         let previousState = null;
         let updatePending = false;
         let lastUpdateTime = 0;
-        const UPDATE_INTERVAL = 500; // ms between updates
+        const UPDATE_INTERVAL = 100; // ms between updates
 
         function getCurrentState() {
             return JSON.stringify({

@@ -1,5 +1,7 @@
 #include "led_controller.h"
 #include "animation_config.h"
+#include <Arduino.h>
+#include <cmath>
 #include <hardware/pio.h>
 #include <hardware/clocks.h>
 #include <pico/util/queue.h>
@@ -139,7 +141,6 @@ void setAnimationConfig(const BlossomConfig& config) {
 
 void updateLEDs() {
     static uint32_t lastFrameMs = 0;
-    static uint16_t phase       = 0;
     static bool     wasEnabled  = true;  // matches _ledsEnabled initial value
 
     // Drain any pending enable/disable commands from Core 0
@@ -162,12 +163,116 @@ void updateLEDs() {
     if (now - lastFrameMs < 17u) return;
     lastFrameMs = now;
 
-    // TODO: Replace rainbow with full BlossomConfig animation pipeline:
-    //   1. Apply base color/sparkle settings from _currentConfig
-    //   2. Layer flicker (noise) animation if enabled
-    //   3. Layer pulse (sine) animation if enabled
-    //   4. Apply spin (pixel rotation) if enabled
-    //   For now, rainbow serves as placeholder
-    send_rainbow_frame(phase);
-    phase = (uint16_t)((phase + 2u) % 360u);
+    // ── Animation Pipeline ─────────────────────────────────────────────────────
+    // Step 1: Base color and sparkle values from _currentConfig
+    // Step 2-4: TODO - Flicker, Pulse, Spin (not implemented yet)
+    
+    const ColorSettings& color = _currentConfig.color;
+    const SparkleSettings& sparkle = _currentConfig.sparkles;
+    
+    // Pre-computed sine wave values (calculated once, used forever)
+    // Half-cycle (0° to 180°) for ORDERED/RANDOM modes: 0 → 1 → 0
+    static const float halfCycleSine[LED_COUNT] = {
+        0.0000f, 0.1951f, 0.3827f, 0.5556f, 0.7071f, 0.8315f, 0.9239f, 0.9808f,
+        1.0000f, 0.9808f, 0.9239f, 0.8315f, 0.7071f, 0.5556f, 0.3827f, 0.1951f
+    };
+    // Full-cycle (0° to 360°) for LOOPING mode: 0 → 1 → 0 → -1 → 0
+    static const float fullCycleSine[LED_COUNT] = {
+        0.0000f,  0.3827f,  0.7071f,  0.9239f,  1.0000f,  0.9239f,  0.7071f,  0.3827f,
+        0.0000f, -0.3827f, -0.7071f, -0.9239f, -1.0000f, -0.9239f, -0.7071f, -0.3827f
+    };
+    // Interleaving pattern for RANDOM mode (bit-reversal): which ordered position to pull from
+    static const uint8_t interleavedIndices[LED_COUNT] = {
+        0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15
+    };
+    
+    for (int i = 0; i < LED_COUNT; i++) {
+        // ── Color Channel (HSV) ────────────────────────────────────────────────
+        uint16_t hue;
+        uint8_t sat = 255;  // Full saturation for vivid colors
+        uint8_t val;
+        
+        // Early-exit if color brightness is zero (prevents spread from lighting LEDs)
+        if (color.brightness == 0) {
+            val = 0;
+            hue = 0;  // hue doesn't matter when val=0
+        } else {
+            // Get sine value from pre-computed lookup table (no floating-point math!)
+            float sineValue;
+            if (color.mode == DistributionMode::RANDOM) {
+                // Use ORDERED sine values but pull from interleaved positions
+                sineValue = halfCycleSine[interleavedIndices[i]];
+            } else if (color.mode == DistributionMode::ORDERED) {
+                sineValue = halfCycleSine[i];
+            } else {  // LOOPING
+                sineValue = fullCycleSine[i];
+            }
+            
+            // Apply spread offset to primary hue
+            int16_t offset;
+            if (color.mode == DistributionMode::LOOPING) {
+                offset = (int16_t)(sineValue * (float)color.spread * 0.5f);  // Full cycle: -spread/2 to +spread/2
+            } else {
+                offset = (int16_t)((sineValue - 0.5f) * (float)color.spread);  // Half cycle: -spread/2 to +spread/2
+            }
+            hue = (uint16_t)(((int16_t)color.primary + offset + 256) % 256) * 360 / 256;
+            
+            // Apply brightness and LED_BRIGHTNESS cap
+            val = (uint8_t)((float)color.brightness * LED_BRIGHTNESS);
+        }
+        
+        // ── Sparkle Channel (White) ────────────────────────────────────────────
+        uint8_t white;
+        
+        // Early-exit if sparkle brightness is zero (prevents spread from lighting LEDs)
+        if (sparkle.brightness == 0) {
+            white = 0;
+        } else {
+            // Get sine value from pre-computed lookup table (no floating-point math!)
+            float sineValue;
+            if (sparkle.mode == DistributionMode::RANDOM) {
+                // Use ORDERED sine values but pull from interleaved positions
+                sineValue = halfCycleSine[interleavedIndices[i]];
+            } else if (sparkle.mode == DistributionMode::ORDERED) {
+                sineValue = halfCycleSine[i];
+            } else {  // LOOPING
+                sineValue = fullCycleSine[i];
+            }
+            
+            // Apply spread offset to brightness
+            int16_t offset;
+            if (sparkle.mode == DistributionMode::LOOPING) {
+                offset = (int16_t)(sineValue * (float)sparkle.spread * 0.5f);  // Full cycle
+            } else {
+                offset = (int16_t)((sineValue - 0.5f) * (float)sparkle.spread);  // Half cycle
+            }
+            white = (uint8_t)constrain((int16_t)sparkle.brightness + offset, 0, 255);
+            
+            // Apply LED_BRIGHTNESS cap to white channel
+            white = (uint8_t)((float)white * LED_BRIGHTNESS);
+        }
+        
+        // ── Pack and Send ──────────────────────────────────────────────────────
+        // Convert HSV to RGB
+        uint8_t region = hue / 60u;
+        uint8_t rem    = (uint8_t)((hue % 60u) * 255u / 60u);
+        uint8_t p = (uint8_t)((uint32_t)val * (255u - sat) / 255u);
+        uint8_t q = (uint8_t)((uint32_t)val * (255u - (uint32_t)sat * rem  / 255u) / 255u);
+        uint8_t t = (uint8_t)((uint32_t)val * (255u - (uint32_t)sat * (255u - rem) / 255u) / 255u);
+        uint8_t r, g, b;
+        switch (region) {
+            case 0:  r = val; g = t;   b = p;   break;
+            case 1:  r = q;   g = val; b = p;   break;
+            case 2:  r = p;   g = val; b = t;   break;
+            case 3:  r = p;   g = q;   b = val; break;
+            case 4:  r = t;   g = p;   b = val; break;
+            default: r = val; g = p;   b = q;   break;
+        }
+        
+        // Pack SK6812 GRBW word (G, R, B, W in MSB-first order)
+        uint32_t pixel = ((uint32_t)g << 24) | ((uint32_t)r << 16) | ((uint32_t)b << 8) | white;
+        put_pixel(pixel);
+    }
+    
+    send_reset();
 }

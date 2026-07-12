@@ -77,7 +77,7 @@
 //      Hold BOOTSEL button for 5 seconds in any mode to clear credentials and reboot.
 //    Core 1 is dedicated to the LED controller and animations - see led_controller.cpp.
 
-// Neccessary Libraries for Core operation, web services, and file system management
+// Necessary libraries for core operation, web services, and file system management
 #include <Arduino.h>        // Core Arduino library for Pico W
 #include <WiFi.h>           // WiFi support for Pico W
 #include <WebServer.h>      // HTTP server for handling web requests
@@ -90,17 +90,14 @@
 #include "web_handlers.h"   // HTTP request handlers for the web server
 #include "led_controller.h" // Controls the LED animations and updates (core 1)
 
-// LED pin (Pico W uses WiFi chip LED)
+// On-Board LED pin (Pico W uses WiFi chip LED) Used to display Blossom's connected status
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 25
 #endif
 
-// Global server instances (referenced via extern in web_handlers.h)
+// Global server instances (used in web_handlers.h)
 WebServer server(80);
 DNSServer dnsServer;
-
-// LED state tracking (exposed to web_handlers.cpp via extern)
-bool ledState = true;
 
 // System state
 enum SystemMode {
@@ -109,64 +106,86 @@ enum SystemMode {
 };
 SystemMode currentMode = MODE_PROVISIONING;
 
-// Deferred reboot - lets HTTP response flush before AP goes down
+// Enable Serial Output to Watch debug messages on your serial monitor!
+bool serialDebug = true;  // Usually false for production builds
+
+// LED state tracking (If the web handler needs to look at the state of the LED)
+bool ledState = true;
+
+// Deferred reboot - Allows messages to complete before restarting system
 bool rebootPending = false;
 unsigned long rebootAt = 0;
-
+// Schedule a reboot after a specified delay (in milliseconds)
 void scheduleReboot(unsigned long delayMs) {
   rebootPending = true;
   rebootAt = millis() + delayMs;
 }
 
-// Factory reset button state
+// Factory reset button state (Uses the built-in Pico 2W BOOTSEL button)
 unsigned long bootselPressStart = 0;
 bool bootselPressedLastLoop = false;
 const unsigned long FACTORY_RESET_HOLD_TIME = 5000;  // 5 seconds
 
-// --- Core 0: Setup & Loop ---
+// ###########################################################################
+// ##                   MAIN.cpp - Core 0 Setup and Loop                    ##
+// ###########################################################################
 
 void setup() {
-  Serial.begin(115200);
-  delay(1000);
+  // Initialize Serial Output (if active) and give it some time to start up
+  if (serialDebug) {
+    Serial.begin(115200);
+    delay(1000);  // Allow time for the serial monitor to connect
+    Serial.println("\n=================================");
+    Serial.println("Blossom - Programmable Light Display");
+    Serial.println("=================================\n");
+  }
 
-  Serial.println("\n\n=================================");
-  Serial.println("Blossom - Programmable Light Display");
-  Serial.println("=================================\n");
-
+  // Initialize the on-board LED pin for status indication
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 
+  // Initialize the file system (LittleFS)
+  // Report status to serial if enabled
   if (!LittleFS.begin()) {
-    Serial.println("! LittleFS mount failed -- run: pio run --target uploadfs");
+    if (serialDebug) Serial.println("! LittleFS mount failed. Run: pio run --target uploadfs");
   } else {
-    Serial.println("+ LittleFS mounted");
+    if (serialDebug) Serial.println("+ LittleFS mounted");
   }
 
+  // Try to load saved WiFi credentials from the file system
   String savedSSID, savedPassword;
+  int timeoutSeconds = 20;  
   if (loadCredentials(savedSSID, savedPassword)) {
-    Serial.println("Found saved credentials, attempting connection...");
+    if (serialDebug) Serial.println("Found saved credentials, attempting connection...");
 
-    if (connectToWiFi(savedSSID, savedPassword, 20)) {
+    if (connectToWiFi(savedSSID, savedPassword, timeoutSeconds)) {
+      // Successful connection! Set mode and turn indicator LED on
       currentMode = MODE_CONNECTED;
       digitalWrite(LED_BUILTIN, HIGH);
 
+      // Start mDNS responder for local network discovery: "blossom.local"
       if (MDNS.begin("blossom")) {
-        Serial.println("+ mDNS responder started -- hostname: blossom.local");
+        if (serialDebug) Serial.println("+ mDNS responder started. Hostname: blossom.local");
         MDNS.addService("http", "tcp", 80);
       } else {
-        Serial.println("x mDNS setup failed");
+        if (serialDebug) Serial.println("! mDNS setup failed. Check network configuration.");
       }
 
+      // Set up web server routes for connected mode
       setupConnectedRoutes();
 
-      Serial.println("\n=================================");
-      Serial.println("+ CONNECTED TO WIFI");
-      Serial.print("Network: ");
-      Serial.println(WiFi.SSID());
-      Serial.print("IP: ");
-      Serial.println(WiFi.localIP());
-      Serial.println("Hostname: blossom.local");
-      Serial.println("=================================\n");
+      if (serialDebug) {
+        Serial.println("\n=================================");
+        Serial.println("+ CONNECTED TO WIFI");
+        Serial.print("Network: ");
+        Serial.println(WiFi.SSID());
+        Serial.print("IP: ");
+        Serial.println(WiFi.localIP());
+        Serial.println("Hostname: blossom.local");
+        Serial.println("=================================\n");
+      }
+
+      // If connected, setup is finished! 
       return;
     }
 
@@ -177,15 +196,17 @@ void setup() {
     // cycle will retry automatically, and the provisioning AP lets the user reconfigure
     // immediately without needing to know about stored credentials.
     if (WiFi.status() == WL_CONNECT_FAILED) {
-      Serial.println("x Authentication failed -- clearing credentials");
+      if (serialDebug) Serial.println("x Authentication failed -- clearing credentials");
       clearCredentials();
     } else {
-      Serial.println("x Network unreachable -- credentials preserved, starting provisioning AP");
-      Serial.println("  (Power cycle will retry stored credentials automatically)");
+      if (serialDebug) {
+        Serial.println("x Network unreachable -- credentials preserved, starting provisioning AP");
+        Serial.println("  (Power cycle will retry stored credentials automatically)");
+      }
     }
     // fall through to start the provisioning AP in both cases
   } else {
-    Serial.println("No saved credentials found");
+    if (serialDebug) Serial.println("No saved credentials found");
   }
 
   currentMode = MODE_PROVISIONING;

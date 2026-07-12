@@ -271,9 +271,9 @@ static void handleScan() {
 
   json += "]}";
 
-  Serial.print("Filtered to ");
-  Serial.print(addedCount);
-  Serial.println(" unique networks");
+  //Serial.print("Filtered to ");
+  //Serial.print(addedCount);
+  //Serial.println(" unique networks");
 
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200, "application/json", json);
@@ -294,11 +294,11 @@ void setupProvisioningRoutes() {
   server.on("/api/connect", HTTP_POST, handleConnect);
   server.onNotFound(handleNotFound);
   server.begin();
-  Serial.println("✓ Web server started on port 80");
-  Serial.println("\n=================================");
-  Serial.println("Connect to WiFi: Blossom_Setup");
-  Serial.println("Open browser: http://192.168.4.1");
-  Serial.println("=================================\n");
+  //Serial.println("✓ Web server started on port 80");
+  //Serial.println("\n=================================");
+  //Serial.println("Connect to WiFi: Blossom_Setup");
+  //Serial.println("Open browser: http://192.168.4.1");
+  //Serial.println("=================================\n");
 }
 
 void setupConnectedRoutes() {
@@ -312,5 +312,5 @@ void setupConnectedRoutes() {
   server.on("/api/animation", HTTP_POST, handleAnimation);
   server.onNotFound(handleNotFound);
   server.begin();
-  Serial.println("✓ Web server started (connected mode)");
+  //Serial.println("✓ Web server started (connected mode)");
 }

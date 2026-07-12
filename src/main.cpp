@@ -41,23 +41,27 @@
 //     it's definitely recommended to give them their own 5V power supply.
 // ###########################################################################
 //   SYSTEM ARCHITECTURE
-//                  ┌───────────────────────────────────┐
-//                  │            RP 2350 CPU            │
-//       ┌────────┐ │ ┌──────────────┐ ┌──────────────┐ │
+//                    ┌────────────┐                     
+//                   (▌  BOOTSEL/  ▐)                    
+//                   (▌Reset Button▐)                    
+//                    └──┬─────────┘                     
+//                  ┌────┼──────────────────────────────┐
+//                  │    │       RP 2350 CPU            │
+//       ┌────────┐ │ ┌──┴───────────┐ ┌──────────────┐ │
 //       │  File  ├─┴─┤    CORE 0:   ├─┤    CORE 1:   │ │
 //       │ System ├─┬─┤ Wifi and Web ├─┤LED Controller│ │
 //       └────────┘ │ └──────┬───────┘ └───────┬──────┘ │
 //                  └────────┼─────────────────┼────────┘
-//                      ┌────┴─────┐     ┌─────┴────┐   
-//                      │Wifi Chip │     │PIO State │   
-//                      │          │     │ Machine  │   
-//                      └──────────┘     └─────┬────┘   
-//                       ││▲    ▼││         *  │  *     
-//                     Local Network      *  LEDs   *   
-//                                          *  *  *     
+//                      ┌────┴─────┐     ┌─────┴────┐    
+//                      │Wifi Chip │     │PIO State │    
+//                      │          │     │ Machine  │    
+//                      └──────────┘     └─────┬────┘    
+//                       ││▲    ▼││         *  │  *      
+//                     Local Network      *  LEDs   *    
+//                                          *  *  *      
 // The Pico could probably manage everything on a single core, but let's show off!
 // We use the dual-core to manage connections while ensuring the LED animation is unbroken.
-//   Core 0: WiFi, WebServer, and provisioning.
+//   Core 0: WiFi, WebServer, provisioning and monitoring factory reset button.
 //   Core 1: Calculating LED animations and sending updates to them via PIO.
 // The Pico comes with built-in "Programmable I/O" ("PIO") state machines.
 //   These are little tiny machine-code processors with perfect timing.
@@ -189,13 +193,15 @@ void setup() {
       return;
     }
 
-    // Distinguish why the connection failed before deciding what to do with credentials.
-    // WL_CONNECT_FAILED means the password was rejected — credentials are definitively wrong.
-    // Any other failure (timeout, WL_NO_SSID_AVAIL) means the network was unreachable —
-    // could be temporary outage OR a new location.  Keep credentials either way: a power
-    // cycle will retry automatically, and the provisioning AP lets the user reconfigure
-    // immediately without needing to know about stored credentials.
+    // If we've reached this part of the code, it means we've successfully loaded
+    // credentials but failed to connect to the WiFi network. Possibilities:
+    // WL_CONNECT_FAILED means password was rejected. Credentials are definitively wrong.
+    // Any other failure (timeout, WL_NO_SSID_AVAIL) means the network was unreachable.
+    //   - Possibly a temporary outage. Keep credentials and wait for a power cycle.
+    //   - Possibly a new setup. Keep credentials but start provisioning mode.
+    // Either way, this code will fall through to start the provisioning AP.
     if (WiFi.status() == WL_CONNECT_FAILED) {
+      // Password was rejected. Clear credentials.
       if (serialDebug) Serial.println("x Authentication failed -- clearing credentials");
       clearCredentials();
     } else {
@@ -204,11 +210,11 @@ void setup() {
         Serial.println("  (Power cycle will retry stored credentials automatically)");
       }
     }
-    // fall through to start the provisioning AP in both cases
   } else {
     if (serialDebug) Serial.println("No saved credentials found");
   }
 
+  // Failed to connect to WiFi, so we fire up the provisioning access point:
   currentMode = MODE_PROVISIONING;
   startProvisioningAP(dnsServer);
   setupProvisioningRoutes();
@@ -216,33 +222,44 @@ void setup() {
 }
 
 void loop() {
+  // Core 0 main loop: Handles WiFi, web server, and factory reset button
+  // #################### Factory Reset Button Handling ####################
   bool bootselPressed = BOOTSEL;
 
+  // Check if reset button was pressed and start the timer if so.
   if (bootselPressed && !bootselPressedLastLoop) {
     bootselPressStart = millis();
-    Serial.println("\nBOOTSEL button pressed - hold for 5 seconds to factory reset...");
+    if (serialDebug) Serial.println("\nBOOTSEL button pressed - hold for 5 seconds to factory reset...");
   }
 
+  // If the reset button is being held, flash the LED and check the timer
   if (bootselPressed && bootselPressedLastLoop) {
     unsigned long holdDuration = millis() - bootselPressStart;
-    digitalWrite(LED_BUILTIN, (millis() / 100) % 2);
+    digitalWrite(LED_BUILTIN, (millis() / 100) % 2); // Flash onboard LED every 100 ms
 
-    static unsigned long lastCountdown = 0;
-    if (millis() - lastCountdown > 1000) {
-      int secondsLeft = (FACTORY_RESET_HOLD_TIME - holdDuration) / 1000;
-      if (secondsLeft >= 0) {
-        Serial.print("Factory reset in ");
-        Serial.print(secondsLeft + 1);
-        Serial.println(" seconds...");
+    // Output countdown to serial monitor if debug is enabled
+    if (serialDebug) {
+      static unsigned long lastCountdown = 0;
+      if (millis() - lastCountdown > 1000) {
+        int secondsLeft = (FACTORY_RESET_HOLD_TIME - holdDuration) / 1000;
+        if (secondsLeft >= 0) {
+            Serial.print("Factory reset in ");
+            Serial.print(secondsLeft + 1);
+            Serial.println(" seconds...");
+          }
+        lastCountdown = millis();
       }
-      lastCountdown = millis();
     }
 
+    // Trigger factory reset if the button has been held long enough
     if (holdDuration >= FACTORY_RESET_HOLD_TIME) {
-      Serial.println("\n=================================");
-      Serial.println("FACTORY RESET TRIGGERED");
-      Serial.println("=================================");
+      if (serialDebug) {
+        Serial.println("\n=================================");
+        Serial.println("FACTORY RESET TRIGGERED");
+        Serial.println("=================================");
+      }
 
+      // Rapid confirmation blink right before reset:
       for (int i = 0; i < 10; i++) {
         digitalWrite(LED_BUILTIN, HIGH);
         delay(50);
@@ -250,29 +267,35 @@ void loop() {
         delay(50);
       }
 
+      // Wipe credentials and reboot!
       clearCredentials();
-      Serial.println("Rebooting to provisioning mode...");
+      if (serialDebug) Serial.println("Rebooting to provisioning mode...");
       delay(500);
       rp2040.reboot();
     }
   }
 
+  // Reset the hold timer if the reset button has been released
   if (!bootselPressed && bootselPressedLastLoop) {
     unsigned long holdDuration = millis() - bootselPressStart;
     if (holdDuration < FACTORY_RESET_HOLD_TIME) {
-      Serial.println("BOOTSEL button released - factory reset cancelled");
-    }
+      if (serialDebug) Serial.println("BOOTSEL button released - factory reset cancelled");
+    } 
   }
 
+  // Store button state for next loop
   bootselPressedLastLoop = bootselPressed;
 
+  // Handle deferred reboot if scheduled
   if (rebootPending && millis() >= rebootAt) {
     rp2040.reboot();
   }
 
+  // #################### Main Mode Handling ####################
   if (currentMode == MODE_PROVISIONING) {
+    // While provisioning, process requests
     dnsServer.processNextRequest();
-
+    // Blink LED slowly to indicate provisioning mode
     if (!bootselPressed) {
       static unsigned long lastBlink = 0;
       if (millis() - lastBlink > 2000) {
@@ -281,21 +304,22 @@ void loop() {
       }
     }
   } else {  // MODE_CONNECTED
+    // While connected, update mDNS and monitor WiFi connection
     MDNS.update();
 
     // WiFi watchdog: if the connection drops (e.g. router reboot, brief outage),
-    // the WebServer and lwIP stack won't recover on their own.  After a 30-second
-    // grace period we reboot — the device reconnects in ~10 s and re-advertises
-    // blossom.local via mDNS.  Core 1 / LEDs are unaffected during the wait.
+    // the WebServer and lwIP stack won't recover on their own. After a 30-second
+    // grace period we reboot. The device reconnects in ~10s and re-advertises
+    // blossom.local via mDNS. Core 1 / LEDs are unaffected during the wait.
     static bool          wifiWasLost = false;
     static unsigned long wifiLostAt  = 0;
     if (WiFi.status() != WL_CONNECTED) {
       if (!wifiWasLost) {
         wifiWasLost = true;
         wifiLostAt  = millis();
-        Serial.println("! WiFi disconnected -- will reboot in 30 s if not restored");
+        if (serialDebug) Serial.println("! WiFi disconnected - rebooting in 30s if not restored");
       } else if (millis() - wifiLostAt >= 30000UL) {
-        Serial.println("! WiFi lost for 30 s -- rebooting to reconnect");
+        if (serialDebug) Serial.println("! WiFi lost for 30s - rebooting to reconnect");
         delay(100);
         rp2040.reboot();
       }
@@ -303,22 +327,26 @@ void loop() {
       wifiWasLost = false;
     }
 
+    // Ensure the built-in LED is on when connected and BOOTSEL is not pressed
     if (!bootselPressed) {
-      digitalWrite(LED_BUILTIN, ledState ? HIGH : LOW);
+      digitalWrite(LED_BUILTIN, HIGH);
     }
   }
 
+  // Handle incoming web requests, regardless of mode (provisioning or connected):
   server.handleClient();
 }
 
-// --- Core 1: LED Animation Engine ---
+// ###########################################################################
+// ##                   MAIN.cpp - Core 1 Setup and Loop                    ##
+// ###########################################################################
 
 void setup1() {
-  // Core 1 starts here — LED controller initialization
+  // Core 1 immediately initializes the LED array on startup:
   initLEDs();
 }
 
 void loop1() {
-  // Core 1 main loop — runs animation engine at ~30 FPS independently of Core 0
+  // Core 1 main loop: Creates new anim frames and sends them to the LED array
   updateLEDs();
 }

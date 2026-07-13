@@ -1,0 +1,6 @@
+.pio/
+.git/
+build/
+**/*.bin
+**/*.elf
+**/*.hex

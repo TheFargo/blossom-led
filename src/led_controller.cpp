@@ -164,6 +164,8 @@ static inline float flickerSpeedToRate(uint8_t speed) {
 
 // Returns the Flicker contribution for pixel `i` at time `t` (seconds), in [-1, +1].
 // `mode` (Synchronicity) controls how the noise is distributed across the ring:
+//   UNISON  — every pixel shares the exact same noise value at the exact same
+//             instant — the whole ring flickers together as one light.
 //   RANDOM  — every pixel gets its own independent noise stream (own seed).
 //   ORDERED — every pixel samples the *same* noise stream, but delayed by an
 //             amount proportional to its position — the randomness visibly
@@ -175,6 +177,9 @@ static float flickerSignal(int i, float t, DistributionMode mode, uint8_t speed)
     float tScaled = t * flickerSpeedToRate(speed);
     float raw;
     switch (mode) {
+        case DistributionMode::UNISON:
+            raw = valueNoise(0u, tScaled);  // no per-pixel seed, no delay — one shared value for all
+            break;
         case DistributionMode::RANDOM:
             raw = valueNoise((uint32_t)i * 104729u, tScaled);  // large prime → decorrelated seeds
             break;
@@ -204,6 +209,8 @@ static inline float pulseSpeedToHz(uint8_t speed) {
 
 // Returns the Pulse contribution for pixel `i` at time `t` (seconds), in [-1, +1].
 // `mode` (Synchronicity II) controls how the sine wave is laid out across the ring:
+//   UNISON  — every pixel shares the exact same phase — the whole ring breathes
+//             together as one light, no spatial variation at all.
 //   RANDOM  — each pixel gets a fixed, scattered starting phase (golden-angle
 //             spacing keeps neighboring pixels from lining up), so every pixel
 //             breathes with its own curve rather than in sync.
@@ -220,6 +227,8 @@ static float pulseSignal(int i, float t, DistributionMode mode, uint8_t speed) {
     float freq = pulseSpeedToHz(speed);
     float temporalPhase = TWO_PI * freq * t;
     switch (mode) {
+        case DistributionMode::UNISON:
+            return sinf(temporalPhase);  // no spatial phase offset — every pixel breathes in perfect sync
         case DistributionMode::RANDOM: {
             const float GOLDEN_ANGLE = 2.399963f;  // radians (~137.5°) — scatters phases evenly
             float spatialPhase = (float)i * GOLDEN_ANGLE;
@@ -361,19 +370,24 @@ void updateLEDs() {
 
             if (!colorAnimated) {
                 // Step 1: static spread distribution (Container 2's radio buttons) —
-                // unchanged from the original implementation.
-                float sineValue;
-                if (color.mode == DistributionMode::RANDOM) {
-                    sineValue = halfCycleSine[interleavedIndices[i]];
-                } else if (color.mode == DistributionMode::ORDERED) {
-                    sineValue = halfCycleSine[i];
-                } else {  // LOOPING
-                    sineValue = fullCycleSine[i];
-                }
-                if (color.mode == DistributionMode::LOOPING) {
-                    offset = sineValue * (float)color.spread * 0.5f;
+                // unchanged from the original implementation, plus the new Unison
+                // option which simply pins every pixel to the primary hue (no spread).
+                if (color.mode == DistributionMode::UNISON) {
+                    offset = 0.0f;
                 } else {
-                    offset = (sineValue - 0.5f) * (float)color.spread;
+                    float sineValue;
+                    if (color.mode == DistributionMode::RANDOM) {
+                        sineValue = halfCycleSine[interleavedIndices[i]];
+                    } else if (color.mode == DistributionMode::ORDERED) {
+                        sineValue = halfCycleSine[i];
+                    } else {  // LOOPING
+                        sineValue = fullCycleSine[i];
+                    }
+                    if (color.mode == DistributionMode::LOOPING) {
+                        offset = sineValue * (float)color.spread * 0.5f;
+                    } else {
+                        offset = (sineValue - 0.5f) * (float)color.spread;
+                    }
                 }
             } else {
                 // Steps 2 & 3: Flicker and/or Pulse drive this pixel's position
@@ -405,18 +419,22 @@ void updateLEDs() {
             float offset;
 
             if (!sparkleAnimated) {
-                float sineValue;
-                if (sparkle.mode == DistributionMode::RANDOM) {
-                    sineValue = halfCycleSine[interleavedIndices[i]];
-                } else if (sparkle.mode == DistributionMode::ORDERED) {
-                    sineValue = halfCycleSine[i];
-                } else {  // LOOPING
-                    sineValue = fullCycleSine[i];
-                }
-                if (sparkle.mode == DistributionMode::LOOPING) {
-                    offset = sineValue * (float)sparkle.spread * 0.5f;
+                if (sparkle.mode == DistributionMode::UNISON) {
+                    offset = 0.0f;
                 } else {
-                    offset = (sineValue - 0.5f) * (float)sparkle.spread;
+                    float sineValue;
+                    if (sparkle.mode == DistributionMode::RANDOM) {
+                        sineValue = halfCycleSine[interleavedIndices[i]];
+                    } else if (sparkle.mode == DistributionMode::ORDERED) {
+                        sineValue = halfCycleSine[i];
+                    } else {  // LOOPING
+                        sineValue = fullCycleSine[i];
+                    }
+                    if (sparkle.mode == DistributionMode::LOOPING) {
+                        offset = sineValue * (float)sparkle.spread * 0.5f;
+                    } else {
+                        offset = (sineValue - 0.5f) * (float)sparkle.spread;
+                    }
                 }
             } else {
                 float position = 0.0f;
@@ -491,5 +509,3 @@ void updateLEDs() {
     
     send_reset();
 }
-
-

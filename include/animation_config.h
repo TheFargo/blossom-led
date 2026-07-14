@@ -6,10 +6,12 @@
 // ── Shared enum for distribution patterns ─────────────────────────────────────
 // Used for Color Spread, Sparkle Spread, and Synchronicity options.
 enum class DistributionMode : uint8_t {
-    RANDOM  = 0,  // Randomly distributed among the pixels
-    ORDERED = 1,  // Placed in order from first pixel to last
-    LOOPING = 2   // Split in two for seamless transitions/reflections
+    UNISON  = 0,  // All 16 pixels act in perfect concert — no variation across the ring
+    RANDOM  = 1,  // Randomly distributed among the pixels
+    ORDERED = 2,  // Placed in order from first pixel to last
+    LOOPING = 3   // Split in two for seamless transitions/reflections
 };
+
 
 // ── Container 2: Color Channel Settings ───────────────────────────────────────
 struct ColorSettings {

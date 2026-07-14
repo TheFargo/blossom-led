@@ -145,9 +145,11 @@ static bool parseBool(const String& body, const char* key) {
 
 static DistributionMode parseMode(const String& body, const char* key) {
   uint8_t val = parseUint8(body, key);
-  if (val > 2) return DistributionMode::RANDOM;
+  // Valid range is now 0-3: Unison, Random, Ordered, Looping (see animation_config.h)
+  if (val > 3) return DistributionMode::RANDOM;
   return (DistributionMode)val;
 }
+
 
 static void handleLeds() {
   if (!server.hasArg("plain")) {

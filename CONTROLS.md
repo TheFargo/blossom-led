@@ -29,11 +29,13 @@ tracks are applied.
     extremes. Users can quickly iterate by adjusting the color and spread sliders.
 4. Slider: Brightness (255 positions, representing color LED brightness levels.)
   Brightness levels are *relative* to LED_BRIGHTNESS constant in code! That's a hard cap!
-5. Radio Buttons: Color Spread (Three options available:)
+5. Radio Buttons: Color Spread (Four options available:)
+    - Unison (All 16 pixels use the exact same color — no spread applied)
     - Random (The resulting color spread is randomly distributed among the pixels)
     - Ordered (The color spread is placed in order from first pixel to last)
     - Looping (Color spread split in two, using half the pixels to reach destination
         color, and half to transition back, erasing the "seam.")
+
 
 # Container 3: White Channel 
 
@@ -48,11 +50,13 @@ In this section, users can definte how bright and varied they want these pixels 
   A spread of 0 means all the white lights are the same brightness.
   A spread of 255 means the lights will vary from full bright to full dark. 
   Again, the LED_BRIGHTNESS cap is respected as the max value in these calculations.
-4. Radio Buttons: Sparkle Spread (Three options available:)
+4. Radio Buttons: Sparkle Spread (Four options available:)
+    - Unison (All 16 pixels use the exact same brightness — no spread applied)
     - Random (The resulting white spread is randomly distributed among the pixels)
     - Ordered (The white spread is placed in order from first pixel to last)
     - Looping (White spread split in two, using half the pixels to go from min to 
       max brightness, and the other half to transition back, creating a seamless loop.)
+
 
 # Container 4: Flicker Animation
 
@@ -66,10 +70,12 @@ The Flicker animation will use a randomized noise track to move a pixel between 
   At low amplitudes, pixels will stay close the the primary color/brightness.
   At high amplitudes, the value of the noise is multiplied, but capped at the spread.
     This means pixels will stay at extremes longer. 
-6. Radio Buttons: Synchonicity (Three options availble:)
+6. Radio Buttons: Synchonicity (Four options availble:)
+    - Unison (Every pixel shares the exact same noise value — the whole ring flickers as one)
     - Random (Every pixel uses its own noise pattern)
     - Ordered (Pixels follow the noise pattern in order, so it moves along the ring)
     - Looping (Pixels are split in two, half following the pattern, half reflecting it)
+
 
 # Container 5: Pulse Animation
 
@@ -83,10 +89,12 @@ The Pulse animation uses a sine-wave track to smoothly cycle a pixel between the
   At the halfway point, the pixel will animate exactly from one extreme to another.
   At high amplitudes, the value of the curve is multiplied, but capped at the spread.
     This means pixels will stay at extremes longer. 
-6. Radio Buttons: Synchonicity II (Three options availble:)
+6. Radio Buttons: Synchonicity II (Four options availble:)
+    - Unison (Every pixel shares the exact same phase — the whole ring breathes as one)
     - Random (Every pixel uses its own sine curve pattern)
     - Ordered (Pixels follow the sine curve in order, so it moves along the ring)
     - Looping (Curve is squashed to fit entirely in the number of LEDs)
+
 
 # Container 6: Spin Animation
 

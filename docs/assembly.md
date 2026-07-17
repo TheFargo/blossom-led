@@ -43,8 +43,10 @@ Building your own Blossom from scratch? Great idea! This is the perfect starter/
 
 To construct this project from scratch, you'll need the skills and equipment to laser-cut and prepare wood, and to solder wires onto circuit boards. If you've never done those things before, this is a _great_ project to get started with! Here's what you should have on-hand:
 
-1. A 5W (or greater) laser engraver/cutter.
-Text here
+1. **A 5W (or greater) laser engraver/cutter.**
 
-2. Another thing
+For the best results, you'll want an air assist and a honeycomb workbench panel. A more powerful laser will cut the project faster, but a little 5W will do. 
+
+2. **Another thing**
+
 Text here 

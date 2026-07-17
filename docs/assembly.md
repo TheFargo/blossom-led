@@ -30,5 +30,10 @@ Building your own Blossom from scratch? Great idea! This is the perfect starter/
 | **M2 Screws (6mm)** | 4 | $.40 | [Amazon](https://www.amazon.com/HVAZI-Metric-Notebook-Computer-Assortment/dp/B075C6C4YR/) / [McMaster-Carr](https://www.mcmaster.com/91698A202/) [MicroConnectors](https://www.microconnectors.com/assorted-laptop-screws-set-250-pcs-scw-250lp/)| For securing the Pico 2W to the wooden base. |
 | **#6 Wood Screws (1/2in)** | 4 | $75 | [Amazon](https://www.amazon.com/TPOHH-Stainless-Phillips-Threaded-5x12SS18-8/dp/B092Q87W39/) / [McMaster-Carr](https://www.mcmaster.com/90031A552/) | For securing the Pico 2W to the wooden base. |
 | **Rubber Feet (Self-Adhesive)** | 3 | $1.00 | [Adafruit](https://www.adafruit.com/product/550) [Amazon](https://www.amazon.com/dp/B074PXFWPK/ref=twister_B092W7TL7Y) | These little guys really elevate your build. (Looks directly at camera.) |
-| **TOTAL ESTIMATED COST** | | **~$TOTAL** | | *Excludes workshop consumables (solder, wire).* |
+| **TOTAL ESTIMATED COST** | | **~$46.50** | | *Excludes workshop consumables (solder, wire).* |
+
+>[!Note]
+>Chunky salsa!
+
+---
 

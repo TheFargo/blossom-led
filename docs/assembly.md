@@ -29,7 +29,7 @@ Building your own Blossom from scratch? Great idea! This is the perfect starter/
 | **Micro-USB Cable (3ft to 6ft)** | 1 | ~$3.00 | Generic / Amazon [Example](https://www.amazon.com/Charging-Transfer-Android-Trustable-MYFON/dp/B098DW7485/) | For power and programming. Ensure it's a data cable, not just power! |
 | **5V 1A USB Power Adapter** | 1 | ~$8.00 | Generic / Amazon [Example](https://www.amazon.com/Certified-Charger-Universal-Portable-Adapter/dp/B017TXGM4I/) | Standard phone charger wall brick to power the Blossom independant of a computer. |
 | **M2 Screws (6mm)** | 4 | $.40 | [Amazon](https://www.amazon.com/HVAZI-Metric-Notebook-Computer-Assortment/dp/B075C6C4YR/) / [McMaster-Carr](https://www.mcmaster.com/91698A202/) [MicroConnectors](https://www.microconnectors.com/assorted-laptop-screws-set-250-pcs-scw-250lp/)| For securing the Pico 2W to the wooden base. |
-| **#6 Wood Screws (1/2in)** | 4 | $.75 | [Amazon](https://www.amazon.com/TPOHH-Stainless-Phillips-Threaded-5x12SS18-8/dp/B092Q87W39/) / [McMaster-Carr](https://www.mcmaster.com/90031A552/) | For securing the Pico 2W to the wooden base. |
+| **#6 Wood Screws (1/2in)** | 4 | $.75 | [Amazon](https://www.amazon.com/TPOHH-Stainless-Phillips-Threaded-5x12SS18-8/dp/B092Q87W39/) / [McMaster-Carr](https://www.mcmaster.com/90031A552/) | For fastening the two halves of the base enclosure. |
 | **Rubber Feet (Self-Adhesive)** | 3 | $1.00 | [Adafruit](https://www.adafruit.com/product/550) [Amazon](https://www.amazon.com/dp/B074PXFWPK/ref=twister_B092W7TL7Y) | These little guys really elevate your build. (Looks directly at camera.) |
 | **TOTAL ESTIMATED COST** | | **~$48.00** | | *Excludes workshop consumables (solder, wire).* |
 
@@ -49,9 +49,16 @@ To construct this project from scratch, you'll need the skills and equipment to 
 
 3. **A Soldering Iron Station.** Work in a well-ventilated area, preferably with a heat-resistant mat to protect your work surface. We're only soldering 6 connections, but they're very small: a magnifying glass and "helping hands" to hold the material will really help. 
 
-4. **(Optional) Metal-Drilling Equipment.** If you need to run wiring through your lighting display, you may want to drill a hole. _Use caution when drilling metal!_ Wear gloves and goggles, secure the art well, and use a stepped drill bit. Blossom needs only three small wires, so rather than risk damaging your art (or yourself!), you may just want to discretely run the wires.
+4. **Adhesive.** You'll want a way to attach the wooden parts of the Blossom to the art piece - little bit of Gorilla Glue will do the trick here. Optionally, a hot-glue gun is terrific for attaching and running hidden wires.
+
+5. **(Optional) Metal-Drilling Equipment.** If you need to run wiring through your lighting display, you may want to drill a hole. _Use caution when drilling metal!_ Wear gloves and goggles, secure the art well, and use a stepped drill bit. Blossom needs only three small wires, so rather than risk damaging your art (or yourself!), you may just want to discretely run the wires.
 
 ---
 
 ## 3. Manufacturing the Case
 
+The files you need for cutting and engraving the wooden case and lighting spindle are located in the `\enclosure` folder. Essentially, we're cutting out a "six-pack" of wooden disks. We'll glue three of these together to form the bottom half of the base with pre-printed instructions. The other three layers will be glued together to form the top half of the base, which holds the heart of the project: the blossom artwork, the lighting spindle, and the micontroller. Once assembled and wired, we will screw both halves together to enclose the hardware and wires in a small hollow cavity.
+
+1. **Cut the Sandwich.** Here's the text.
+
+2. **Mayonaise.** Yeah.

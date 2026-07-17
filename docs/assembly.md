@@ -41,12 +41,17 @@ Building your own Blossom from scratch? Great idea! This is the perfect starter/
 
 ## 2. Workbench Equipment
 
-To construct this project from scratch, you'll need the skills and equipment to laser-cut and prepare wood, and to solder wires onto circuit boards. If you've never done those things before, this is a _great_ project to get started with! Here's what you should have on-hand:
+To construct this project from scratch, you'll need the skills and equipment to laser-cut and prepare wood, and to solder wires onto circuit boards. If you've never done those things before, this is a _great_ project for getting started! Here's what you should have on-hand:
 
-1. **A 5W (or greater) laser engraver/cutter.**
+1. **A 5W (or Greater) Laser Engraver/Cutter.** For the best results, you'll want an air assist and a honeycomb workbench panel. A more powerful laser will cut the project faster, but a little 5W will do. 
 
-For the best results, you'll want an air assist and a honeycomb workbench panel. A more powerful laser will cut the project faster, but a little 5W will do. 
+2. **Wood Prep Materials.** Wood glue and clamps are essential, but for a really pro look and feel you'll also want sandpaper (200 and 400 grit), your color choice of stain, and your choice of finish (I'm a big fan of Danish Oil).
 
-2. **Another thing**
+3. **A Soldering Iron Station.** Work in a well-ventilated area, preferably with a heat-resistant mat to protect your work surface. We're only soldering 6 connections, but they're very small: a magnifying glass and "helping hands" to hold the material will really help. 
 
-Text here 
+4. **(Optional) Metal-Drilling Equipment.** If you need to run wiring through your lighting display, you may want to drill a hole. _Use caution when drilling metal!_ Wear gloves and goggles, secure the art well, and use a stepped drill bit. Blossom needs only three small wires, so rather than risk damaging your art (or yourself!), you may just want to discretely run the wires.
+
+---
+
+## 3. Manufacturing the Case
+

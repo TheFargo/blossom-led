@@ -32,7 +32,7 @@ Building your own Blossom from scratch? Great idea! This is the perfect starter/
 | **Rubber Feet (Self-Adhesive)** | 3 | $1.00 | [Adafruit](https://www.adafruit.com/product/550) [Amazon](https://www.amazon.com/dp/B074PXFWPK/ref=twister_B092W7TL7Y) | These little guys really elevate your build. (Looks directly at camera.) |
 | **TOTAL ESTIMATED COST** | | **~$46.50** | | *Excludes workshop consumables (solder, wire).* |
 
->[!Note] Sourcing a Tea-Light Holder:
+>[!Note] Sourcing a Tea-Light Holder
 >The capiz-shell design pictured here is available from [World Market](https://www.worldmarket.com/p/capiz-20-petal-lotus-tealight-candle-holder-119956.html). These are crafted in the Philippines from local materials and look great. Anything designed for a 4cm tea-light candle should work. Try to find something with a lot of translucent surfaces for the light to play off of. Look around and see what "Blossoms" for you!
 
 ---

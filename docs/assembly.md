@@ -19,16 +19,15 @@ Building your own Blossom from scratch? Great idea! This is the perfect starter/
 
 ## 1. Bill of Materials
 
-### 📝 Bill of Materials (BOM)
-
 | Item | Qty | Est. Price (USD) | Vendor Ideas | Notes |
 | :--- | :---: | ---: | :--- | :--- |
-| **Raspberry Pi Pico 2W** | 1 | $7.00 | [Adafruit](https://www.adafruit.com/product/6087) [Microcenter](https://www.microcenter.com/product/687384/raspberry-pi-pico-2-w) | Our heroic Microcontroller!  |
+| **Raspberry Pi Pico 2W** | 1 | $7.00 | [Adafruit](https://www.adafruit.com/product/6087) [Microcenter](https://www.microcenter.com/product/687384/raspberry-pi-pico-2-w) | Our heroic Microcontroller! Make sure to get the "2W." |
 | **Adafruit NeoPixel Ring (16-pixel) RGBW** | 1 | $11.95 | [Adafruit](https://www.adafruit.com/product/2854) | Beautiful pre-assembled array of RGBW LEDs. I prefer warm-white. |
-| **Micro-USB Cable (3ft to 6ft)** | 1 | ~$3.00 | Generic / Amazon | For power and programming. Ensure it's a data cable, not just power! |
-| **5V 1A USB Power Adapter** | 1 | ~$5.00 | Generic / Amazon | Standard phone charger wall brick to powr the Blossom independant of a computer. |
 | **Capiz-Shell Decorative Lotus** | 1 | (Varies) | Any decorative tea-light holder will work; See notes below for sourcing the beautiful capiz-shell assembly shown.  |
 | **3mm (1/8-in) Basswood or Birch Plywood** | 1 | ~$4.00 | Local Lumber / Craft Store | You'll need roughly 8"x12" of wood for laser cutting the case. |
-| **M2.5 Screws & Brass Standoffs (6mm)** | 4 | $1.50 | Amazon / McMaster-Carr | For securing the Pico 2W to the wooden base. |
-| **Rubber Feet (Self-Adhesive)** | 3 | $0.50 | Amazon | These little guys really elevate your build. (Looks directly at camera.) |
+| **Micro-USB Cable (3ft to 6ft)** | 1 | ~$3.00 | Generic / Amazon [Example](https://www.amazon.com/Charging-Transfer-Android-Trustable-MYFON/dp/B098DW7485/) | For power and programming. Ensure it's a data cable, not just power! |
+| **5V 1A USB Power Adapter** | 1 | ~$8.00 | Generic / Amazon [Example](https://www.amazon.com/Certified-Charger-Universal-Portable-Adapter/dp/B017TXGM4I/) | Standard phone charger wall brick to power the Blossom independant of a computer. |
+| **M2 Screws (6mm)** | 4 | $.40 | [Amazon](https://www.amazon.com/HVAZI-Metric-Notebook-Computer-Assortment/dp/B075C6C4YR/) / [McMaster-Carr](https://www.mcmaster.com/91698A202/) [MicroConnectors](https://www.microconnectors.com/assorted-laptop-screws-set-250-pcs-scw-250lp/)| For securing the Pico 2W to the wooden base. |
+| **#6 Wood Screws (1/2in)** | 4 | $75 | [Amazon](https://www.amazon.com/TPOHH-Stainless-Phillips-Threaded-5x12SS18-8/dp/B092Q87W39/) / [McMaster-Carr](https://www.mcmaster.com/90031A552/) | For securing the Pico 2W to the wooden base. |
+| **Rubber Feet (Self-Adhesive)** | 3 | $1.00 | [Adafruit](https://www.adafruit.com/product/550) [Amazon](https://www.amazon.com/dp/B074PXFWPK/ref=twister_B092W7TL7Y) | These little guys really elevate your build. (Looks directly at camera.) |
 | **TOTAL ESTIMATED COST** | | **~$TOTAL** | | *Excludes workshop consumables (solder, wire).* |

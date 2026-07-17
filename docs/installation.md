@@ -15,12 +15,8 @@ Platform IO takes away a lot of the busy-work for you when it comes to compilili
 1. [What You'll Need](#1-what-youll-need)
 2. [Installing PlatformIO](#2-installing-platformio)
 3. [Opening the Project](#3-opening-the-project)
-4. [Understanding the Build Process](#4-understanding-the-build-process)
-5. [Building the Firmware](#5-building-the-firmware)
-6. [Uploading Firmware to the Pico 2W](#6-uploading-firmware-to-the-pico-2w)
-7. [Uploading the Filesystem (LittleFS)](#7-uploading-the-filesystem-littlefs)
-8. [Monitoring Serial Output](#8-monitoring-serial-output)
-9. [Troubleshooting](#9-troubleshooting)
+4. [Next Steps](#4-next-steps)
+
 
 ---
 
@@ -75,6 +71,8 @@ There's also a .pio directory in the project where PlatformIO will store everyth
 
 ---
 
-Installation Complete!
+## 4. Next Steps
 
-See the [Build and Upload Guide](build_and_upload.md) for help settin up your hardware.
+Installation Complete! Let's get the rest of your environment set up. 
+
+See the [Build and Upload Guide](build_and_upload.md) for help setting up your hardware.

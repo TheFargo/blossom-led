@@ -11,7 +11,7 @@
 #define LED_COUNT  16   // 16-pixel SK6812 RGBW ring
 
 // Master brightness scalar (0.0 – 1.0). Adjust to taste.
-static const float LED_BRIGHTNESS = 0.1f;
+static const float LED_BRIGHTNESS = 0.2f;
 
 // ── PIO program (SK6812/WS2812 bit-banging, 8 MHz clock) ──────────────────────
 // Translated from the MicroPython neopixel_projector PIO assembly.

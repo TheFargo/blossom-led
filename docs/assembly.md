@@ -57,7 +57,11 @@ To construct this project from scratch, you'll need the skills and equipment to 
 
 ## 3. Manufacturing the Case
 
-The files you need for cutting and engraving the wooden case and lighting spindle are located in the `\enclosure` folder. Essentially, we're cutting out a "six-pack" of wooden disks. We'll glue three of these together to form the bottom half of the base with pre-printed instructions. The other three layers will be glued together to form the top half of the base, which holds the heart of the project: the blossom artwork, the lighting spindle, and the micontroller. Once assembled and wired, we will screw both halves together to enclose the hardware and wires in a small hollow cavity.
+The files you need for cutting and engraving the wooden case and lighting spindle are located in the `\enclosure` folder.
+
+![The Enclosure Before Prep and Assembly](images/laser_cut_parts.jpg)
+
+Essentially, we're cutting out a "six-pack" of wooden disks. We'll glue three of these together to form the bottom half of the base with pre-printed instructions. The other three layers will be glued together to form the top half of the base, which holds the heart of the project: the blossom artwork, the lighting spindle, and the micontroller. Once assembled and wired, we will screw both halves together to enclose the hardware and wires in a small hollow cavity.
 
 1. **Cut the Sandwich.** Here's the text.
 

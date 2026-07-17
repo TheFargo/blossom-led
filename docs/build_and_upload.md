@@ -27,11 +27,11 @@ The Pico2W we're using for this project has 4MB of onboard Flash memory. Flash i
     │ (Compiled Code) │ (HTML, Fonts) │
     └─────────────────┴───────────────┘
 
-All of the source code you see in the project will get compiled into machine language, a complete list of instructions for everything the device does as soon as you power it on. The Pico is designed for this and has a neat "execute in place" (XIP) feature where the CPU can run the code straight from the flash without copying it anywhere first. 
+All of the source code you see in the project will get compiled into machine language, a complete list of instructions for everything the device does as soon as you power it on. This machine code will be stored in flash. It's what we call the "firmware." The Pico is designed for this, and has a neat "execute in place" (XIP) feature where the CPU can run the code straight from the flash without copying it anywhere first. 
 
 We'll build and upload our code in step 3.
 
-We also set aside a chunk of the Flash memory to be used as a file system. This bit of flash will act a lot like a computer's hard drive - we can read files from it and write to it as needed. We use a library of tools for this called "Little FS." We need a file system because our Blossom acts as its own little webserver: It can serve pages from this file system, and the fonts your browser needs to display them. 
+We also set aside a chunk of the Flash memory to be used as a file system. This bit of flash will act a lot like a computer's hard drive - we can read files from it and write to it as needed. We use a library of tools for this called "Little FS." We need a file system because our Blossom acts as its own little webserver: It can serve pages from this file system, and even the fonts your browser needs to display them. 
 
 We'll upload the file system in step 4. 
 

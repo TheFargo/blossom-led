@@ -6,12 +6,13 @@ This folder contains the vector graphics files required to cut out Blossom's cir
 All design assets in this folder are licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0). 
 
 Copyright 2026 Word Smith & Wright, LLC.
+
 Designed by Dave Kosak, July 2026.
 
 ## Files Included
 
-* `display_case.svg` - Universal vector format for use with any laser cutter software (LightBurn, Glowforge, etc.).
-* `display_case.xs` - xTool Studio project file, including settings used for the photographed prototypes.
+* `blossom.svg` - Universal vector format for use with any laser cutter software (LightBurn, Glowforge, etc.).
+* `blossom.xs` - xTool Studio project file, including settings used for the photographed prototypes.
 
 ## Assembly Instructions
 

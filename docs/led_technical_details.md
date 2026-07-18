@@ -36,4 +36,4 @@ Speaking of lights, it's hard to see the individual LEDs when the package isn't 
 
 From any distance, the white and color channels blend right together, especially if you've got a good diffuser over the light. But if you're up-close - such as when the device is sitting on your desk - the color LEDs and the white LED are visibly just a little offset from one another. In the case of the Blossom, this slight offset only adds to the visual. In the photo below, both the red and white lights are very dim. Together, they make a kind of spiral pattern!
 
-![The Blossom, photographed at low exposure so you can see the differences in the lights.](images/led-spiral.jpg)
+![The Blossom, photographed at low exposure so you can see the differences in the lights.](images/led-guide-spiral.jpg)

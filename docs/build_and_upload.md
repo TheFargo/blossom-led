@@ -53,13 +53,15 @@ However, if PlatformIO ever reports that it can't find or can't reboot the hardw
 
 If you look closely at the very bottom of your VS Code window, you'll see a new little group of icons, including a checkmark and a right-arrow.
 
-![PlatformIO Toolbar](images/PlatformIO_Tools.png)
+![PlatformIO Toolbar](images/platformio_tools.png)
 
 These are some handy tools for working with external hardware. When it comes to building and installing code, we're interested in the checkmark and the arrow:
 
 ### PlatformIO: Build (the Checkmark)
 
 When you click the checkmark, PlatformIO will go through everything your code needs to run on your target platform, download anything that's missing, and compile it all together. In your terminal window you'll see the results: If you have any problems you'll get an error (hopefully a helpful one), otherwise you'll see a SUCCESS message and a little time-stamp of how long it took. 
+
+![PlatformIO Successful Build Message](images/platformio_build_success.png)
 
 The first build might take a little bit, since PlatformIO has to go out and grab all the libraries we use for things like the webserver or operating WiFi. It'll go faster in the future, because you'll only recompile the files that changed. 
 

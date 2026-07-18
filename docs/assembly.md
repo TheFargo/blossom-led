@@ -63,6 +63,18 @@ The files you need for cutting and engraving the wooden case and lighting spindl
 
 Essentially, we're cutting out a "six-pack" of wooden disks. We'll glue three of these together to form the bottom half of the base with pre-printed instructions. The other three layers will be glued together to form the top half of the base, which holds the heart of the project: the blossom artwork, the lighting spindle, and the micontroller. Once assembled and wired, we will screw both halves together to enclose the hardware and wires in a small hollow cavity.
 
-1. **Cut the Sandwich.** Here's the text.
+1. **Download the Design.** Download the correct files for the hardware you're using.
 
-2. **Mayonaise.** Yeah.
+- `\enclosure\blossom.svg` is a general-purpose file in "scalable vector graphics" format, or .svg. Import these files into your tool of choice (like LightBurn or Glowforge) and make sure your settings are correct (cut red lines, score blue lines, engrave black lines.) There's an adorable scale configuration cube that you can use to ensure you're cutting exactly the right size.
+
+- `\enclosure\blossom.xs` is the "xTool Studio" file used for the original design and the prototypes made in the photographs. The machine used was an xTool D1 Pro with a 5W laser. The settings for 3mm birch plywood should already be configured in this file, but you should still double-check the settings and scale for your machine. 
+
+2. **Laser-Cut Your Material.** The pictured build uses 3mm (1/8") birch plywood. Do some test to make sure your configuration is spot-on. You're looking for:
+
+![Laserin'!](images/laser_cutting.jpg)
+
+- Clean cuts all the way through the wood without scoring.
+- An "Engrave" setting that burns in, with high contrast, things like the logo and the headers
+- A "Score" setting that burns a nice clean high-contrast line without scoring. 
+
+3. **To be continued.** Yeah.

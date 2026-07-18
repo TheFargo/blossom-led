@@ -22,14 +22,14 @@ Building your own Blossom from scratch? Great idea! This is the perfect starter/
 | Item | Qty | Est. Price (USD) | Vendor Ideas | Notes |
 | :--- | :---: | ---: | :--- | :--- |
 | **Raspberry Pi Pico 2W** | 1 | $7.00 | [Adafruit](https://www.adafruit.com/product/6087) [Microcenter](https://www.microcenter.com/product/687384/raspberry-pi-pico-2-w) | Our heroic Microcontroller! Make sure to get the "2W." |
-| **Adafruit NeoPixel Ring (16-pixel) RGBW** | 1 | $11.95 | [Adafruit](https://www.adafruit.com/product/2854) | Beautiful pre-assembled array of RGBW LEDs. I prefer warm-white. |
+| **Adafruit NeoPixel Ring (16-pixel) RGBW** | 1 | $11.95 | [Adafruit](https://www.adafruit.com/product/2854) | Beautiful pre-assembled circular array of RGBW LEDs. I prefer warm-white. |
 | **Capiz-Shell Decorative Lotus Art** | 1 | ~$10.00+ | (See notes) | Any decorative tea-light holder will work; See notes below for sourcing the beautiful capiz-shell assembly shown.  |
 | **50mm Frosted-Glass Cabochon** | 1 | ~$1.50+ | [Amazon](https://www.amazon.com/dp/B07JKZP1Z6) | This acts as a diffuser to bounce our LED lights around; a 50mm translucent acyrlic circle is an inexpensive alternative. |
 | **3mm (1/8-in) Basswood or Birch Plywood** | 1 | ~$4.00 | Local Lumber / Craft Store | You'll need roughly 8"x12" of wood for laser cutting the case. |
 | **Micro-USB Cable (3ft to 6ft)** | 1 | ~$3.00 | Generic / Amazon [Example](https://www.amazon.com/Charging-Transfer-Android-Trustable-MYFON/dp/B098DW7485/) | For power and programming. Ensure it's a data cable, not just power! |
 | **5V 1A USB Power Adapter** | 1 | ~$8.00 | Generic / Amazon [Example](https://www.amazon.com/Certified-Charger-Universal-Portable-Adapter/dp/B017TXGM4I/) | Standard phone charger wall brick to power the Blossom independant of a computer. |
-| **M2 Screws (6mm)** | 4 | $.40 | [Amazon](https://www.amazon.com/HVAZI-Metric-Notebook-Computer-Assortment/dp/B075C6C4YR/) / [McMaster-Carr](https://www.mcmaster.com/91698A202/) [MicroConnectors](https://www.microconnectors.com/assorted-laptop-screws-set-250-pcs-scw-250lp/)| For securing the Pico 2W to the wooden base. |
-| **#6 Wood Screws (1/2in)** | 4 | $.75 | [Amazon](https://www.amazon.com/TPOHH-Stainless-Phillips-Threaded-5x12SS18-8/dp/B092Q87W39/) / [McMaster-Carr](https://www.mcmaster.com/90031A552/) | For fastening the two halves of the base enclosure. |
+| **M2 Screws (6mm)** | 4 | $.40 | [Amazon](https://www.amazon.com/HVAZI-Metric-Notebook-Computer-Assortment/dp/B075C6C4YR/) / [McMaster-Carr](https://www.mcmaster.com/91698A202/) / [MicroConnectors](https://www.microconnectors.com/assorted-laptop-screws-set-250-pcs-scw-250lp/)| For securing the Pico 2W to the wooden base. |
+| **#6 Wood Screws (1/2in)** | 3 | $.75 | [Amazon](https://www.amazon.com/TPOHH-Stainless-Phillips-Threaded-5x12SS18-8/dp/B092Q87W39/) / [McMaster-Carr](https://www.mcmaster.com/90031A552/) | For fastening the two halves of the base enclosure. |
 | **Rubber Feet (Self-Adhesive)** | 3 | $1.00 | [Adafruit](https://www.adafruit.com/product/550) [Amazon](https://www.amazon.com/dp/B074PXFWPK/ref=twister_B092W7TL7Y) | These little guys really elevate your build. (Looks directly at camera.) |
 | **TOTAL ESTIMATED COST** | | **~$48.00** | | *Excludes workshop consumables (solder, wire).* |
 
@@ -67,16 +67,16 @@ Essentially, we're cutting out a "six-pack" of wooden disks. We'll glue three of
 
 - `\enclosure\blossom.svg` is a general-purpose file in "scalable vector graphics" format, or .svg. Import these files into your tool of choice (like LightBurn or Glowforge) and make sure your settings are correct (cut red lines, score blue lines, engrave black lines.) There's an adorable scale configuration cube that you can use to ensure you're cutting exactly the right size.
 
-- `\enclosure\blossom.xs` is the "xTool Studio" file used for the original design and the prototypes made in the photographs. The machine used was an xTool D1 Pro with a 5W laser. The settings for 3mm birch plywood should already be configured in this file, but you should still double-check the settings and scale for your machine. 
+- `\enclosure\blossom.xs` is the "xTool Studio" file used for the original design and the prototypes made in the photographs. If you're using xTool hardware and like using their propretiary software, this is the file you want. The machine used was an xTool D1 Pro with a 5W laser. The settings for 3mm birch plywood should already be configured in this file, but you should still double-check the settings and scale for your machine. 
 
-2. **Laser-Cut Your Material.** The pictured build uses 3mm (1/8") birch plywood. Do some test to make sure your configuration is spot-on.
+2. **Laser-Cut Your Material.** The pictured build uses 3mm (1/8") birch plywood. Do some tests to make sure your configuration is spot-on.
 
 ![Laserin'!](images/laser_cutting.jpg)
 
  You're looking for:
- 
+
 - Clean cuts all the way through the wood without scoring.
 - An "Engrave" setting that burns in, with high contrast, things like the logo and the headers
-- A "Score" setting that burns a nice clean high-contrast line without scoring. 
+- A "Score" setting that burns a nice clean high-contrast line without scorching the wood. 
 
 3. **To be continued.** Yeah.

@@ -6,7 +6,7 @@ We'll be using two tools familiar to embedded systems designers:
   - Visual Studio Code: A software development environment.
   - Platform IO: An extension to VS Code specifically for embedded systems.
 
-Platform IO takes away a lot of the busy-work for you when it comes to compililing and installing your code on a device. A real time-saver when you're building stuff!
+Platform IO takes away a lot of the busy-work for you when it comes to compiling and installing your code on a device. A real time-saver when you're building stuff!
 
 ---
 
@@ -22,10 +22,10 @@ Platform IO takes away a lot of the busy-work for you when it comes to compilili
 
 ## 1. What You'll Need
 
-- **Raspberry Pi Pico 2W** Our micro-controller. Make sure it's the **2W** (wireless) version with the RP2350 chip.
-- **USB data cable** A _data-capable_ Micro-USB cable.
-- **Computer** Windows, macOS, or Linux. This guide uses Windows paths, but the steps are similar on other OSes.
-- **_Blossom_** Light Assembly. Construction and wiring details are located in the [Blossom Assembly Guide](docs/assembly.md).
+- **Raspberry Pi Pico 2W:** Our micro-controller. Make sure it's the **2W** (wireless) version with the RP2350 chip.
+- **USB data cable:** A _data-capable_ Micro-USB cable.
+- **Computer:** Windows, macOS, or Linux. This guide uses Windows paths, but the steps are similar on other OSes.
+- **_Blossom_ Light Assembly:**. Construction and wiring details are located in the [Blossom Assembly Guide](/docs/assembly.md).
 
 ## 2. Installing the Software
 

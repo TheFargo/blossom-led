@@ -28,7 +28,7 @@ We are interested, specifically, in the "SK6812" lights, invented by Dongguang O
 
 ![SK6812 Extreme Close Up](images/led-guide-6812.jpg)
 
-What's this? There's a whole little logic circuit in there! Each of these lights have their own tiny controller embedded right onto the chip. It's not very smart; all it does is either light up a specific color or pass the color information on to the next light. We'll talk about how that works in [part 3](#3-talking-to-leds).
+What's this? There's a whole little logic circuit in there! Each of these lights have their own tiny controller embedded _right onto the chip_. It's not super sophisticated; all it does is either light up a specific color or pass the color information on to the next light. We'll talk about how that works in [part 3](#3-talking-to-leds).
 
 You'll see four pads on the corners of the chip, the classic "5050" design for these things. I've labelled the pads for the SK6812: Power input (5V) and ground are on opposite corners. The other two corners are for "data in" and "data out." The idea is you can wire up a whole line of these pretty cleanly, having a shared 5V line on one side, the ground line on the other, and a data line snaking between each light. 
 

@@ -28,3 +28,12 @@ We are interested, specifically, in the "SK6812" lights, invented by Dongguang O
 
 ![SK6812 Extreme Close Up](images/led-guide-6812.jpg)
 
+What's this? There's a whole little logic circuit in there! Each of these lights have their own tiny controller embedded right onto the chip. It's not very smart; all it does is either light up a specific color or pass the color information on to the next light. We'll talk about how that works in [part 3](#3-talking-to-leds).
+
+You'll see four pads on the corners of the chip, the classic "5050" design for these things. I've labelled the pads for the SK6812: Power input (5V) and ground are on opposite corners. The other two corners are for "data in" and "data out." The idea is you can wire up a whole line of these pretty cleanly, having a shared 5V line on one side, the ground line on the other, and a data line snaking between each light. 
+
+Speaking of lights, it's hard to see the individual LEDs when the package isn't lit up. The red, green, and blue LEDs are packed together on the right side of the image. Turn your attention to that big golden semicircular area at the top of the chip. That's the whole reason we chose this hardware! That yellow piece is a diffuser on top of a VERY bright pure-white LED. The yellow color is why the resulting light is a warm yellow shine instead of the bright blue-white we associate with colder LEDs.
+
+From any distance, the white and color channels blend right together, especially if you've got a good diffuser over the light. But if you're up-close - such as when the device is sitting on your desk - the color LEDs and the white LED are visibly just a little offset from one another. In the case of the Blossom, this slight offset only adds to the visual. In the photo below, both the red and white lights are very dim. Together, they make a kind of spiral pattern!
+
+![The Blossom, photographed at low exposure so you can see the differences in the lights.](images/led-spiral.jpg)

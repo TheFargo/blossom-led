@@ -25,7 +25,7 @@ Platform IO takes away a lot of the busy-work for you when it comes to compiling
 
 - **Raspberry Pi Pico 2W:** Our micro-controller. Make sure it's the **2W** (wireless) version with the RP2350 chip.
 - **USB data cable:** A _data-capable_ Micro-USB cable.
-- **Computer:** Windows, macOS, or Linux. This guide uses Windows paths, but the steps are similar on other OSes.
+- **Computer:** Windows, macOS, or Linux.
 - **_Blossom_ Light Assembly:** Construction and wiring details are located in the [Blossom Assembly Guide](/docs/assembly.md).
 
 ---
@@ -51,7 +51,7 @@ If you are comfortable using a terminal or command prompt, you can clone the rep
 3. Run the following command:
 
 ```bash
-git clone https://github.com/The_Fargo/blossom-led.git
+git clone https://github.com/TheFargo/blossom-led.git
 ```
 
 *Note: This requires you to have [Git installed](https://git-scm.com/) on your computer.*

@@ -93,12 +93,12 @@ We usually need a whole software stack in order to build things on a device. Pla
 ## 4. Opening the Project
 
 1. In VS Code, click **File -> Open Folder...** (or press `Ctrl+K Ctrl+O`)
-2. Navigate to the `blossom-led` folder
+2. Navigate to the `blossom-led` folder you created in step 2
 3. Click **Select Folder**
 
 VS Code will now open the project. PlatformIO will automatically detect the `platformio.ini` configuration file and set up the project environment. This .ini file has all the details about the hardware we're using (the Raspberry Pi Pico 2W) and the SDK we're building on top of (we're using the Arduino framework with the Earle Philhower core).
 
-There's also a .pio directory in the project where PlatformIO will store everything it needs to make a build with our specific hardware. This folder will fill up with stuff when you first build the project. You won't need to worry about it; PlatformIO will keep that space organized.
+There's also a .pio directory in the project where PlatformIO will store everything it needs to make a build with our specific hardware. This folder will fill up with stuff when you first build the project. You won't need to worry about it; PlatformIO will keep that space organized. Thanks, little alien head guy!
 
 ---
 

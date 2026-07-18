@@ -63,7 +63,7 @@ When you click the checkmark, PlatformIO will go through everything your code ne
 
 ![PlatformIO Successful Build Message](images/platformio_build_success.png)
 
-The first build might take a little bit, since PlatformIO has to go out and grab all the libraries we use for things like the webserver or operating WiFi. It'll go faster in the future, because you'll only recompile the files that changed. 
+The first build might take a little bit, since PlatformIO has to go out and grab all the libraries we use for things like the webserver or operating WiFi. You'll see a lot of text scroll by: _Bask in the glow of being a hacker like in the movies!_ In the future builds will go faster, because you'll only recompile the files that changed. 
 
 ### PlatformIO: Upload (the Right Arrow)
 

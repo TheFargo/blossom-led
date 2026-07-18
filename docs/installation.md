@@ -32,7 +32,7 @@ Platform IO takes away a lot of the busy-work for you when it comes to compiling
 
 ## 2. Cloning This Repository
 
-You'll want a copy (or "clone") of all the local source files somewhere on your local machine. You can grab the files directly from the github website, or if you're comfortable with the console, you can just type a command line 
+You'll want a copy (or "clone") of all the local source files somewhere on your local machine. You can grab the files directly from the github website, or if you're comfortable with the console, you can just type a command line. 
 
 ### Option A: Grab the .zip file from the website
 
@@ -51,7 +51,7 @@ If you are comfortable using a terminal or command prompt, you can clone the rep
 3. Run the following command:
 
 ```bash
-git clone [https://github.com/The_Fargo/blossom-led.git](https://github.com/The_Fargo/blossom-led.git)
+git clone https://github.com/The_Fargo/blossom-led.git
 ```
 
 *Note: This requires you to have [Git installed](https://git-scm.com/) on your computer.*

@@ -53,7 +53,7 @@ However, if PlatformIO ever reports that it can't find or can't reboot the hardw
 
 If you look closely at the very bottom of your VS Code window, you'll see a new little group of icons, including a checkmark and a right-arrow.
 
-![PlatformIO Toolbar](images/platformio_tools.png)
+![PlatformIO Toolbar](images/platformio_toolbar.png)
 
 These are some handy tools for working with external hardware. When it comes to building and installing code, we're interested in the checkmark and the arrow:
 

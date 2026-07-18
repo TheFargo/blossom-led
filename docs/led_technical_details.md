@@ -52,3 +52,27 @@ Adafruit uses the "NeoPixel" name for WS2812B designs (these only have the color
 
 Adafuit has assembled 16 lights in a circle. The positioning of the white channel on the chip gives us a wonderful "outer ring" of white lights. The PCB is cut to the smallest possible size and we're given 6 connections, three of which I've labelled above. The power, ground, and data lines are (by design) 90-degrees apart around the circle. There's also a data-out line, for stringing multiple rings or strips of neopixels together (Adafruit's website has [Plans for making light-up glasses](https://learn.adafruit.com/celebration-spectacles) by connecting two rings this way.)
 
+The outer diameter of the 16-light ring is 44.5mm (1.75"). That's almost the exact dimensions of a tea-candle, which gives us a library of decorative hardware to choose from. And we can address the white lights and colored lights independently, playing one pattern on the colorful "inner ring" while playing another on the bright "outer ring." It's like getting two rings of lights in a single hardware package! 
+
+---
+
+## 3. Talking to LEDs
+
+You don't have to understand how the lights work to program pretty colors, but the technology that makes these lights "individually addressable" is pretty cool, so let's talk it out!
+
+### Transmitting Data in Binary
+
+The data line is binary, meaning it can only be "on" or "off" (technically, the voltage on the wire is either high or low.) Our goal is to turn little on/off pulses into color information. There are a lot of ways to do this, but our hardware uses signal timing. That is, a short-duration high pulse represents a 0 and a long-duration high pulse represents a 1. These pulses are spaced out very precisely (1.25 microseconds each!).
+
+### From Binary to Colors
+
+To convert the 1s and 0s (bits) into color information, we need to assign a handful of bits to each LED. 8 bits is known as a byte, and it's a digital way of storing a number between 0 (00000000) and 255 (11111111). Our hardware assigns one byte for each color LED. For instance, let's look at the red LED:
+
+| Binary | Decimal | Hex | Result |
+| :---: | :---: | :---: | :--- |
+| 00000000 | 0 | 00 | Off |
+| 01010000 | 80 | 50 | Dim red |
+| 10010110 | 150 | 96 | Rich red |
+| 11111111 | 255 | FF | Brightest red possible |
+
+Individual LEDs have 256 different "power" levels. 

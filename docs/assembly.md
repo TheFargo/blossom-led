@@ -69,10 +69,12 @@ Essentially, we're cutting out a "six-pack" of wooden disks. We'll glue three of
 
 - `\enclosure\blossom.xs` is the "xTool Studio" file used for the original design and the prototypes made in the photographs. The machine used was an xTool D1 Pro with a 5W laser. The settings for 3mm birch plywood should already be configured in this file, but you should still double-check the settings and scale for your machine. 
 
-2. **Laser-Cut Your Material.** The pictured build uses 3mm (1/8") birch plywood. Do some test to make sure your configuration is spot-on. You're looking for:
+2. **Laser-Cut Your Material.** The pictured build uses 3mm (1/8") birch plywood. Do some test to make sure your configuration is spot-on.
 
 ![Laserin'!](images/laser_cutting.jpg)
 
+ You're looking for:
+ 
 - Clean cuts all the way through the wood without scoring.
 - An "Engrave" setting that burns in, with high contrast, things like the logo and the headers
 - A "Score" setting that burns a nice clean high-contrast line without scoring. 

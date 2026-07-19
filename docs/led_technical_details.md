@@ -13,7 +13,7 @@ In this guide, we'll look at these cool little LEDs, talk about how they work, a
 3. [Talking to LEDs](#3-talking-to-leds)
 4. [Taking Advantage of the Pico](#4-taking-advantage-of-the-pico)
 5. [Newer LED Tech](#5-newer-led-tech)
-6. [Power and Other LED Considerations](#6-power-and-other-led-considerations)
+6. [LED Power and Brightness Considerations](#6-led-power-and-brightness-considerations)
 7. [Further Reading](#7-further-reading)
 
 ---
@@ -84,18 +84,79 @@ We use a total of 24 bits to give three values for red, green, and blue. By mixi
 
 | Binary | Decimal | Hex | Result |
 | :---: | :---: | :---: | :--- |
-| `00000000 00000000 00000000` | 0 0 0 | 000000 | Off |
-| `01010000 00000000 00000000` | 80 0 0 | 500000 | Dim red |
-| `11111111 00000000 00000000` | 255 0 0 | FF0000 | Bright Red |
-| `00000000 11111111 00000000` | 0 255 0 | 00FF00 | Bright Green |
-| `00000000 00000000 11111111` | 0 0 255 | 0000FF | Bright Blue |
-| `11111111 11111111 00000000` | 255 255 0 | FFFF00 | Yellow |
-| `11111111 11010111 00000000` | 255 215 0 | FFD700 | Gold |
-| `11111111 10100101 00000000` | 255 165 0 | FFA500 | Orange |
-| `11011010 01110000 11010110` | 218 112 214 | DA70D6 | Orchid / Light Purple |
-| `10000000 00000000 10000000` | 128 0 128 | 800080 | Purple |
-| `01101010 01011010 11001101` | 106 90 205 | 6A5ACD | Slate Blue |
-| `01000000 11100000 11010000` | 64 224 208 | 40E0D0 | Turquoise |
-| `00000000 11111111 11111111` | 0 255 255 | 00FFFF | Cyan / Aqua |
-| `11111111 00000000 11111111` | 255 0 255 | FF00FF | Magenta / Fuchsia |
-| `11111111 11111111 11111111` | 255 255 255 | FFFFFF | Brightest white possible |
+| 00000000 00000000 00000000 | 0 0 0 | 000000 | Off |
+| 01010000 00000000 00000000 | 80 0 0 | 500000 | Dim red |
+| 11111111 00000000 00000000 | 255 0 0 | FF0000 | Bright Red |
+| 00000000 11111111 00000000 | 0 255 0 | 00FF00 | Bright Green |
+| 00000000 00000000 11111111 | 0 0 255 | 0000FF | Bright Blue |
+| 11111111 11111111 00000000 | 255 255 0 | FFFF00 | Yellow |
+| 11111111 11010111 00000000 | 255 215 0 | FFD700 | Gold |
+| 11111111 10100101 00000000 | 255 165 0 | FFA500 | Orange |
+| 10000000 00000000 10000000 | 128 0 128 | 800080 | Purple |
+| 01101010 01011010 11001101 | 106 90 205 | 6A5ACD | Slate Blue |
+| 01000000 11100000 11010000 | 64 224 208 | 40E0D0 | Turquoise |
+| 00000000 11111111 11111111 | 0 255 255 | 00FFFF | Cyan / Aqua |
+| 11111111 00000000 11111111 | 255 0 255 | FF00FF | Magenta / Fuchsia |
+| 11111111 11111111 11111111 | 255 255 255 | FFFFFF | Brightest white possible |
+
+Of course, these are SK6812 lights, so they also have a white LED. Eight bits are set aside for this LED, essentially controlling how bright our special "warm sunlight" LED shines. This gives us a total of 32 bits of data, which are sent in order through the data line. Here's a picture of the data layout from the actual datasheet:
+
+![32 Bits of Color Data](images/led-guide-32-bit-color.png)
+
+### Programming a Whole String of Lights
+
+Each light on our string gets 32 bits of data to set its color. But how do we control a whole string of lights? That's where the little integrated circuits inside each light come into play. The chip is programmed to collect 32 bits of data into a buffer and then:
+
+* If more data keeps coming, it makes room for the new data. It empties the buffer by sending the data to the next light in the chain via the "data out" line.
+
+* If the data stops for a specific amount of time (80 microseconds), the current data in the buffer is considered the correct color info, and it "latches in." The lights now display that color.
+
+One nice thing about these lights is that they don't require constant updates: Once they are displaying a color, the on-board circuitry continues to display that color until the data line starts piping in new color info. 
+
+### 'Individually Addressable' Means Software Not Hardware
+
+You may have noticed that even though we often describe these lights as "individually addressable," the hardware itself really isn't. You don't technically tell the sixth light in the string to turn purple - each light has no information about where it is on the string! _Every time an individual light is updated, we have to update the entire string._
+
+However, this happens fast. In the case of the Blossom and its 16 RGBW lights, it takes 720 microseconds to send all the color data and then pause long enough to latch. That means we could update the Blossom over 1300 times _per second_ if we wanted to.
+
+This is easy to manage in software. Each color channel is only one byte, so we can easily save the state of every single light in an array - even for huge strings or matrices of lights. We can update an individual light in the array (hence, "individually addressable") and then tell our processor to output the change to the whole string of lights.
+
+We really take advantage of this with the Blossom. The white lights are treated as a separate array of data and we can perform calculations or animations on just the white channel. That data is then assembled with the color data in the correct order and sent to the hardware whenever the lights are updated... at a _leisurely_ 60 frames a second, by the way. Nice and slow!
+
+---
+
+## 4. Taking Advantage of the Pico
+
+Now you know the secret of controlling a whole chain of LEDs, and all it requires is micro-second precise timing! It's possible to do this with a microcontroller: You program it to set a pin to high, and then wait so many microseconds, and then flip it to low, and then wait, and then... Honestly, it's not a very good use of a CPU. We'd rather use that processing power to do something interesting, like calculate new colors or patterns.
+
+The hardware we're using is a handsome little miracle-machine, though! The Raspberry Pi Pico 2W uses the RP2350 microcontroller. It's that little black chip right in the center of your board, with the Raspberry Pi logo on it. This microcontroller not only has two CPUs; it also has a bank of 12 "Programmable I/O" state machines, or "PIOs."
+
+### Programmable I/O (PIO) State Machines
+
+Think of thse little state machines as teeny-tiny machine-language computers. They only understand a handful of commands and only have a couple of registers, but they run with precise timing independent of anything else the computer is doing. You just load a program into these things, set the frequency they're going to compute at, and then let 'em rip!
+
+The PIO machines are designed to solve the exact problem of communicating with our time-sensitive LEDs. We set up one machine just to communicate to our string of lights. The CPU dumps a big pile of color data onto it - an update for the entire string of lights - and then the PIO dutifully chews through the data, typing out 1s and 0s with precise timing, until its buffer is empty. The CPU just has to drop off the data and then it moves on to other things while the PIO sends the message. 
+
+Information on how we program the PIOs is in the source code, specifically `/src/led_controller.cpp`.
+
+---
+
+## 5. Newer LED Tech
+
+In the years since the SK6812 (and similar chips) were invented, LED technology has continued to advance.
+
+- **Faster Refresh Rate:** Even when we're not updating the colors on each LED, the LED has to manage its own brightness level by turning on and off super-fast. This is called "Pulse Width Modulation" or just PWM. The little integrated circuit inside our chip takes care of this modulation for us. The Blossom's NeoPixels refresh at 1.2KHz. You can see the refresh rate if you light up a bare Neopixel ring and move it around quickly - it'll look a little flickery. The effect is even more noticeable if you shoot video. More advanced LEDs, like the APA102 designs that Adafruit calls "Dotstars," refresh 20 times faster. This is faster than the human eye can see, even when moving around quickly, and even on video. If your display relies on "persistence of vision" effects, the NeoPixels we use for the Blossom would look pretty dated.
+
+- **More Flexible Timing:** Another advantage of the APA102/DotStar generation of lights is that they have a dedicated clock line in addition to data. Because they're more flexible with timing, they're easier to drive straight from the CPU and more resistant to signal interruptions/delays.
+
+- **Faster Data Rates:** Our SK6812 NeoPixel array is picky about its timing, but with only 16 lights to manage, we can update it pretty quickly. With really long strings of lights, we start to worry more about how long it takes to send data to the entire string, and how many times per second we can do it. Newer LEDs support much faster data rates, which is important (again) for persistence-of-vision displays.
+
+- **16-Bit Color Depth:** NeoPixels use 8 bits for each color channel, giving us 256 "brightness levels" (including off.) Doubling it to 16 bits gives us a whopping 65,536 brightness levels! Per color! The HD108 LEDs that came out in 2019 have this color depth, in addition to the fast data rates. You can really see the lack of color depth at low levels of light on the Blossom. Turn the colors or white channels down very low and you'll find you can't get a "smooth" fade; there's several visible steps of brightness with no in-betweens.
+
+- **Backup Data Lines:** If any one of the Blossom's LED's give out, the remainder of the ring will also stop working, because the dead light will no longer pass on data. On really huge builds with lots of lights, this becomes a nightmare to maintain. Later LED designs incorpoate backup data lines that allow the strip to bypass any bad lights.
+
+- **Continued Miniturization:** Eventually 5050 designs gave way to 2020 designs, which is the same idea but in a 2mm by 2mm package. Adafruit calls these the "DotStar Micro." You can really pack those together. My friend, they kept getting smaller: As of 2025 you can get individually addressable LEDs that measure 1.1mm square (!). As Alex Lorman notes on [this github SK6805-EC10 project](https://github.com/alorman/SK6805-EC10-Notes), "Buy extras... breathing on them the wrong way blows them away."
+
+## 6. LED Power and Brightness Considerations
+
+

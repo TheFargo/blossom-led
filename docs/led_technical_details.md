@@ -68,7 +68,7 @@ The data line is binary, meaning it can only be "on" or "off" (technically, the 
 
 To convert the 1s and 0s (bits) into color information, we need to assign a handful of bits to each LED. 8 bits is known as a byte, and it's a digital way of storing a number between 0 (00000000) and 255 (11111111). Our hardware assigns one byte for each color LED. For instance, let's look at the red LED:
 
-| Binary | Decimal | Hex | Result |
+| Binary (R G B) | Decimal | Hex | Result |
 | :---: | :---: | :---: | :--- |
 | 00000000 | 0 | 00 | Off |
 | 01010000 | 80 | 50 | Dim red |
@@ -78,7 +78,7 @@ To convert the 1s and 0s (bits) into color information, we need to assign a hand
 >[!TIP]
 >Programmers use hexadecimal (a 16-digit number system, using A-F in addition to 0-9) as a shorthand way of referencing groups of bits. Each "digit" represents four bits, from 0 (0000) to F (1111). So, instead of saying "1111-1100," you can just say "FC."
 
-Similarly, we can assign eight bits to the green LED. It's physically right next to the red one, so when the red one is going full blast (255), and the green one is going full blast (255), the result is bright yellow. We've also got a blue LED there, and - you guessed it - we give it eight bits of its own. If all three channels are equally bright, the resulting color looks white. (This is, in fact, what "white LEDs" are doing.)
+Similarly, we can assign eight bits to the green LED. It's physically right next to the red one, so when the red one is going full blast (255), and the green one is going full blast (255), the result is bright yellow. We've also got a blue LED there, and - you guessed it - we give it eight bits of its own. If all three channels are equally bright, the resulting color looks white. (This is, in fact, how "white LEDs" actually work.)
 
 We use a total of 24 bits to give three values for red, green, and blue. By mixing them, we can get all sorts of fun colors. You can see it gets a little cumbersome to type it out in binary every time:
 
@@ -99,7 +99,7 @@ We use a total of 24 bits to give three values for red, green, and blue. By mixi
 | 11111111 00000000 11111111 | 255 0 255 | FF00FF | Magenta / Fuchsia |
 | 11111111 11111111 11111111 | 255 255 255 | FFFFFF | Brightest white possible |
 
-Of course, these are SK6812 lights, so they also have a white LED. Eight bits are set aside for this LED, essentially controlling how bright our special "warm sunlight" LED shines. This gives us a total of 32 bits of data, which are sent in order through the data line. Here's a picture of the data layout from the actual datasheet:
+Of course, these are SK6812 lights, so they also have a white LED. Eight bits are set aside for this LED, essentially controlling how bright our special "warm sunlight" LED shines. This gives us a total of 32 bits of data, which are sent in order through the data line. Here's a picture of the data layout from the [actual datasheet](https://cdn-shop.adafruit.com/product-files/2757/p2757_SK6812RGBW_REV01.pdf):
 
 ![32 Bits of Color Data](images/led-guide-32-bit-color.png)
 
@@ -109,7 +109,7 @@ Each light on our string gets 32 bits of data to set its color. But how do we co
 
 * If more data keeps coming, it makes room for the new data. It empties the buffer by sending the data to the next light in the chain via the "data out" line.
 
-* If the data stops for a specific amount of time (80 microseconds), the current data in the buffer is considered the correct color info, and it "latches in." The lights now display that color.
+* If the data stops for a specific amount of time (80 microseconds), the current data in the buffer is considered the correct color info, and it "latches in." The light now displays that color.
 
 One nice thing about these lights is that they don't require constant updates: Once they are displaying a color, the on-board circuitry continues to display that color until the data line starts piping in new color info. 
 
@@ -133,7 +133,7 @@ The hardware we're using is a handsome little miracle-machine, though! The Raspb
 
 ### Programmable I/O (PIO) State Machines
 
-Think of thse little state machines as teeny-tiny machine-language computers. They only understand a handful of commands and only have a couple of registers, but they run with precise timing independent of anything else the computer is doing. You just load a program into these things, set the frequency they're going to compute at, and then let 'em rip!
+Think of these little state machines as teeny-tiny machine-language computers. They only understand a handful of commands and only have a couple of registers, but they run with precise timing independent of anything else the computer is doing. You just load a program into these things, set the frequency they're going to compute at, and then let 'em rip!
 
 The PIO machines are designed to solve the exact problem of communicating with our time-sensitive LEDs. We set up one machine just to communicate to our string of lights. The CPU dumps a big pile of color data onto it - an update for the entire string of lights - and then the PIO dutifully chews through the data, typing out 1s and 0s with precise timing, until its buffer is empty. The CPU just has to drop off the data and then it moves on to other things while the PIO sends the message. 
 
@@ -145,7 +145,7 @@ Information on how we program the PIOs is in the source code, specifically `/src
 
 In the years since the SK6812 (and similar chips) were invented, LED technology has continued to advance.
 
-- **Faster Refresh Rate:** Even when we're not updating the colors on each LED, the LED has to manage its own brightness level by turning on and off super-fast. This is called "Pulse Width Modulation" or just PWM. The little integrated circuit inside our chip takes care of this modulation for us. The Blossom's NeoPixels refresh at 1.2KHz. You can see the refresh rate if you light up a bare Neopixel ring and move it around quickly - it'll look a little flickery. The effect is even more noticeable if you shoot video. More advanced LEDs, like the APA102 designs that Adafruit calls "Dotstars," refresh 20 times faster. This is faster than the human eye can see, even when moving around quickly, and even on video. If your display relies on "persistence of vision" effects, the NeoPixels we use for the Blossom would look pretty dated.
+- **Faster Refresh Rate:** Even when we're not updating the colors on each LED, the LED has to manage its own brightness level by turning on and off super-fast. This is called "Pulse Width Modulation" or just PWM. The little integrated circuit inside our chip takes care of this modulation for us so we don't have to think about it, but we can _see_ it. The Blossom's NeoPixels refresh at 1.2KHz. You can see the refresh rate if you light up a bare Neopixel ring and move it around quickly - it'll look a little flickery. The effect is even more noticeable if you shoot video. More advanced LEDs, like the APA102 designs that Adafruit calls "Dotstars," refresh 20 times faster. This is faster than the human eye can see, even when moving around quickly, and even on video. If your display relies on "persistence of vision" effects, the NeoPixels we use for the Blossom would look pretty dated.
 
 - **More Flexible Timing:** Another advantage of the APA102/DotStar generation of lights is that they have a dedicated clock line in addition to data. Because they're more flexible with timing, they're easier to drive straight from the CPU and more resistant to signal interruptions/delays.
 
@@ -153,12 +153,75 @@ In the years since the SK6812 (and similar chips) were invented, LED technology 
 
 - **16-Bit Color Depth:** NeoPixels use 8 bits for each color channel, giving us 256 "brightness levels" (including off.) Doubling it to 16 bits gives us a whopping 65,536 brightness levels! Per color! The HD108 LEDs that came out in 2019 have this color depth, in addition to the fast data rates. You can really see the lack of color depth at low levels of light on the Blossom. Turn the colors or white channels down very low and you'll find you can't get a "smooth" fade; there's several visible steps of brightness with no in-betweens.
 
-- **Backup Data Lines:** If any one of the Blossom's LED's give out, the remainder of the ring will also stop working, because the dead light will no longer pass on data. On really huge builds with lots of lights, this becomes a nightmare to maintain. Later LED designs incorpoate backup data lines that allow the strip to bypass any bad lights.
+- **Backup Data Lines:** If any one of the Blossom's LED's give out, the remainder of the ring will also stop working, because the dead light will no longer pass on data. On really huge builds with lots of lights, this becomes a nightmare to maintain. Later LED designs incorporate backup data lines that allow the strip to bypass any bad lights.
 
-- **Continued Miniturization:** Eventually 5050 designs gave way to 2020 designs, which is the same idea but in a 2mm by 2mm package. Adafruit calls these the "DotStar Micro." You can really pack those together. My friend, they kept getting smaller: As of 2025 you can get individually addressable LEDs that measure 1.1mm square (!). As Alex Lorman notes on [this github SK6805-EC10 project](https://github.com/alorman/SK6805-EC10-Notes), "Buy extras... breathing on them the wrong way blows them away."
+- **Continued Miniaturization:** Eventually 5050 designs gave way to 2020 designs, which is the same idea but in a 2mm by 2mm package. Adafruit calls these the "DotStar Micro." You can really pack those together. My friend, they kept getting smaller: As of 2025 you can get individually addressable LEDs that measure 1.1mm square (!). As Alex Lorman notes on [this github SK6805-EC10 project](https://github.com/alorman/SK6805-EC10-Notes), "Buy extras... breathing on them the wrong way blows them away."
 
 ---
 
 ## 6. LED Power and Brightness Considerations
 
+### Colorful Accent Light or Blinding Flashlight?
 
+Despite the tiny package, these LEDs can be _bright_. Colorful NeoPixel arrays are bright enough to be admired at night from a football field away. We must consider that when we set one of these things on our desk. 
+
+>[!Tip]
+>Just to pick a random example, don't stick your face right into the Blossom and plug it in while there's a bug in your code that turns on every light full blast. It's like that scene where they open the Lost Ark. This tip is written in blood.
+
+Because we want to create a soft ambient lighting display, we only need to run these LEDs at a fraction of their potential. Inside the `\src\led_controller.cpp` code you'll find a constant named `LED_BRIGHTNESS`. It's set to 0.2 - that's right - we're capping our lights at 20% brightness!
+
+    // Master brightness scalar (0.0 – 1.0). Adjust to taste.
+    static const float LED_BRIGHTNESS = 0.2f;
+
+Believe it or not, I feel that 20% may be too bright for a desktop display. I did most of my testing at 10%, so that I could look directly even at the brightest lights. 
+
+Of course, now that I've warned you but showed you the code, you know what to do... Go ahead and play with that constant. Please be careful not to hurt your eyes! Setting that number to .75 makes it so you can see the colors even outside in daylight, and with higher numbers you can use your Blossom to beam colorful lights onto the ceiling and light up a dark room. Go for it!
+
+>[!Tip]
+>Don't give your partner a migraine with bright pulsating lights. This tip? Also written in blood.
+
+### Power Use with 16 LEDs
+
+The beauty of LEDs is that they're the most efficient design we have for converting energy into light. That said, once you have a giant array of lights blasting colors at face-melting brightness, you really have to consider the power draw.
+
+Our SK6812 lights are designed to use a 5V power supply. (Other common LEDs are designed for 24V, which is what we use in cars.) 5V is exactly what our Micro USB is delivering through the cable to the device. This makes wiring super simple: we pull power from the VBUS, pin 40 on the upper corner of the Pico. This connects us right to the incoming 5V line.
+
+As you might imagine, there's a risk in powering the lights and microcontroller from the same supply. If the lights suddenly required a lot of power (say, a bright flash) they might interrupt operation of the computer. For this project, however, we're not too worried:
+
+* The Blossom has only 16 lights. It's a manageable draw, even at full brightness.
+
+* We're only running at 20% brightness.
+
+* The Pico is a super-star at power management and requires very little power on its own.
+
+This gives us enough overhead that I didn't complicate the device with a separate power line. What happens if we wanted to light up a bigger project?
+
+### Power Use for Longer Strings of LEDs
+
+Little 5050-size LEDs are small, so the wires connecting them are also small. There's also a little bit of resistance in those copper traces, so if you have a long string of lights, voltage drops over the distance. The lights at the end of the string, farthest from the power supply, won't get enough "juice" and they won't display the proper colors.
+
+For our 5V hardware, this becomes a problem once we've got more than 40 or 50 lights. This is solved by something called "Power Injection," which is simply adding some extra 5V and ground lines that connect into the string every meter or so, spreading out the power draw.
+
+---
+
+## 7. Further Reading
+
+Congratulations! You're now an expert in the incredible world of _individually addressable LEDs_. As you can see, the technology is evolving every year. Artists today can create brightly illuminated, animated, programmable riots of light and color that were unimaginable even a decade ago. I hope the Blossom is just the first of many such project for you!
+
+* [Adafruit's Neopixel Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide) - Enormous how-to resource deserving of the umlaut.
+* [Understanding the WS2812](https://cpldcpu.com/2014/01/14/light_ws2812-library-v2-0-part-i-understanding-the-ws2812/) - A very technical but foundational study of the communication protocol we talk about in part 3.
+* [PicoTech's NeoPixel Blog](https://www.picotech.com/library/articles/blog/how-do-individually-addressable-leds-work) - See how NeoPixel signalling looks through an oscilloscope.
+* [QuinLED](https://quinled.info/) - Developer Nico ("QuinLED") sells LED hardware and runs an extensive resource, including guides, videos, and a Discord all about addressable LEDs.
+* [Official Raspberry Pi "PIO" Documentation](https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf) - The definitive guide to programming PIO state machines. This is pretty advanced stuff.
+* [Gary Explains the PIO State Machines](https://www.youtube.com/watch?v=QlKtEA5XKc4) - A friendly video explanation of the PIO documentation above.
+* [Adafruit DotStar Guide](https://learn.adafruit.com/adafruit-dotstar-leds) - The successor to the NeoPixels we use.
+* [Adafruit's LED Intro](https://learn.adafruit.com/all-about-leds) - A more basic introduction to LED technology and the many available form-factors.
+* [Visit an LED Factory with SparkFun](https://learn.sparkfun.com/tutorials/how-leds-are-made) - See how LEDs are made. 
+* [The SK6812RGBW Datasheet](https://cdn-shop.adafruit.com/product-files/2757/p2757_SK6812RGBW_REV01.pdf) - Dense reading about the specific light this project uses.
+
+### Other LED Communities and Forums
+
+* [Reddit: r/FastLED](https://www.reddit.com/r/FastLED/) - Specializing in writing code to support awesome LED designs. 
+* [Reddit: r/WLED](https://www.reddit.com/r/WLED/) - Lots of practical advice for real-world builds. You'll see some amazing projects on here!
+* [The Adafruit Discord Server](https://adafru.it/discord) - A great community of makers. If you're stuck, the community here can help you out!
+* **Your Local Makerspace!** - The most fun way to get help is to connect with other makers in your area. Today Blossoms... tomorrow Art Cars!

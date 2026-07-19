@@ -50,7 +50,7 @@ Adafruit uses the "NeoPixel" name for WS2812B designs (these only have the color
 
 ![Adafruit's NeoPixel 16 RGBW Ring.](images/led-guide-neopixel.jpg)
 
-Adafuit has assembled 16 lights in a circle. The positioning of the white channel on the chip gives us a wonderful "outer ring" of white lights. The PCB is cut to the smallest possible size and we're given 6 connections, three of which I've labelled above. The power, ground, and data lines are (by design) 90-degrees apart around the circle. There's also a data-out line, for stringing multiple rings or strips of neopixels together (Adafruit's website has [Plans for making light-up glasses](https://learn.adafruit.com/celebration-spectacles) by connecting two rings this way.)
+Adafruit has assembled 16 lights in a circle. The positioning of the white channel on the chip gives us a wonderful "outer ring" of white lights. The PCB is cut to the smallest possible size and we're given 6 connections, three of which I've labelled above. The power, ground, and data lines are (by design) 90-degrees apart around the circle. There's also a data-out line, for stringing multiple rings or strips of NeoPixels together (Adafruit's website has [Plans for making light-up glasses](https://learn.adafruit.com/celebration-spectacles) by connecting two rings this way.)
 
 The outer diameter of the 16-light ring is 44.5mm (1.75"). That's almost the exact dimensions of a tea-candle, which gives us a library of decorative hardware to choose from. And we can address the white lights and colored lights independently, playing one pattern on the colorful "inner ring" while playing another on the bright "outer ring." It's like getting two rings of lights in a single hardware package! 
 
@@ -75,4 +75,27 @@ To convert the 1s and 0s (bits) into color information, we need to assign a hand
 | 10010110 | 150 | 96 | Rich red |
 | 11111111 | 255 | FF | Brightest red possible |
 
-Individual LEDs have 256 different "power" levels. 
+>[!TIP]
+>Programmers use hexadecimal (a 16-digit number system, using A-F in addition to 0-9) as a shorthand way of referencing groups of bits. Each "digit" represents four bits, from 0 (0000) to F (1111). So, instead of saying "1111-1100," you can just say "FC."
+
+Similarly, we can assign eight bits to the green LED. It's physically right next to the red one, so when the red one is going full blast (255), and the green one is going full blast (255), the result is bright yellow. We've also got a blue LED there, and - you guessed it - we give it eight bits of its own. If all three channels are equally bright, the resulting color looks white. (This is, in fact, what "white LEDs" are doing.)
+
+We use a total of 24 bits to give three values for red, green, and blue. By mixing them, we can get all sorts of fun colors. You can see it gets a little cumbersome to type it out in binary every time:
+
+| Binary | Decimal | Hex | Result |
+| :---: | :---: | :---: | :--- |
+| `00000000 00000000 00000000` | 0 0 0 | 000000 | Off |
+| `01010000 00000000 00000000` | 80 0 0 | 500000 | Dim red |
+| `11111111 00000000 00000000` | 255 0 0 | FF0000 | Bright Red |
+| `00000000 11111111 00000000` | 0 255 0 | 00FF00 | Bright Green |
+| `00000000 00000000 11111111` | 0 0 255 | 0000FF | Bright Blue |
+| `11111111 11111111 00000000` | 255 255 0 | FFFF00 | Yellow |
+| `11111111 11010111 00000000` | 255 215 0 | FFD700 | Gold |
+| `11111111 10100101 00000000` | 255 165 0 | FFA500 | Orange |
+| `11011010 01110000 11010110` | 218 112 214 | DA70D6 | Orchid / Light Purple |
+| `10000000 00000000 10000000` | 128 0 128 | 800080 | Purple |
+| `01101010 01011010 11001101` | 106 90 205 | 6A5ACD | Slate Blue |
+| `01000000 11100000 11010000` | 64 224 208 | 40E0D0 | Turquoise |
+| `00000000 11111111 11111111` | 0 255 255 | 00FFFF | Cyan / Aqua |
+| `11111111 00000000 11111111` | 255 0 255 | FF00FF | Magenta / Fuchsia |
+| `11111111 11111111 11111111` | 255 255 255 | FFFFFF | Brightest white possible |

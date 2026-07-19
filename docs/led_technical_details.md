@@ -133,7 +133,7 @@ Now you know the secret of controlling a whole chain of LEDs, and all it require
 
 The hardware we're using is a handsome little miracle-machine, though! The Raspberry Pi Pico 2W uses the RP2350 microcontroller. It's that little black chip right in the center of your board, with the Raspberry Pi logo on it. This microcontroller not only has two CPUs; it also has a bank of 12 "Programmable I/O" state machines, or "PIOs."
 
-![The mesmerizing Raspberry Pi Pico 2W](images/pico2w.png)
+![The mesmerizing Raspberry Pi Pico 2W](images/pico2w.jpg)
 
 ### Programmable I/O (PIO) State Machines
 

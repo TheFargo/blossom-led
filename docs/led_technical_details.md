@@ -202,7 +202,7 @@ This gives us enough overhead that I didn't complicate the device with a separat
 
 ### Power Use for Longer Strings of LEDs
 
-Little 5050-size LEDs are small, so the wires connecting them are also small. There's also a little bit of resistance in those copper traces, so if you have a long string of lights, voltage drops over the distance. The lights at the end of the string, farthest from the power supply, won't get enough "juice" and they won't display the proper colors.
+Little 5050-size LEDs are small, so the wires connecting them are also small. There's also a little bit of resistance in those copper traces, so if you have a long string of lights, voltage begins to drop over the distance. The lights at the end of the string, farthest from the power supply, won't get enough "juice" and they won't display the proper colors.
 
 For our 5V hardware, this becomes a problem once we've got more than 40 or 50 lights. This is solved by something called "Power Injection," which is simply adding some extra 5V and ground lines that connect into the string every meter or so, spreading out the power draw.
 
@@ -215,17 +215,18 @@ Congratulations! You're now an expert in the incredible world of _individually a
 * [Adafruit's Neopixel Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide) - Enormous how-to resource deserving of the umlaut.
 * [Understanding the WS2812](https://cpldcpu.com/2014/01/14/light_ws2812-library-v2-0-part-i-understanding-the-ws2812/) - A very technical but foundational study of the communication protocol we talk about in part 3.
 * [PicoTech's NeoPixel Blog](https://www.picotech.com/library/articles/blog/how-do-individually-addressable-leds-work) - See how NeoPixel signalling looks through an oscilloscope.
-* [QuinLED](https://quinled.info/) - Developer Nico ("QuinLED") sells LED hardware and runs an extensive resource, including guides, videos, and a Discord all about addressable LEDs.
-* [Official Raspberry Pi "PIO" Documentation](https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf) - The definitive guide to programming PIO state machines. This is pretty advanced stuff.
+* [QuinLED](https://quinled.info/) - An extensive addressable LED resource, including guides, videos, and a Discord.
+* [Official Raspberry Pi "PIO" Documentation](https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf) - The primary source for programming PIO state machines. This is pretty advanced stuff.
 * [Gary Explains the PIO State Machines](https://www.youtube.com/watch?v=QlKtEA5XKc4) - A friendly video explanation of the PIO documentation above.
 * [Adafruit DotStar Guide](https://learn.adafruit.com/adafruit-dotstar-leds) - The successor to the NeoPixels we use.
 * [Adafruit's LED Intro](https://learn.adafruit.com/all-about-leds) - A more basic introduction to LED technology and the many available form-factors.
 * [Visit an LED Factory with SparkFun](https://learn.sparkfun.com/tutorials/how-leds-are-made) - See how LEDs are made. 
-* [The SK6812RGBW Datasheet](https://cdn-shop.adafruit.com/product-files/2757/p2757_SK6812RGBW_REV01.pdf) - Dense reading about the specific light this project uses.
+* [The SK6812RGBW Datasheet](https://cdn-shop.adafruit.com/product-files/2757/p2757_SK6812RGBW_REV01.pdf) - Full technical specs about the specific light this project uses.
 
 ### Other LED Communities and Forums
 
-* [Reddit: r/FastLED](https://www.reddit.com/r/FastLED/) - Specializing in writing code to support awesome LED designs. 
 * [Reddit: r/WLED](https://www.reddit.com/r/WLED/) - Lots of practical advice for real-world builds. You'll see some amazing projects on here!
+* [Reddit: r/LED](https://www.reddit.com/r/led/) - Reddit's general LED forum. Less technical, but often fun.
+* [Reddit: r/FastLED](https://www.reddit.com/r/FastLED/) - Specializing in writing code to support LED designs.
 * [The Adafruit Discord Server](https://adafru.it/discord) - A great community of makers. If you're stuck, the community here can help you out!
 * **Your Local Makerspace!** - The most fun way to get help is to connect with other makers in your area. Today Blossoms... tomorrow Art Cars!

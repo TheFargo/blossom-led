@@ -4,6 +4,8 @@ We're artists painting with light, and our instrument of choice for this project
 
 In this guide, we'll look at these cool little LEDs, talk about how they work, and then talk about how we send instructions to them with our microprocessor!
 
+![The Adafruit NeoPixel 16 Ring](images/led-guide-intro.jpg)
+
 ---
 
 ## Table of Contents

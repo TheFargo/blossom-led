@@ -20,9 +20,9 @@ In this guide, we'll look at these cool little LEDs, talk about how they work, a
 
 ## 1. Introducing the SK6812
 
-Not long after humanity mastered the secrets of the elusive blue LED, the race was on to shrink and string together LEDs into everything from decorative lighting strips to bright LED monitors. In the early 2000s engineers invented a "5050" LED package, so-named because it was 5.0 mm x 5.0 mm in size. Whole strips of these tiny lights could be easily manufactured. You could put an adhesive backing on them to place a thin strip of bright lighting wherever you needed it. Depending on how they were wired, you could control the RGB values of the whole strip at once.
+Not long after humanity mastered the secrets of the elusive blue LED, the race was on to shrink and string together LEDs into everything from decorative lighting strips to bright LED monitors. In the early 2000s engineers invented a "5050" LED package, so-named because it was 5.0 mm x 5.0 mm in size. Whole strips of these tiny lights could be easily manufactured. A popular design is to put adhesive backing on long flexible strips of 5050s, allowing people to place a thin strip of brightly-colored lighting wherever they want. Designers could easily control the RGB values of the whole strip at once.
 
-But programmers and artists wanted to be able to make patterns with the lights! To do this, engineers needed to design "individually addressable" LEDs so that you can control the color and brightness of each individual light in the string. It seems crazy to control a whole line of lights with a single data out line from a microcontroller, but those mad lads did it! A generation of lights came out with names like WS2812B or SK6812. Rather than make people memorize alphabet soup, companies like Adafruit gave this technology a name: "NeoPixels."
+But programmers and artists wanted to be able to make _patterns_ with the lights! To do this, engineers needed to design "individually addressable" LEDs so that you can control the color and brightness of each individual light in the string. It seems impossible to control a whole string of lights with a single data out line from a microcontroller, but those mad lads did it! A generation of lights came out with names like WS2812B or SK6812, designed to be strung together yet individually programmed. Rather than make people memorize an alphabet soup of chip designations, Adafruit gave this technology a name: "NeoPixels." 
 
 We are interested, specifically, in the "SK6812" lights, invented by Dongguang Opsco Optoelectronics in 2015. These guys are special because they have FOUR LED lights integrated into the package: red, green, blue, and a special white LED that comes in various color warmths. For this project, I like the warmest color available, "Warm Sunlight." This looks the most like an incandescent light or candle flame at low intensities. The full chip name, "SK6812RGBW-WS" reflects this choice. Let's look at it!
 
@@ -156,6 +156,8 @@ In the years since the SK6812 (and similar chips) were invented, LED technology 
 - **Backup Data Lines:** If any one of the Blossom's LED's give out, the remainder of the ring will also stop working, because the dead light will no longer pass on data. On really huge builds with lots of lights, this becomes a nightmare to maintain. Later LED designs incorpoate backup data lines that allow the strip to bypass any bad lights.
 
 - **Continued Miniturization:** Eventually 5050 designs gave way to 2020 designs, which is the same idea but in a 2mm by 2mm package. Adafruit calls these the "DotStar Micro." You can really pack those together. My friend, they kept getting smaller: As of 2025 you can get individually addressable LEDs that measure 1.1mm square (!). As Alex Lorman notes on [this github SK6805-EC10 project](https://github.com/alorman/SK6805-EC10-Notes), "Buy extras... breathing on them the wrong way blows them away."
+
+---
 
 ## 6. LED Power and Brightness Considerations
 

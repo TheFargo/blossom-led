@@ -1,8 +1,8 @@
 # LED Technical Details: Blossom Programmable Light Display
 
-We're artists painting with light, and our instrument of choice for this project is called the "SK6812RGBW-WS" - it's a tiny 5mm x 5mm wafer of electronics with four integrated LEDs. These things are _bright_ and _colorful_. Best of all, you can string them together and address them individually, creating incredible patterns.
+We're artists painting with light, and our instrument of choice for this project is called the "SK6812RGBW-WS" - it's a tiny 5mm x 5mm wafer of electronics with four integrated LEDs. These things are _bright_ and _colorful_. Best of all, you can string them together and address them individually, creating incredible patterns. We'll use a ring of 16 of these chips to create the Blossom.
 
-In this guide, we'll look at these cool little LEDs, talk about how they work, and then talk about how we send instructions to them with our microprocessor!
+In this guide, we'll look at these cool little LEDs, describe how they work, and then talk about how we send instructions to them with our microprocessor!
 
 ![The Adafruit NeoPixel 16 Ring](images/led-guide-intro-small.jpg)
 
@@ -26,7 +26,7 @@ Not long after humanity mastered the secrets of the elusive blue LED, the race w
 
 But programmers and artists wanted to be able to make _patterns_ with the lights! To do this, engineers needed to design "individually addressable" LEDs so that you can control the color and brightness of each individual light in the string. It seems impossible to control a whole string of lights with a single data out line from a microcontroller, but those mad lads did it! A generation of lights came out with names like WS2812B or SK6812, designed to be strung together yet individually programmed. Rather than make people memorize an alphabet soup of chip designations, Adafruit gave this technology a name: "NeoPixels." 
 
-We are interested, specifically, in the "SK6812" lights, invented by Dongguang Opsco Optoelectronics in 2015. These guys are special because they have FOUR LED lights integrated into the package: red, green, blue, and a special white LED that comes in various color warmths. For this project, I like the warmest color available, "Warm Sunlight." This looks the most like an incandescent light or candle flame at low intensities. The full chip name, "SK6812RGBW-WS" reflects this choice. Let's look at it!
+We are interested, specifically, in the "SK6812" lights, invented by Dongguang Opsco Optoelectronics in 2015. These guys are special because they have FOUR LED lights integrated into the package: red, green, blue, and a special white LED that comes in various color warmths. For this project, I like the warmest color available, "Warm Sunlight." At low intensities, this looks the most like an incandescent light or candle flame. The full chip name, "SK6812RGBW-WS" reflects this choice. Let's look at it!
 
 ![SK6812 Extreme Close Up](images/led-guide-6812.jpg)
 
@@ -34,7 +34,7 @@ What's this? There's a whole little logic circuit in there! Each of these lights
 
 You'll see four pads on the corners of the chip, the classic "5050" design for these things. I've labelled the pads for the SK6812: Power input (5V) and ground are on opposite corners. The other two corners are for "data in" and "data out." The idea is you can wire up a whole line of these pretty cleanly, having a shared 5V line on one side, the ground line on the other, and a data line snaking between each light. 
 
-Speaking of lights, it's hard to see the individual LEDs when the package isn't lit up. The red, green, and blue LEDs are packed together on the right side of the image. Turn your attention to that big golden semicircular area at the top of the chip. That's the whole reason we chose this hardware! That yellow piece is a diffuser on top of a VERY bright pure-white LED. The yellow color is why the resulting light is a warm yellow shine instead of the bright blue-white we associate with colder LEDs.
+Speaking of lights, it's hard to see the individual LEDs when the package isn't lit up. The red, green, and blue LEDs are packed together on the right side of the image. Turn your attention to that big golden semicircular area at the top of the chip. That's the whole reason we chose this hardware! That yellow piece is a diffuser on top of a very bright pure-white LED. The yellow color is why the resulting light is a warm yellow shine instead of the bright blue-white we associate with colder LEDs.
 
 From any distance, the white and color channels blend right together, especially if you've got a good diffuser over the light. But if you're up-close - such as when the device is sitting on your desk - the color LEDs and the white LED are visibly just a little offset from one another. In the case of the Blossom, this slight offset only adds to the visual. In the photo below, all sixteen chips are lit up with both red and white lights. Taken together, they make a kind of spiral pattern!
 
@@ -121,7 +121,7 @@ You may have noticed that even though we often describe these lights as "individ
 
 However, this happens fast. In the case of the Blossom and its 16 RGBW lights, it takes 720 microseconds to send all the color data and then pause long enough to latch. That means we could update the Blossom over 1300 times _per second_ if we wanted to.
 
-This is easy to manage in software. Each color channel is only one byte, so we can easily save the state of every single light in an array - even for huge strings or matrices of lights. We can update an individual light in the array (hence, "individually addressable") and then tell our processor to output the change to the whole string of lights.
+Outputting data to the lights and storing their status is easy to manage in software. Each color channel is only one byte, so we can easily save the state of every single light in an array - even for huge strings or matrices of lights. We can update an individual light in the array (hence, "individually addressable") and then tell our processor to output the change to the whole string of lights.
 
 We really take advantage of this with the Blossom. The white lights are treated as a separate array of data and we can perform calculations or animations on just the white channel. That data is then assembled with the color data in the correct order and sent to the hardware whenever the lights are updated... at a _leisurely_ 60 frames a second, by the way. Nice and slow!
 
@@ -132,6 +132,8 @@ We really take advantage of this with the Blossom. The white lights are treated 
 Now you know the secret of controlling a whole chain of LEDs, and all it requires is micro-second precise timing! It's possible to do this with a microcontroller: You program it to set a pin to high, and then wait so many microseconds, and then flip it to low, and then wait, and then... Honestly, it's not a very good use of a CPU. We'd rather use that processing power to do something interesting, like calculate new colors or patterns.
 
 The hardware we're using is a handsome little miracle-machine, though! The Raspberry Pi Pico 2W uses the RP2350 microcontroller. It's that little black chip right in the center of your board, with the Raspberry Pi logo on it. This microcontroller not only has two CPUs; it also has a bank of 12 "Programmable I/O" state machines, or "PIOs."
+
+![The mesmerizing Raspberry Pi Pico 2W](images/pico2w.png)
 
 ### Programmable I/O (PIO) State Machines
 

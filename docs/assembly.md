@@ -45,7 +45,7 @@ To construct this project from scratch, you'll need the skills and equipment to 
 
 1. **A 5W (or Greater) Laser Engraver/Cutter.** For the best results, you'll want an air assist and a honeycomb workbench panel. A more powerful laser will cut the project faster, but a little 5W will do. 
 
-2. **Wood Prep Materials.** Wood glue and clamps are essential, but for a really pro look and feel you'll also want sandpaper (200 and 400 grit), your color choice of stain, and your choice of finish (I'm a big fan of Danish Oil).
+2. **Wood Prep Materials.** Wood glue and clamps are essential, but for a really pro look and feel you'll also want sandpaper (200 and 400 grit), your color choice of stain, and your choice of finish.
 
 3. **A Soldering Iron Station.** Work in a well-ventilated area, preferably with a heat-resistant mat to protect your work surface. We're only soldering 6 connections, but they're very small: a magnifying glass and "helping hands" to hold the material will really help. 
 
@@ -65,7 +65,7 @@ Essentially, we're cutting out a "six-pack" of wooden disks. We'll glue three of
 
 1. **Download the Design.** Download the correct files for the hardware you're using.
 
-- `\enclosure\blossom.svg` is a general-purpose file in "scalable vector graphics" format, or .svg. Import these files into your tool of choice (like LightBurn or Glowforge) and make sure your settings are correct (cut red lines, score blue lines, engrave black lines.) There's an adorable scale configuration cube that you can use to ensure you're cutting exactly the right size.
+- `\enclosure\blossom.svg` is a general-purpose file in "scalable vector graphics" format, or .svg. Import these files into your tool of choice (like LightBurn or Glowforge) and make sure your settings are correct (cut red lines, score blue lines, engrave black lines.) The .svg file features a friendly calibration cube that you can use to ensure you're cutting exactly the right size.
 
 - `\enclosure\blossom.xs` is the "xTool Studio" file used for the original design and the prototypes made in the photographs. If you're using xTool hardware and like using their propretiary software, this is the file you want. The machine used was an xTool D1 Pro with a 5W laser. The settings for 3mm birch plywood should already be configured in this file, but you should still double-check the settings and scale for your machine. 
 
@@ -81,13 +81,13 @@ Essentially, we're cutting out a "six-pack" of wooden disks. We'll glue three of
 
 Ensure your tea-candle holder/art display fits into the round holes on top - it's easier to sand and adjust that now than it will be after assembly.
 
-3. **Glue!** Glue the three top pieces together, making sure the nicest wood-grain you have is facing up for the top ring. Align the screw-holes and glue the bottom three pieces together, ensuring that the instructions face down. It's easy to mix up or invert these pieces so, double-check before you glue.  
+3. **Glue!** Glue the three top pieces together, making sure the nicest wood-grain you have is facing up for the top ring. Align the screw-holes and glue the bottom three pieces together, ensuring that the instructions face down. It's easy to mix up or invert these pieces, so double-check before you glue.  
 
 ![Assembling the Two Halves](images/assembly_01.png)
 
 4. **Sand!** When the glue is dry, screw the top and bottom half together and then sand the exterior. Really smooth it out! You want to remove all the char from the sides of the wood and bevel the edges until your device is smooth to the touch.
 
-5. **Stain!** Once smooth, unscrew both halves and stain them. Remove the instruction insert before staining to get a nice two-tone finish! I prefer a dark stain: The pictured build uses Varathane Classic Penetrating Wood Stain in Red Oak. Glue the instruction insert back onto the bottom after the stain dries.
+5. **Stain!** Once smooth, unscrew both halves and stain them. Remove the instruction insert before staining to get a nice two-tone finish. I prefer a dark stain: The pictured build uses Varathane Classic Penetrating Wood Stain in Red Oak. Glue the instruction insert back onto the bottom after the stain dries.
 
 6. **Finish!** If you want your wood to feel silky smooth and look professional, hit it with some finish! I like Danish Oil for a natural feel. Generously rub the oil onto all the exterior surfaces. I ususally use a couple coats. It'll feel a little sticky for a day or so as the oil seeps into the wood; just keep handling it and soon the wood will be soft and smooth with just a hint of gloss. 
 
@@ -143,7 +143,7 @@ We must make the following connections:
 When you are done, attach the Pico onto the enclosure with four screws. It should look like the above picture, except your soldering will probably be _much_ nicer than mine. I posted that pic to give you mad confidence. Note that the Pico is "hanging upside down from the ceiling" of the top half of the enclosure. The Pico's green on-board LED and white BOOTSEL button should be facing _down_, so you'll be able to use them from the bottom of the device.
 
 > [!TIP]
-> Earlier we pointed out the little black CPU in the center of the Pico 2W board. So, what's that big giant metal chip, the largest component on the PCB? That's the WiFi and Bluetooth chip! It's like a whole little radio tower for sending and receiving signals. We take advantage of it to serve the webpages we use to control the Blossom. _If you don't see a big metal chip, make sure you have a Pico 2W, and not just a Pico 2!_
+> Earlier we pointed out the little black CPU in the center of the Pico 2W board. So, what's that big giant square metal chip, the largest component on the PCB? That's the WiFi and Bluetooth hardware! It's like a whole little radio tower for sending and receiving signals. We take advantage of it to serve the webpages used to control the Blossom. _If you don't see a big metal chip, make sure you have a Pico 2W!_
 
 ---
 
@@ -155,4 +155,4 @@ Once you're happy that your wiring works, the bottom half of the enclosure attac
 
 ![The Blossom Finished Product](images/assembly_finished.jpg)
 
-# Enjoy your new hand-crafted wifi-enabled programmable illuminated art display!**
+# Enjoy your hand-crafted wifi-enabled illuminated art display!

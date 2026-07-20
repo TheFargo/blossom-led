@@ -128,6 +128,31 @@ Our objective is to glue the spindle to the artwork, and the artwork to the encl
 
 ## 6. Wiring the Pico 2W
 
-This is where I need to draw a picture. 
+If you've never soldered anything onto a PCB before, now's the time to learn. This project requires soldering only six connections, and if you've already wired your lights and spindle, you're halfway there.
 
-![A hole drilled into the artwork, ready for wiring.](images/wiring.png)
+![Blossom Wiring Guide.](images/wiring.png)
+
+We must make the following connections:
+
+* NeoPixel Power -> Pico Pin 40 ("VBUS")
+* NeoPixel Ground -> Pico Pin 38 ("Ground" - 33, 28, and 23 also work)
+* NeoPixel Data -> Pico Pin 21 ("GP16")
+
+![Wiring finished and Pico attached.](images/assembly_wiring_complete.jpg)
+
+When you are done, attach the Pico onto the enclosure with four screws. It should look like the above picture, except your soldering will probably be _much_ nicer than mine. I posted that pic to give you mad confidence. Note that the Pico is "hanging upside down from the ceiling" of the top half of the enclosure. The Pico's green on-board LED and white BOOTSEL button should be facing _down_, so you'll be able to use them from the bottom of the device.
+
+> [!TIP]
+> Earlier we pointed out the little black CPU in the center of the Pico 2W board. So, what's that big giant metal chip, the largest component on the PCB? That's the WiFi and Bluetooth chip! It's like a whole little radio tower for sending and receiving signals. We take advantage of it to serve the webpages we use to control the Blossom. _If you don't see a big metal chip, make sure you have a Pico 2W, and not just a Pico 2!_
+
+---
+
+## 7. Final Assembly
+
+All that's left to do is to close it up! All the electronics are self-contained in the top-half of the enclosure; the bottom half simply displays the instructions and hides our wiring. At this point, you'll probably want to [install the software](/docs/installation.md) and make sure everything's ship-shape.
+
+Once you're happy that your wiring works, the bottom half of the enclosure attaches to the top half with three screws. Sink them until they're flush, then hide all three with little rubber feet.
+
+![The Blossom Finished Product](images/assembly_finished.jpg)
+
+# Enjoy your new hand-crafted wifi-enabled programmable illuminated art display!**

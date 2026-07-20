@@ -145,7 +145,7 @@ We must make the following connections:
 When you are done, attach the Pico onto the enclosure with four screws. It should look like the above picture, except your soldering will probably be _much_ nicer than mine. I posted that pic to give you mad confidence. Note that the Pico is "hanging upside down from the ceiling" of the top half of the enclosure. The Pico's green on-board LED and white BOOTSEL button should be facing _down_, so you'll be able to use them from the bottom of the device.
 
 > [!TIP]
-> Earlier we pointed out the little black CPU in the center of the Pico 2W board. So, what's that big giant square metal chip, the largest component on the PCB? That's the WiFi and Bluetooth hardware! It's like a whole little radio tower for sending and receiving signals. We take advantage of it to serve the webpages used to control the Blossom. _If you don't see a big metal chip, make sure you have a Pico 2W!_
+> The little black chip with the Raspberry Pi logo in the center of the Pico 2W board is our CPU. So, what's that big giant square metal chip, the largest component on the PCB? That's the WiFi and Bluetooth hardware! It's like a whole little radio tower for sending and receiving signals. We take advantage of it to serve the webpages used to control the Blossom. _If you don't see a big metal chip, make sure you have a Pico 2W and not a Pico 2!_
 
 ---
 

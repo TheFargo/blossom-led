@@ -228,5 +228,5 @@ Congratulations! You're now an expert in the incredible world of _individually a
 * [Reddit: r/WLED](https://www.reddit.com/r/WLED/) - Lots of practical advice for real-world builds. You'll see some amazing projects on here!
 * [Reddit: r/LED](https://www.reddit.com/r/led/) - Reddit's general LED forum. Less technical, but often fun.
 * [Reddit: r/FastLED](https://www.reddit.com/r/FastLED/) - Specializing in writing code to support LED designs.
-* [The Adafruit Discord Server](https://adafru.it/discord) - A great community of makers. If you're stuck, the community here can help you out!
+* [The Adafruit Discord Server](https://adafru.it/discord) - A great community of makers. If you're stuck, you might find friendly help in real-time!
 * **Your Local Makerspace!** - The most fun way to get help is to connect with other makers in your area. Today Blossoms... tomorrow Art Cars!

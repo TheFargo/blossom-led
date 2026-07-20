@@ -99,7 +99,7 @@ Ensure your tea-candle holder/art display fits into the round holes on top - it'
 
 With the case assembled we're almost ready to turn our attention to the electronics. We use a spindle and a glass cabochon to elevate and diffuse the lights. Before gluing the spindle together, solder three short wires onto your NeoPixel ring: 5V, Ground, and Data. There are three labelled notches in the spindle that will fit the wires. There's not a lot of room to work with on the ring without damaging the lights, so solder carefully!
 
-![Assembling the Two Halves and the Spindle.](images/assembly_02.jpg)
+![Assembling the Two Halves and the Spindle.](images/assembly_02.png)
 
 > [!TIP]
 > **Options for the Diffuser:**  

@@ -10,7 +10,7 @@ Building your own Blossom from scratch? Great idea! This is the perfect starter/
 2. [Workbench Equipment](#2-workbench-equipment)
 3. [Manufacturing the Case](#3-manufacturing-the-case)
 4. [Prepping the Lights and Spindle](#4-prepping-the-lights-and-spindle)
-5. [Prepping the Blossom Sculpture](#5-prepping-the-blossom-sculpture)
+5. [Prepping Your Artwork](#5-prepping-your-artwork)
 6. [Wiring the Pico 2W](#6-wiring-the-pico-2w)
 7. [Final Assembly](#7-final-seembly)
 8. [Next Steps](#8-next-steps)
@@ -79,4 +79,55 @@ Essentially, we're cutting out a "six-pack" of wooden disks. We'll glue three of
 - An "Engrave" setting that burns in, with high contrast, things like the logo and the headers
 - A "Score" setting that burns a nice clean high-contrast line without scorching the wood. 
 
-3. **To be continued.** Yeah.
+Ensure your tea-candle holder/art display fits into the round holes on top - it's easier to sand and adjust that now than it will be after assembly.
+
+3. **Glue!** Glue the three top pieces together, making sure the nicest wood-grain you have is facing up for the top ring. Align the screw-holes and glue the bottom three pieces together, ensuring that the instructions face down. It's easy to mix up or invert these pieces so, double-check before you glue.  
+
+![Assembling the Two Halves](images/assembly_01.png)
+
+4. **Sand!** When the glue is dry, screw the top and bottom half together and then sand the exterior. Really smooth it out! You want to remove all the char from the sides of the wood and bevel the edges until your device is smooth to the touch.
+
+5. **Stain!** Once smooth, unscrew both halves and stain them. Remove the instruction insert before staining to get a nice two-tone finish! I prefer a dark stain: The pictured build uses Varathane Classic Penetrating Wood Stain in Red Oak. Glue the instruction insert back onto the bottom after the stain dries.
+
+6. **Finish!** If you want your wood to feel silky smooth and look professional, hit it with some finish! I like Danish Oil for a natural feel. Generously rub the oil onto all the exterior surfaces. I ususally use a couple coats. It'll feel a little sticky for a day or so as the oil seeps into the wood; just keep handling it and soon the wood will be soft and smooth with just a hint of gloss. 
+
+![Finishing with Danish Oil.](images/assembly_danish_oil.jpg)
+
+---
+
+## 4. Prepping the Lights and Spindle
+
+With the case assembled we're almost ready to turn our attention to the electronics. We use a spindle and a glass cabochon to elevate and diffuse the lights. Before gluing the spindle together, solder three short wires onto your NeoPixel ring: 5V, Ground, and Data. There are three labelled notches in the spindle that will fit the wires. There's not a lot of room to work with on the ring without damaging the lights, so solder carefully!
+
+![Assembling the Two Halves and the Spindle.](images/assembly_02.jpg)
+
+> [!TIP]
+> **Options for the Diffuser:**  
+> It's hard to find frosted glass. I buy clear glass cabochons and then use a Rustoleum frosted glass spray (2 coats) to give them a translucent surface with some cool patterns. A translucent 50mm acrylic disc would also do the trick. A capiz-shell insert could be a beautiful solution.
+
+Once your wires are in place you can start to glue together the spindle as pictured above (The pattern contains an extra spindle piece if you need it.) If you're feeling fancy you can use some hot-glue to neatly run the wiring. I've found Gorilla Glue is best for mounting the glass cabochon onto the wood.
+
+---
+
+## 5. Prepping Your Artwork
+
+Consider how you want to get the wiring from the spindle down to your Raspberry Pi Pico in the enclosure. For this project I use capiz-shell tea-candle holders with a metal base. I drilled a small hole in the bottom of the candle holder about a centimeter from the edge - just enough to fit three wires and line up with the gap cut into the enclosure. Drilling holes in finished art is risky, so I'll repeat a warning from earlier:
+
+> [!CAUTION]
+> **Use Care When Drilling Metal:**  Wear gloves and goggles, secure the art well, and use a stepped drill bit. Rather than risk damaging your art (or yourself!), you may just want to discretely run the wires on the outside. 
+
+![A hole drilled into the artwork, ready for wiring.](images/assembly_art_prep.jpg)
+
+Three wires need to pass through. In the piece pictured above, I drilled a hole about 6mm (quarter-inch).
+
+Our objective is to glue the spindle to the artwork, and the artwork to the enclosure, with three wires passing all the way through. See the photo below. It's starting to smell pretty exciting in here, because it's time to install our state-of-the-art computer core! 
+
+![High-Tech Computer Core Awaiting Insertion.](images/assembly_03.jpg)
+
+---
+
+## 6. Wiring the Pico 2W
+
+This is where I need to draw a picture. 
+
+![A hole drilled into the artwork, ready for wiring.](images/wiring.png)

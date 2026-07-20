@@ -107,6 +107,8 @@ With the case assembled we're almost ready to turn our attention to the electron
 
 Once your wires are in place you can start to glue together the spindle as pictured above (The pattern contains an extra spindle piece if you need it.) If you're feeling fancy you can use some hot-glue to neatly run the wiring. I've found Gorilla Glue is best for mounting the glass cabochon onto the wood.
 
+![Spindle Top and Side Views](images/assembly_spindle.jpg)
+
 ---
 
 ## 5. Prepping Your Artwork

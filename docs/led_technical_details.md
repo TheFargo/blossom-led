@@ -155,9 +155,9 @@ In the years since the SK6812 (and similar chips) were invented, LED technology 
 
 - **Faster Data Rates:** Our SK6812 NeoPixel array is picky about its timing, but with only 16 lights to manage, we can update it pretty quickly. With really long strings of lights, we start to worry more about how long it takes to send data to the entire string, and how many times per second we can do it. Newer LEDs support much faster data rates, which is important (again) for persistence-of-vision displays.
 
-- **16-Bit Color Depth:** NeoPixels use 8 bits for each color channel, giving us 256 "brightness levels" (including off.) Doubling it to 16 bits gives us a whopping 65,536 brightness levels! Per color! The HD108 LEDs that came out in 2019 have this color depth, in addition to the fast data rates. You can really see the lack of color depth at low levels of light on the Blossom. Turn the colors or white channels down very low and you'll find you can't get a "smooth" fade; there's several visible steps of brightness with no in-betweens.
+- **16-Bit Color Depth:** NeoPixels use 8 bits for each color channel, giving us 256 "brightness levels" (including off.) Doubling it to 16 bits gives us a whopping 65,536 brightness levels! Per color! The HD108 LEDs that came out in 2019 have this color depth, in addition to the fast data rates. You can really see Blossom's lack of color depth at low levels of light. Turn the colors or white channels down very low and you'll find you can't get a "smooth" fade; there's several visible steps of brightness with no in-betweens.
 
-- **Backup Data Lines:** If any one of the Blossom's LED's give out, the remainder of the ring will also stop working, because the dead light will no longer pass on data. On really huge builds with lots of lights, this becomes a nightmare to maintain. Later LED designs incorporate backup data lines that allow the strip to bypass any bad lights.
+- **Backup Data Lines:** If any one of the Blossom's LEDs give out, the remainder of the ring will also stop working, because the dead light will no longer pass on data. On really huge builds with lots of lights, this becomes a nightmare to maintain. Later LED designs incorporate backup data lines that allow the strip to bypass any bad lights.
 
 - **Continued Miniaturization:** Eventually 5050 designs gave way to 2020 designs, which is the same idea but in a 2mm by 2mm package. Adafruit calls these the "DotStar Micro." You can really pack those together. My friend, they kept getting smaller: As of 2025 you can get individually addressable LEDs that measure 1.1mm square (!). As Alex Lorman notes on [this github SK6805-EC10 project](https://github.com/alorman/SK6805-EC10-Notes), "Buy extras... breathing on them the wrong way blows them away."
 
@@ -186,9 +186,11 @@ Of course, now that I've warned you but showed you the code, you know what to do
 
 ### Power Use with 16 LEDs
 
-The beauty of LEDs is that they're the most efficient design we have for converting energy into light. That said, once you have a giant array of lights blasting colors at face-melting brightness, you really have to consider the power draw.
+The beauty of LEDs is that they're the most efficient design we have for converting electricity into light. That said, once you have a giant array of lights blasting colors at face-melting brightness, you really have to consider the power draw.
 
 Our SK6812 lights are designed to use a 5V power supply. (Other common LEDs are designed for 24V, which is what we use in cars.) 5V is exactly what our Micro USB is delivering through the cable to the device. This makes wiring super simple: we pull power from the VBUS, pin 40 on the upper corner of the Pico. This connects us right to the incoming 5V line.
+
+![Wiring Guide](images/wiring.png)
 
 As you might imagine, there's a risk in powering the lights and microcontroller from the same supply. If the lights suddenly required a lot of power (say, a bright flash) they might interrupt operation of the computer. For this project, however, we're not too worried:
 

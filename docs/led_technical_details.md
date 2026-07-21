@@ -215,7 +215,7 @@ For our 5V hardware, this becomes a problem once we've got more than 40 or 50 li
 Congratulations! You're now an expert in the incredible world of _individually addressable LEDs_. This tech is changing every few years. The best place to see the state-of-the-art lighting technology in action is, funny enough, at EDM festivals or raves. Artists today can create brightly illuminated, animated, programmable riots of light and color that were unimaginable even a decade ago. I hope the Blossom is just the first of many such projects for you!
 
 * [Adafruit's Neopixel Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide) - Enormous how-to resource deserving of the umlaut.
-* [Understanding the WS2812](https://cpldcpu.com/2014/01/14/light_ws2812-library-v2-0-part-i-understanding-the-ws2812/) - A very technical but foundational study of the communication protocol we talk about in part 3.
+* [Understanding the WS2812](https://cpldcpu.com/2014/01/14/light_ws2812-library-v2-0-part-i-understanding-the-ws2812/) - A very technical but foundational study of the communication protocol we talked about in part 3.
 * [PicoTech's NeoPixel Blog](https://www.picotech.com/library/articles/blog/how-do-individually-addressable-leds-work) - See how NeoPixel signalling looks through an oscilloscope.
 * [QuinLED](https://quinled.info/) - An extensive addressable LED resource, including guides, videos, and a Discord.
 * [Official Raspberry Pi "PIO" Documentation](https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf) - The primary source for programming PIO state machines. This is pretty advanced stuff.

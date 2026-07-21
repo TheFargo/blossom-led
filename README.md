@@ -41,8 +41,23 @@ Inside you'll find extensively commented code, build photos, and background mate
 
 ## Repository Table of Contents
 
-1. [Title](link)
-2. [Title](link)
+1. [PDF Manual] (Coming soon)
+2. [API] (Coming soon) 
+3. [Animation Guide] (Coming soon)
+4. [Illustrated Assembly Instructions](/docs/assembly.md)
+5. [Software Installation Guide](/docs/installation.md)
+6. [Build and Upload Guide](/docs/build_and_upload.md)
+7. [Extensively Commented C++ Source](\src)
+8. [Explanation of PIO Assembly Code](Coming soon)
+9. [Using the Serial Monitor](/docs/serial_monitor.md)
+10. [Fun LED Technical Details](/docs/led_technical_details.md)
+
+---
+
+Image bar:
+- Pretty!
+- Controlled via Web Page
+- Instructions Printed on the Bottom
 
 ---
 
@@ -53,6 +68,8 @@ Software: Licensed under the Apache License 2.0. Feel free to modify, distribute
 Hardware/Enclosure Design: Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0). You are free to share and adapt the physical design, provided you give appropriate credit. Additional info in `\enclosure\README.md`.
 
 ---
+
+![The Final Product](/docs/images/readme_final_product.jpg)
 
 ## Support This Project
 

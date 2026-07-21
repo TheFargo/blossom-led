@@ -29,9 +29,13 @@ Saavy users can also write their own programs to update _Blossom_ via HTTP.
 
 Build your own Blossom with all of the project files enclosed! Laser cutter/engraver patterns, wiring guides, and the complete source code are included in this repository. 
 
+![Preview of the Enclosure Construction Files](/docs/images/readme_plans_preview.png)
+
 ## A Project for Learning
 
 Inside you'll find extensively commented code, build photos, and background materials about the technology we're using. This is a great beginner-to-intermediate project: if you're looking to move away from breadboards and start embedding remote hardware into real-world devices, this is the place. Topics covered include LED tech, laser woodworking, web provisioning, and even PIO assembly code.
+
+![Assembly In-Progress Close-Up](/docs/images/readme_assembly_preview.jpg)
 
 ---
 

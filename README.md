@@ -13,11 +13,15 @@ Inside the handcrafted wooden case you'll find a Raspberry Pi Pico 2W connected 
 
 ## Features
 
-* **WiFI Enabled**: _Blossom_ acts as its own web server, connecting to your local network\ and allowing you to interact with it from any device.
-* **No Apps Required**: Use any web browser to interact with your _Blossom._\There's nothing to download and all your data stays local.
-* **Create Animations**: Iteratively play with color gradients and noise patterns\while the _Blossom_ updates in real-time. 
+* **WiFI Enabled**: _Blossom_ acts as its own web server, connecting to your local network\
+and allowing you to interact with it from any device.
+* **No Apps Required**: Use any web browser to interact with your _Blossom._\
+There's nothing to download and all your data stays local.
+* **Create Animations**: Iteratively play with color gradients and noise patterns\
+while the _Blossom_ updates in real-time. 
 * **Play Meditations**: Practice mindfulness with guided breathing exercises. 
-* **Control from Any Device**: Simply connect to `blossom.local` from any web browser.\Saavy users can also write their own programs to update _Blossom_ via HTTP.
+* **Control from Any Device**: Simply connect to `blossom.local` from any web browser.\
+Saavy users can also write their own programs to update _Blossom_ via HTTP.
 
 ---
 

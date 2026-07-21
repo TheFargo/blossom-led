@@ -6,18 +6,18 @@
 
 _Blossom_ is a standalone interactive art piece that connects to your local network. Control it from any web browser and vibe along with customizable ambient light displays or guided meditations!
 
-Inside the handcrafted wooden case you'll find a Raspberry Pi Pico 2W connected to a 16-light RGBW Neopixel array. For this build I've used a beautiful 20-petal capiz shell lotus blossom tealight candle holder and a frosted glass cabochon to create a cozy blend of modern tech and natural materials.
+Inside the handcrafted wooden case you'll find a Raspberry Pi Pico 2W connected to a 16-light RGBW NeoPixel array. For this build I've used a beautiful 20-petal capiz shell lotus blossom tealight candle holder and a frosted glass cabochon to create a cozy blend of modern tech and natural materials.
 
 > [!TIP]
 > Support the creator! [Buy a hand-crafted pre-assembled Blossom from Etsy](http://www.etsy.com/MYFINALSTORELINK)
 
 ## Features
 
-* **WiFI Enabled**: _Blossom_ acts as its own web server, connecting to your local network and allowing you to interact with it from any device.
-* **No Apps Required**: Use any web browser to interact with your _Blossom._ There's nothing to download and all your data stays local.
-* **Create Animations**: Iteratively play with color gradients and noise patterns while the Blossom updates in real-time. 
+* **WiFI Enabled**: _Blossom_ acts as its own web server, connecting to your local network\ and allowing you to interact with it from any device.
+* **No Apps Required**: Use any web browser to interact with your _Blossom._\There's nothing to download and all your data stays local.
+* **Create Animations**: Iteratively play with color gradients and noise patterns\while the _Blossom_ updates in real-time. 
 * **Play Meditations**: Practice mindfulness with guided breathing exercises. 
-* **Control from Any Device**: Simply connect to `blossom.local` from any web browser. Saavy users can also write their own programs to update _Blossom_ via HTTP.
+* **Control from Any Device**: Simply connect to `blossom.local` from any web browser.\Saavy users can also write their own programs to update _Blossom_ via HTTP.
 
 ---
 

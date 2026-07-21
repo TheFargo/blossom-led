@@ -48,7 +48,7 @@ Inside you'll find extensively commented code, build photos, and background mate
 5. [Bill of Materials](/docs/assembly.md#1-bill-of-materials)
 6. [Software Installation Guide](/docs/installation.md)
 7. [Build and Upload Guide](/docs/build_and_upload.md)
-8. [Extensively Commented C++ Source](\src)
+8. [Extensively Commented C++ Source](/src)
 9. [Explanation of PIO Assembly Code](Coming soon)
 10. [Using the Serial Monitor](/docs/serial_monitor.md)
 11. [Fun LED Technical Details](/docs/led_technical_details.md)

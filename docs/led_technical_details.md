@@ -44,7 +44,7 @@ From any distance, the white and color channels blend right together, especially
 
 ## 2. Adafruit's NeoPixel Rings
 
-Individual LEDs are cool, but they're _tiny_. Without a heat-gun and an advanced workshop it's really hard to solder these. But the whole point of the 5050 form factor is to be able to easily manufacture these in strips or shapes or matrixes. A quick search for "SK6812 LED" on [Alibaba](https://www.alibaba.com/) will reveal hundreds of such products. My favorite designs come from [Adafruit](https://www.adafruit.com/), a New York based company focused on cool tech for hobbyists like us.
+Individual LEDs are cool, but they're _tiny_. Without a heat-gun and an advanced workshop it's really hard to solder these. But the whole point of the 5050 form factor is to be able to easily manufacture these in strips or shapes or matrices. A quick search for "SK6812 LED" on [Alibaba](https://www.alibaba.com/) will reveal hundreds of such products. My favorite designs come from [Adafruit](https://www.adafruit.com/), a New York based company focused on cool tech for hobbyists like us.
 
 Adafruit uses the "NeoPixel" name for WS2812B designs (these only have the color LEDs, or "RGB") and the SK6812 designs (these are the ones with a dedicated white channel, "RGBW"). As discussed above, we're looking for the warmest white channel we can find, which brings us to this beauty:
 
@@ -113,7 +113,7 @@ Each light on our string gets 32 bits of data to set its color. But how do we co
 
 * If the data stops for a specific amount of time (80 microseconds), the current data in the buffer is considered the correct color info, and it "latches in." The light now displays that color.
 
-One nice thing about these lights is that they don't require constant updates: Once they are displaying a color, the on-board circuitry continues to display that color until the data line starts piping in new color info. 
+One nice thing about these lights is that they don't require constant updates: Once they are displaying a color, the on-board circuitry continues to display that color at the correct brightness until the data line pipes in new color info. 
 
 ### 'Individually Addressable' Means Software Not Hardware
 

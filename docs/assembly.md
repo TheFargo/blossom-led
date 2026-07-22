@@ -153,6 +153,8 @@ When you are done, attach the Pico onto the enclosure with four screws. It shoul
 
 All that's left to do is to close it up! All the electronics are self-contained in the top-half of the enclosure; the bottom half simply displays the instructions and hides our wiring. At this point, you'll probably want to [install the software](/docs/installation.md) and make sure everything's ship-shape.
 
+![The Pico sitting snug inside the final assembly.](images/assembly_final_fit.jpg)
+
 Once you're happy that your wiring works, the bottom half of the enclosure attaches to the top half with three screws. Sink them until they're flush, then hide all three with little rubber feet.
 
 ![The Blossom Finished Product](images/assembly_finished.jpg)

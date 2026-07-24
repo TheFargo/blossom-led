@@ -2,6 +2,7 @@
 #include "credentials.h"
 #include "led_controller.h"
 #include "animation_config.h"
+#include "presets.h"
 #include <LittleFS.h>
 #include <WiFi.h>
 
@@ -114,42 +115,9 @@ static void handleLedToggle() {
   server.send(200, "application/json", json);
 }
 
-// ── JSON parsing helpers for BlossomConfig ────────────────────────────────────
-static uint8_t parseUint8(const String& body, const char* key) {
-  String search = String("\"") + key + "\":";
-  int start = body.indexOf(search);
-  if (start < 0) return 0;
-  start += search.length();
-  int end = start;
-  while (end < body.length() && isdigit(body[end])) end++;
-  return (uint8_t)body.substring(start, end).toInt();
-}
-
-static int8_t parseInt8(const String& body, const char* key) {
-  String search = String("\"") + key + "\":";
-  int start = body.indexOf(search);
-  if (start < 0) return 0;
-  start += search.length();
-  int end = start;
-  if (body[end] == '-') end++;
-  while (end < body.length() && isdigit(body[end])) end++;
-  return (int8_t)body.substring(start, end).toInt();
-}
-
-static bool parseBool(const String& body, const char* key) {
-  String search = String("\"") + key + "\":";
-  int start = body.indexOf(search);
-  if (start < 0) return false;
-  return body.substring(start).startsWith(search + "true");
-}
-
-static DistributionMode parseMode(const String& body, const char* key) {
-  uint8_t val = parseUint8(body, key);
-  // Valid range is now 0-3: Unison, Random, Ordered, Looping (see animation_config.h)
-  if (val > 3) return DistributionMode::RANDOM;
-  return (DistributionMode)val;
-}
-
+// NOTE: The flat-JSON parsing helpers (jsonParseUint8, jsonParseBool, etc.)
+// used to live here, but presets.cpp needs them too — they moved to the
+// presets module (see presets.h) so both files share one implementation.
 
 static void handleLeds() {
   if (!server.hasArg("plain")) {
@@ -160,7 +128,7 @@ static void handleLeds() {
   String body = server.arg("plain");
   
   // Parse "enabled" field from JSON
-  bool enabled = parseBool(body, "enabled");
+  bool enabled = jsonParseBool(body, "enabled");
   
   ledState = enabled;
   digitalWrite(LED_BUILTIN, ledState ? HIGH : LOW);
@@ -184,43 +152,13 @@ static void handleAnimation() {
   }
 
   String body = server.arg("plain");
-  
-  // Parse BlossomConfig from JSON
-  BlossomConfig config;
-  
-  // Color settings
-  config.color.primary    = parseUint8(body, "color.primary");
-  config.color.spread     = parseUint8(body, "color.spread");
-  config.color.brightness = parseUint8(body, "color.brightness");
-  config.color.mode       = parseMode(body, "color.mode");
-  
-  // Sparkle settings
-  config.sparkles.brightness = parseUint8(body, "sparkles.brightness");
-  config.sparkles.spread     = parseUint8(body, "sparkles.spread");
-  config.sparkles.mode       = parseMode(body, "sparkles.mode");
-  
-  // Flicker animation
-  config.flicker.apply_to_color    = parseBool(body, "flicker.apply_to_color");
-  config.flicker.apply_to_sparkles = parseBool(body, "flicker.apply_to_sparkles");
-  config.flicker.speed             = parseUint8(body, "flicker.speed");
-  config.flicker.amplitude         = parseUint8(body, "flicker.amplitude");
-  config.flicker.mode              = parseMode(body, "flicker.mode");
-  
-  // Pulse animation
-  config.pulse.apply_to_color    = parseBool(body, "pulse.apply_to_color");
-  config.pulse.apply_to_sparkles = parseBool(body, "pulse.apply_to_sparkles");
-  config.pulse.speed             = parseUint8(body, "pulse.speed");
-  config.pulse.amplitude         = parseUint8(body, "pulse.amplitude");
-  config.pulse.mode              = parseMode(body, "pulse.mode");
-  
-  // Spin animation
-  config.spin.apply_to_color    = parseBool(body, "spin.apply_to_color");
-  config.spin.apply_to_sparkles = parseBool(body, "spin.apply_to_sparkles");
-  config.spin.speed             = parseInt8(body, "spin.speed");
-  
-  // Apply configuration to LED controller
-  setAnimationConfig(config);
-  
+
+  // Parse the flat-key config JSON into a BlossomConfig (shared parser in
+  // presets.cpp) and apply it. A hand-tweaked config is by definition not a
+  // named preset anymore, so the "Now Playing" title becomes "Custom".
+  BlossomConfig config = parseConfigFromJson(body);
+  applyActiveConfig(config, "Custom");
+
   Serial.println("Animation config updated:");
   Serial.print("  Color: primary=");
   Serial.print(config.color.primary);
@@ -231,6 +169,70 @@ static void handleAnimation() {
   
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200, "application/json", "{\"status\":\"success\"}");
+}
+
+// GET /api/animation — report the currently running config (plus the
+// now-playing name) so a freshly opened web page can sync its controls to
+// what's actually on the ring instead of assuming hard-coded defaults.
+static void handleAnimationGet() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "application/json", getActiveConfigJson());
+}
+
+// ── Preset endpoints ──────────────────────────────────────────────────────────
+
+// GET /api/presets — list all saved presets, plus which one is playing and
+// which one is the boot default. The web page uses this to build the
+// scrap-paper preset picker.
+static void handlePresetList() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "application/json", getPresetListJson());
+}
+
+// POST /api/presets/save — body: {"name":"...","makeDefault":true, ...config}
+// Saves the supplied config under the given name (overwriting any preset with
+// the same name) and optionally marks it as the boot default.
+static void handlePresetSave() {
+  if (!server.hasArg("plain")) {
+    server.send(400, "application/json", "{\"error\":\"No data received\"}");
+    return;
+  }
+
+  String body        = server.arg("plain");
+  String name        = jsonParseString(body, "name");
+  bool   makeDefault = jsonParseBool(body, "makeDefault");
+  BlossomConfig config = parseConfigFromJson(body);
+
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  if (savePreset(name, config, makeDefault)) {
+    // Echo back the (possibly cleaned-up) name now shown as "Now Playing"
+    String json = "{\"status\":\"saved\",\"name\":\"";
+    json += currentPresetName;
+    json += "\"}";
+    server.send(200, "application/json", json);
+  } else {
+    server.send(400, "application/json", "{\"error\":\"Could not save preset\"}");
+  }
+}
+
+// POST /api/presets/load — body: {"name":"..."}
+// Applies the named preset to the LEDs and returns its full config JSON so
+// the web page can update every slider/radio/checkbox to match.
+static void handlePresetLoad() {
+  if (!server.hasArg("plain")) {
+    server.send(400, "application/json", "{\"error\":\"No data received\"}");
+    return;
+  }
+
+  String name = jsonParseString(server.arg("plain"), "name");
+  String presetJson;
+
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  if (loadPreset(name, presetJson)) {
+    server.send(200, "application/json", presetJson);
+  } else {
+    server.send(404, "application/json", "{\"error\":\"Preset not found\"}");
+  }
 }
 
 static void handleScan() {
@@ -311,7 +313,11 @@ void setupConnectedRoutes() {
   server.on("/api/led", HTTP_GET, handleLedStatus);
   server.on("/api/led/toggle", HTTP_POST, handleLedToggle);
   server.on("/api/leds", HTTP_POST, handleLeds);
+  server.on("/api/animation", HTTP_GET,  handleAnimationGet);
   server.on("/api/animation", HTTP_POST, handleAnimation);
+  server.on("/api/presets",      HTTP_GET,  handlePresetList);
+  server.on("/api/presets/save", HTTP_POST, handlePresetSave);
+  server.on("/api/presets/load", HTTP_POST, handlePresetLoad);
   server.onNotFound(handleNotFound);
   server.begin();
   //Serial.println("✓ Web server started (connected mode)");

@@ -118,6 +118,19 @@ On boot, the system:
 **Connected Mode:**
 - `GET /` - Serves "Hello World" status page
 - `GET /api/status` - Returns JSON with `{status, ssid, ip, rssi}`
+- `GET /api/animation` - Returns the currently running config (flat keys) plus `"name"` (now-playing preset name or "Custom")
+- `POST /api/animation` - Accepts flat-key config JSON, applies it, sets now-playing to "Custom"
+- `GET /api/presets` - Returns `{current, default, presets:[...]}` — display names, built-in "Warm Flame" always listed
+- `POST /api/presets/save` - Accepts `{name, makeDefault, ...config}`; saves to `/presets/<safe-name>.json`, optionally sets boot default
+- `POST /api/presets/load` - Accepts `{name}`; applies the preset and returns its stored config JSON
+
+### Animation Presets
+- Module: `include/presets.h` / `src/presets.cpp` — all preset storage, JSON helpers, and "now playing" bookkeeping
+- One LittleFS file per preset at `/presets/<safe-name>.json` (display name stored inside under `"name"`); `/preset_default.txt` holds the file-safe name of the boot default
+- Built-in "Warm Flame" (getDefaultConfig() in animation_config.h) has no file but always appears in the list and always loads
+- Limits: 16 presets max, names ≤ 24 chars; same sanitized name overwrites
+- Boot: `applyDefaultPreset()` is called from `setup()` right after LittleFS mounts, before WiFi. `initLEDs()` on Core 1 only applies the built-in default if no config has arrived yet (`_configReceived` flag) so the boot race between cores is harmless
+- Web handlers apply configs via `applyActiveConfig(config, name)` (never `setAnimationConfig()` directly) so Core 0 keeps a reference copy for `GET /api/animation`
 
 ### Reboot Behavior
 - **Never call `rp2040.reboot()` inside an HTTP handler** — the TCP stack shuts down before the response flushes
@@ -159,6 +172,7 @@ The firmware is split into focused modules. `main.cpp` is the state machine only
 include/                    src/
   credentials.h    <-->       credentials.cpp     save/load/clearCredentials, CRED_FILE
   wifi_manager.h   <-->       wifi_manager.cpp    connectToWiFi(), startProvisioningAP()
+  presets.h        <-->       presets.cpp         save/load/list presets, JSON helpers, applyDefaultPreset()
   web_handlers.h   <-->       web_handlers.cpp    all HTTP handlers + setupProvisioningRoutes/setupConnectedRoutes
   led_controller.h <-->       led_controller.cpp  initLEDs(), setLedsEnabled(), setEffect(), updateLEDs()
                               main.cpp            setup(), loop(), setup1(), loop1()

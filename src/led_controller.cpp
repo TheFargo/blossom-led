@@ -48,6 +48,11 @@ static bool    _ledsEnabled = true;  // Core 1 local state
 static BlossomConfig _currentConfig;
 static volatile bool _configUpdated = false;
 
+// Set the moment Core 0 pushes its first config. initLEDs() checks this so it
+// doesn't clobber a boot preset that Core 0 loaded from LittleFS before Core 1
+// finished starting up (the two cores race at boot — either order is fine).
+static volatile bool _configReceived = false;
+
 // ── PIO state machine initialisation ──────────────────────────────────────────
 static void ws2812_sm_init(PIO pio, uint sm, uint offset, uint pin) {
     pio_gpio_init(pio, pin);
@@ -256,7 +261,14 @@ void initLEDs() {
     ws2812_sm_init(_pio, _sm, offset, LED_PIN);
 
     _ledsEnabled = true;
-    _currentConfig = getDefaultConfig();  // Start with Warm Flame preset
+    // Start with the built-in Warm Flame preset — unless Core 0 has already
+    // loaded a saved default preset from LittleFS and pushed it across
+    // (see applyDefaultPreset() in presets.cpp). Checking the flag instead of
+    // assigning unconditionally means the boot race between the two cores is
+    // harmless whichever core gets here first.
+    if (!_configReceived) {
+        _currentConfig = getDefaultConfig();
+    }
     _configUpdated = true;
 }
 
@@ -271,6 +283,7 @@ void setEffect(const char* /*name*/, uint32_t /*color*/, float /*speed*/, unsign
 
 void setAnimationConfig(const BlossomConfig& config) {
     _currentConfig = config;
+    _configReceived = true;
     _configUpdated = true;
 }
 

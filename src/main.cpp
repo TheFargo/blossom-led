@@ -93,6 +93,7 @@
 #include "wifi_manager.h"   // Handles WiFi connection logic and provisioning
 #include "web_handlers.h"   // HTTP request handlers for the web server
 #include "led_controller.h" // Controls the LED animations and updates (core 1)
+#include "presets.h"        // Save/Load named animation presets to LittleFS
 
 // On-Board LED pin (Pico W uses WiFi chip LED) Used to display Blossom's connected status
 #ifndef LED_BUILTIN
@@ -155,6 +156,12 @@ void setup() {
   } else {
     if (serialDebug) Serial.println("+ LittleFS mounted");
   }
+
+  // Start the boot animation right away, before any (slow) WiFi work below.
+  // This loads the user's saved default preset from LittleFS and hands it to
+  // the LED controller on Core 1. On a fresh device with no saved presets,
+  // the built-in "Warm Flame" config fills the role automatically.
+  applyDefaultPreset();
 
   // Try to load saved WiFi credentials from the file system
   String savedSSID, savedPassword;

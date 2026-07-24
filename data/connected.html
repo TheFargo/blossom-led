@@ -406,6 +406,104 @@
         .toggle-switch.on .toggle-slider {
             transform: translateX(30px);
         }
+
+        /* --- Preset Picker (scrap paper tabs) --- */
+        .preset-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .preset-list.hidden {
+            display: none;
+        }
+
+        .preset-tab {
+            position: relative;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: #1e1e1e;
+            background: transparent;
+            border: 0;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+            z-index: 1;
+        }
+
+        /* Each tab is its own little torn scrap of paper. The nth-child
+           rules vary the tint, tilt, and wriggle so no two tabs match. */
+        .preset-tab::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #f5f0e8;
+            border: 3px solid #83786bc2;
+            border-radius: 8px;
+            box-shadow: 3px 3px 0px #3b2b188a;
+            filter: url('#wriggly-paper-left');
+            transform: rotate(-1deg);
+            z-index: -1;
+        }
+
+        .preset-tab:nth-child(2n)::before  { filter: url('#wriggly-paper-right'); transform: rotate(1.2deg);  background-color: #ffd89b; }
+        .preset-tab:nth-child(3n)::before  { filter: url('#wriggly-btn');         transform: rotate(-0.6deg); background-color: #c9e4ff; }
+        .preset-tab:nth-child(4n)::before  { filter: url('#wriggly-cutout');      transform: rotate(0.8deg);  background-color: #ffc9d8; }
+        .preset-tab:nth-child(5n)::before  { filter: url('#wriggly-apply');       transform: rotate(-1.4deg); background-color: #d8f5c1; }
+
+        .preset-tab:hover {
+            transform: scale(1.06) translateY(-2px);
+        }
+
+        .preset-tab.is-default::after {
+            content: " \2605";  /* star marks the boot-up default */
+        }
+
+        .preset-empty {
+            font-size: 0.85rem;
+            color: #4a4a4a;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* --- Save Preset Panel --- */
+        .save-panel {
+            margin-top: 15px;
+        }
+
+        .save-panel.hidden {
+            display: none;
+        }
+
+        .preset-name-input {
+            width: 100%;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e1e1e;
+            background-color: #f5f0e8;
+            border: 3px solid #83786bc2;
+            border-radius: 10px;
+            padding: 10px 14px;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1);
+            outline: none;
+        }
+
+        .preset-name-input:focus {
+            border-color: #667eea;
+        }
+
+        .save-status {
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4a4a4a;
+            margin-top: 8px;
+            min-height: 1.2em;
+        }
     </style>
 </head>
 <body>
@@ -414,7 +512,10 @@
         <div class="container c1">
             <h1>🪷 Blossom 🪷</h1>
             <div class="subtitle">Now Playing:</div>
-            <button class="mode-button">Custom</button>
+            <button class="mode-button" id="now-playing-btn" onclick="togglePresetList()">...</button>
+            <!-- Preset picker: hidden until the Now Playing button is clicked.
+                 Filled with scrap-paper tabs fetched from /api/presets. -->
+            <div class="preset-list hidden" id="preset-list"></div>
             <div class="toggle-container">
                 <span class="toggle-label">LEDs:</span>
                 <div class="toggle-switch on" id="led-toggle" onclick="toggleLEDs()">
@@ -666,9 +767,26 @@
             </div>
         </div>
 
-        <!-- Save Preset Button -->
+        <!-- Save Preset -->
         <div class="container c1">
-            <button class="apply-button">Save Preset</button>
+            <button class="apply-button" onclick="toggleSavePanel()">Save Preset</button>
+            <!-- Hidden until "Save Preset" is clicked: name it, optionally make
+                 it the boot-up default, then confirm. -->
+            <div class="save-panel hidden" id="save-panel">
+                <div class="control-group">
+                    <label for="preset-name">Preset Name</label>
+                    <input type="text" class="preset-name-input" id="preset-name"
+                           maxlength="24" placeholder="My Preset">
+                </div>
+                <div class="checkbox-group">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="make-default">
+                        Make Default
+                    </label>
+                </div>
+                <button class="mode-button" onclick="confirmSavePreset()">Save It!</button>
+                <div class="save-status" id="save-status"></div>
+            </div>
         </div>
     </div>
 
@@ -839,6 +957,69 @@
             });
         }
 
+        // --- Now Playing / preset name tracking -----------------------------
+        function setNowPlaying(name) {
+            document.getElementById('now-playing-btn').textContent = name;
+        }
+
+        // Push a config object (flat keys like "color.primary") into every
+        // slider, radio, and checkbox on the page — used when loading a preset
+        // or when syncing to the device's running settings at page load.
+        // Note: setting .value/.checked in JS does NOT fire 'change' events,
+        // and the caller resets previousState right after, so this never
+        // triggers a spurious /api/animation update (which would flip the
+        // Now Playing title to "Custom").
+        function applyConfigToControls(cfg) {
+            const sliderKeys = {
+                'color-primary': 'color.primary',
+                'color-spread': 'color.spread',
+                'color-brightness': 'color.brightness',
+                'sparkles-brightness': 'sparkles.brightness',
+                'sparkles-spread': 'sparkles.spread',
+                'flicker-speed': 'flicker.speed',
+                'flicker-amplitude': 'flicker.amplitude',
+                'pulse-speed': 'pulse.speed',
+                'pulse-amplitude': 'pulse.amplitude',
+                'spin-speed': 'spin.speed'
+            };
+            for (const id in sliderKeys) {
+                const value = cfg[sliderKeys[id]];
+                if (value === undefined) continue;
+                document.getElementById(id).value = value;
+                document.getElementById(id + '-val').textContent = value;
+            }
+
+            const radioKeys = {
+                'color-mode': 'color.mode',
+                'sparkles-mode': 'sparkles.mode',
+                'flicker-mode': 'flicker.mode',
+                'pulse-mode': 'pulse.mode'
+            };
+            for (const name in radioKeys) {
+                const value = cfg[radioKeys[name]];
+                if (value === undefined) continue;
+                const radio = document.querySelector('input[name="' + name + '"][value="' + value + '"]');
+                if (radio) radio.checked = true;
+            }
+
+            const checkboxKeys = {
+                'flicker-color': 'flicker.apply_to_color',
+                'flicker-sparkles': 'flicker.apply_to_sparkles',
+                'pulse-color': 'pulse.apply_to_color',
+                'pulse-sparkles': 'pulse.apply_to_sparkles',
+                'spin-color': 'spin.apply_to_color',
+                'spin-sparkles': 'spin.apply_to_sparkles'
+            };
+            for (const id in checkboxKeys) {
+                const value = cfg[checkboxKeys[id]];
+                if (value === undefined) continue;
+                document.getElementById(id).checked = value;
+            }
+
+            updateColorPreview();
+            updateSparklePreview();
+        }
+
         function checkForChanges() {
             const currentState = getCurrentState();
             if (currentState !== previousState) {
@@ -865,7 +1046,11 @@
         function applyAnimation() {
             if (updatePending) return; // Prevent concurrent requests
             updatePending = true;
-            
+
+            // A hand-tweaked animation is no longer a named preset —
+            // the firmware makes the same call in its /api/animation handler.
+            setNowPlaying('Custom');
+
             const config = JSON.parse(getCurrentState());
 
             fetch('/api/animation', {
@@ -882,6 +1067,122 @@
                 updatePending = false;
             });
         }
+
+        // --- Preset picker ---------------------------------------------------
+        function togglePresetList() {
+            const list = document.getElementById('preset-list');
+            if (!list.classList.contains('hidden')) {
+                list.classList.add('hidden');
+                return;
+            }
+
+            // Fetch a fresh list every time it opens (presets may have changed)
+            fetch('/api/presets')
+                .then(r => r.json())
+                .then(data => {
+                    list.innerHTML = '';
+                    data.presets.forEach(name => {
+                        const tab = document.createElement('button');
+                        tab.className = 'preset-tab';
+                        if (name === data.default) tab.classList.add('is-default');
+                        tab.textContent = name;
+                        tab.onclick = function() { loadPreset(name); };
+                        list.appendChild(tab);
+                    });
+                    if (data.presets.length === 0) {
+                        list.innerHTML = '<div class="preset-empty">No presets saved yet</div>';
+                    }
+                    list.classList.remove('hidden');
+                })
+                .catch(function(err) {
+                    console.error('Preset list error:', err);
+                });
+        }
+
+        function loadPreset(name) {
+            fetch('/api/presets/load', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 'name': name })
+            })
+            .then(r => {
+                if (!r.ok) throw new Error('Preset not found');
+                return r.json();
+            })
+            .then(cfg => {
+                // The device has already applied this preset to the LEDs;
+                // sync the page's controls to match, then reset the change
+                // tracker so the poller doesn't see this as a user edit.
+                applyConfigToControls(cfg);
+                previousState = getCurrentState();
+                setNowPlaying(cfg.name || name);
+                document.getElementById('preset-list').classList.add('hidden');
+            })
+            .catch(function(err) {
+                console.error('Preset load error:', err);
+            });
+        }
+
+        // --- Save Preset -----------------------------------------------------
+        function toggleSavePanel() {
+            document.getElementById('save-panel').classList.toggle('hidden');
+            document.getElementById('save-status').textContent = '';
+        }
+
+        function confirmSavePreset() {
+            const name = document.getElementById('preset-name').value.trim();
+            const status = document.getElementById('save-status');
+            if (!name) {
+                status.textContent = 'Give your preset a name first!';
+                return;
+            }
+
+            // Bundle the current control settings with the name + default flag
+            const payload = JSON.parse(getCurrentState());
+            payload['name'] = name;
+            payload['makeDefault'] = document.getElementById('make-default').checked;
+
+            fetch('/api/presets/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(r => {
+                if (!r.ok) throw new Error('Save failed');
+                return r.json();
+            })
+            .then(data => {
+                // The saved settings are what's playing right now, so the new
+                // preset name replaces "Custom" as the Now Playing title.
+                setNowPlaying(data.name || name);
+                status.textContent = 'Saved!';
+                setTimeout(function() {
+                    document.getElementById('save-panel').classList.add('hidden');
+                }, 900);
+            })
+            .catch(function(err) {
+                console.error('Preset save error:', err);
+                status.textContent = 'Could not save preset';
+            });
+        }
+
+        // --- Page-load sync ---------------------------------------------------
+        // Ask the device what's actually playing and mirror it in the controls.
+        // Until (and unless) that answer arrives, seed previousState with the
+        // page's own defaults so the change-poller doesn't immediately blast a
+        // stale config at the device and stomp the boot preset.
+        previousState = getCurrentState();
+        fetch('/api/animation')
+            .then(r => r.json())
+            .then(cfg => {
+                applyConfigToControls(cfg);
+                previousState = getCurrentState();
+                setNowPlaying(cfg.name || 'Custom');
+            })
+            .catch(function(err) {
+                console.error('Initial sync error:', err);
+                setNowPlaying('Custom');
+            });
     </script>
 
     <!-- SVG Filters for Torn Paper Effect -->

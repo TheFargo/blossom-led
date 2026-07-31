@@ -25,6 +25,11 @@ static void handleConnectedRoot() {
   serveFile("/connected.html", "text/html");
 }
 
+static void handleMeditationRoot() {
+  serveFile("/meditation.html", "text/html");
+}
+
+
 static void handleGlutenFont() {
   serveFile("/fonts/Gluten.ttf", "font/ttf");
 }
@@ -284,7 +289,60 @@ static void handleScan() {
   WiFi.scanDelete();
 }
 
+// ── Meditation Mode endpoints ──────────────────────────────────────────────────
+
+// POST /api/meditation/start — body: {"duration": 0|30|60} (0 = open-ended)
+static void handleMeditationStart() {
+  uint32_t duration = 0;
+  if (server.hasArg("plain")) {
+    duration = (uint32_t)jsonParseUint8(server.arg("plain"), "duration");
+    // jsonParseUint8 caps at 255, which comfortably covers 0/30/60; if a
+    // future duration option exceeds a byte, switch to a wider parser.
+  }
+
+  startMeditation(duration);
+
+  Serial.print("Meditation started, duration=");
+  Serial.println(duration);
+
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "application/json", "{\"status\":\"started\"}");
+}
+
+// POST /api/meditation/stop — ends the session immediately (no ending blink)
+static void handleMeditationStop() {
+  stopMeditation();
+  Serial.println("Meditation stopped");
+
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "application/json", "{\"status\":\"stopped\"}");
+}
+
+// GET /api/meditation/status — polled by meditation.html at a steady clip to
+// drive the on-screen instructions ("Inhale", "Hold", "Exhale"...) in sync
+// with the LEDs.
+static void handleMeditationStatus() {
+  MeditationStatus status = getMeditationStatus();
+
+  String json = "{";
+  json += "\"active\":";
+  json += status.active ? "true" : "false";
+  json += ",\"phase\":\"";
+  json += meditationPhaseToString(status.phase);
+  json += "\",\"phaseSecondsLeft\":";
+  json += String(status.phaseSecondsLeft);
+  json += ",\"sessionSecondsElapsed\":";
+  json += String(status.sessionSecondsElapsed);
+  json += ",\"sessionSecondsRemaining\":";
+  json += String(status.sessionSecondsRemaining);
+  json += "}";
+
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "application/json", json);
+}
+
 static void handleNotFound() {
+
   // Redirect all unknown routes to root — helps with captive portal detection
   server.sendHeader("Location", "/", true);
   server.send(302, "text/plain", "");
@@ -307,6 +365,7 @@ void setupProvisioningRoutes() {
 
 void setupConnectedRoutes() {
   server.on("/", handleConnectedRoot);
+  server.on("/meditation.html", handleMeditationRoot);
   server.on("/fonts/Gluten.ttf",  handleGlutenFont);
   server.on("/fonts/Fredoka.ttf", handleFredokaFont);
   server.on("/api/status", handleStatus);
@@ -318,6 +377,9 @@ void setupConnectedRoutes() {
   server.on("/api/presets",      HTTP_GET,  handlePresetList);
   server.on("/api/presets/save", HTTP_POST, handlePresetSave);
   server.on("/api/presets/load", HTTP_POST, handlePresetLoad);
+  server.on("/api/meditation/start",  HTTP_POST, handleMeditationStart);
+  server.on("/api/meditation/stop",   HTTP_POST, handleMeditationStop);
+  server.on("/api/meditation/status", HTTP_GET,  handleMeditationStatus);
   server.onNotFound(handleNotFound);
   server.begin();
   //Serial.println("✓ Web server started (connected mode)");

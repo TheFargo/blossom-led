@@ -13,3 +13,6 @@ void scheduleReboot(unsigned long delayMs);
 // Register routes and start the web server for each operating mode
 void setupProvisioningRoutes();
 void setupConnectedRoutes();
+
+
+

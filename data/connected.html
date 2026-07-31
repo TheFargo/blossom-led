@@ -145,6 +145,53 @@
             filter: url('#wriggly-paper-right');
         }
 
+        /* --- Nav Tabs (Animations / Meditations) --- */
+        .nav-tabs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .nav-tab {
+            position: relative;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: #1e1e1e;
+            background: transparent;
+            border: 0;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+            z-index: 1;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-tab::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #f5f0e8;
+            border: 3px solid #83786bc2;
+            border-radius: 8px;
+            box-shadow: 3px 3px 0px #3b2b188a;
+            filter: url('#wriggly-paper-left');
+            transform: rotate(-1deg);
+            z-index: -1;
+        }
+
+        .nav-tab.active::before {
+            background-color: #6bf1a4;
+            filter: url('#wriggly-paper-right');
+            transform: rotate(1deg);
+        }
+
+        .nav-tab:hover {
+            transform: scale(1.05) translateY(-1px);
+        }
+
         /* --- Mode Button --- */
         .mode-button {
             position: relative;
@@ -511,6 +558,10 @@
         <!-- Container 1: Logo and Mode -->
         <div class="container c1">
             <h1>🪷 Blossom 🪷</h1>
+            <div class="nav-tabs">
+                <a class="nav-tab active" href="/">Animations</a>
+                <a class="nav-tab" href="/meditation.html">Meditations</a>
+            </div>
             <div class="subtitle">Now Playing:</div>
             <button class="mode-button" id="now-playing-btn" onclick="togglePresetList()">...</button>
             <!-- Preset picker: hidden until the Now Playing button is clicked.

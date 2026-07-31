@@ -12,5 +12,55 @@
     "mcpResponse": {
       "error": "Failed to build project: Error: spawn pio ENOENT"
     }
+  },
+  {
+    "id": "374836b3-918f-481b-b087-f24022266bb8",
+    "commandDesc": "MCP Tool: build_project",
+    "timestamp": 1785350743131,
+    "status": "error",
+    "tasks": [],
+    "mcpRequest": {
+      "projectDir": "c:\\Users\\fargo\\source\\repos\\blossom_programmable_light_display"
+    },
+    "mcpToolName": "build_project",
+    "mcpResponse": {
+      "error": "Failed to build project: Error: spawn pio ENOENT"
+    }
+  },
+  {
+    "id": "375b60a1-0ab0-4888-8403-daa849fd0c95",
+    "commandDesc": "MCP Tool: build_project",
+    "timestamp": 1785351501953,
+    "status": "error",
+    "tasks": [],
+    "mcpRequest": {
+      "projectDir": "c:\\Users\\fargo\\source\\repos\\blossom_programmable_light_display"
+    },
+    "mcpToolName": "build_project",
+    "mcpResponse": {
+      "error": "Failed to build project: Error: spawn pio ENOENT"
+    }
+  },
+  {
+    "id": "4eb2ec23-f835-4805-b5ad-13d819b93608",
+    "commandDesc": "MCP Tool: reset_server_state",
+    "timestamp": 1785351520978,
+    "status": "success",
+    "tasks": [],
+    "mcpRequest": {
+      "projectDir": "c:\\Users\\fargo\\source\\repos\\blossom_programmable_light_display"
+    },
+    "mcpToolName": "reset_server_state",
+    "mcpResponse": {
+      "success": false,
+      "policyDecision": {
+        "status": "requires_approval",
+        "reason": "reset_server_state requires explicit approval by policy.",
+        "action": "reset_server_state",
+        "riskLevel": "high",
+        "approvalId": "approval-83038e67-5b18-4225-aa7f-9c6591809c2e",
+        "timestamp": "2026-07-29T18:58:40.987Z"
+      }
+    }
   }
 ]

@@ -236,7 +236,6 @@ void updateLEDs();                        // called from loop1() at ~30 FPS
 
 ### Hardware notes for LED wiring
 - NeoPixel ring powered from **VBUS (5V)** — not 3.3V
-- Pico GPIO is 3.3V; NeoPixels need ≥3.5V signal — a **logic level shifter** (74AHCT125 or equivalent) is **required** between GPIO and LED data line
 
 ### Inter-core communication
 `setLedsEnabled()` runs on Core 0; `updateLEDs()` runs on Core 1. A `pico/util/queue.h` queue carries `uint8_t` commands (0=off, 1=on) between them. **Do not use a plain global struct without a mutex.** The queue is initialized in `initLEDs()` on Core 1; by the time any HTTP handler can call `setLedsEnabled()`, Core 1 has long since started.

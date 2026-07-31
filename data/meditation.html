@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blossom Meditation</title>
+    <style>
+        @font-face {
+            font-family: 'Gluten';
+            src: url('/fonts/Gluten.ttf') format('truetype');
+            font-weight: 100 900;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Fredoka';
+            src: url('/fonts/Fredoka.ttf') format('truetype');
+            font-weight: 300 700;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fredoka', Arial, sans-serif;
+            background: linear-gradient(135deg, #3d53b8 0%, #4e306b 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- Main Container --- */
+        .main-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- Torn Paper Container Base --- */
+        .container {
+            position: relative;
+            padding: 25px;
+            z-index: 1;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #EAD8C1;
+            border: 3px solid #83786bc2;
+            border-radius: 15px;
+            box-shadow: 6px 6px 0px #3b2b188a;
+            z-index: -1;
+        }
+
+        .container.c1::before { filter: url('#wriggly-c1'); transform: rotate(0.5deg); }
+        .container.c2::before { filter: url('#wriggly-c2'); transform: rotate(-0.3deg); background-color: #e9dfd3; }
+        .container.c3::before { filter: url('#wriggly-c3'); transform: rotate(0.4deg); background-color: #e9dfd3; }
+
+        /* --- Headers --- */
+        h1 {
+            font-family: 'Gluten', Arial, sans-serif;
+            color: #1e1e1e;
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 0px #667eea;
+            font-variation-settings: 'wght' 700, 'slnt' -10;
+        }
+
+        h2 {
+            font-family: 'Gluten', Arial, sans-serif;
+            color: #1e1e1e;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            text-align: center;
+            font-variation-settings: 'wght' 600, 'slnt' -10;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #4a4a4a;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* --- Nav Tabs (Animations / Meditations) --- */
+        .nav-tabs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .nav-tab {
+            position: relative;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: #1e1e1e;
+            background: transparent;
+            border: 0;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+            z-index: 1;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-tab::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #f5f0e8;
+            border: 3px solid #83786bc2;
+            border-radius: 8px;
+            box-shadow: 3px 3px 0px #3b2b188a;
+            filter: url('#wriggly-paper-left');
+            transform: rotate(-1deg);
+            z-index: -1;
+        }
+
+        .nav-tab.active::before {
+            background-color: #6bf1a4;
+            filter: url('#wriggly-paper-right');
+            transform: rotate(1deg);
+        }
+
+        .nav-tab:hover {
+            transform: scale(1.05) translateY(-1px);
+        }
+
+        /* --- Mode Button (Begin / Stop) --- */
+        .mode-button {
+            position: relative;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: #1e1e1e;
+            background: transparent;
+            border: 0;
+            padding: 16px 24px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+            z-index: 1;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .mode-button::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #6bf1a4;
+            border: 3px solid #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 5px 5px 0px #1e1e1e;
+            filter: url('#wriggly-apply');
+            transform: rotate(-0.5deg);
+            z-index: -1;
+        }
+
+        .mode-button:hover {
+            transform: scale(1.05) translateY(-2px);
+        }
+
+        .mode-button:hover::before {
+            background-color: #8fffc0;
+        }
+
+        .mode-button:active {
+            transform: translate(2px, 2px);
+        }
+
+        .mode-button:active::before {
+            box-shadow: 3px 3px 0px #1e1e1e;
+        }
+
+        .mode-button.stop-button::before {
+            background-color: #ffb3b3;
+        }
+
+        .mode-button.stop-button:hover::before {
+            background-color: #ffcccc;
+        }
+
+        /* --- Duration Radio Group --- */
+        .duration-group {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0 5px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .duration-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2a2a2a;
+        }
+
+        .duration-option input[type="radio"] {
+            filter: url('#wriggly-radio');
+        }
+
+        input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        /* --- Session Display --- */
+        .session-hidden {
+            display: none;
+        }
+
+        .breath-instruction {
+            font-family: 'Gluten', Arial, sans-serif;
+            font-variation-settings: 'wght' 700, 'slnt' -10;
+            text-align: center;
+            font-size: 3rem;
+            color: #1e1e1e;
+            margin: 20px 0;
+            text-shadow: 2px 2px 0px #667eea;
+            transition: opacity 0.3s ease;
+        }
+
+        .phase-timer {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4a4a4a;
+            margin-bottom: 10px;
+        }
+
+        .session-timer {
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #4a4a4a;
+            margin-bottom: 15px;
+        }
+
+        .breath-ring {
+            width: 140px;
+            height: 140px;
+            margin: 10px auto 20px;
+            border-radius: 50%;
+            border: 4px solid #1e1e1e;
+            background: radial-gradient(circle, #ffffff 0%, #c9e4ff 100%);
+            transition: transform 4s ease-in-out, background 1s linear;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Container 1: Logo and Nav -->
+        <div class="container c1">
+            <h1>🪷 Blossom 🪷</h1>
+            <div class="nav-tabs">
+                <a class="nav-tab" href="/">Animations</a>
+                <a class="nav-tab active" href="/meditation.html">Meditations</a>
+            </div>
+        </div>
+
+        <!-- Container 2: Meditation Configuration -->
+        <div class="container c2" id="config-panel">
+            <h2>Meditation</h2>
+            <div class="subtitle">How long would you like to meditate?</div>
+
+            <div class="duration-group">
+                <label class="duration-option">
+                    <input type="radio" name="duration" value="30">
+                    30 seconds
+                </label>
+                <label class="duration-option">
+                    <input type="radio" name="duration" value="60" checked>
+                    60 seconds
+                </label>
+                <label class="duration-option">
+                    <input type="radio" name="duration" value="0">
+                    Open-ended
+                </label>
+            </div>
+
+            <button class="mode-button" id="begin-btn" onclick="beginMeditation()">Begin</button>
+        </div>
+
+        <!-- Container 3: Active Meditation Session -->
+        <div class="container c3 session-hidden" id="session-panel">
+            <h2>Breathe with the Blossom</h2>
+            <div class="breath-ring" id="breath-ring"></div>
+            <div class="breath-instruction" id="breath-instruction">Inhale</div>
+            <div class="phase-timer" id="phase-timer"></div>
+            <div class="session-timer" id="session-timer"></div>
+            <button class="mode-button stop-button" onclick="stopMeditation()">Stop</button>
+        </div>
+    </div>
+
+    <script>
+        function getSelectedDuration() {
+            const radio = document.querySelector('input[name="duration"]:checked');
+            return radio ? parseInt(radio.value) : 60;
+        }
+
+        function beginMeditation() {
+            const duration = getSelectedDuration();
+            fetch('/api/meditation/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ duration: duration })
+            })
+            .then(function() {
+                document.getElementById('config-panel').classList.add('session-hidden');
+                document.getElementById('session-panel').classList.remove('session-hidden');
+                pollStatus();
+            })
+            .catch(function(err) {
+                console.error('Meditation start error:', err);
+            });
+        }
+
+        function stopMeditation() {
+            fetch('/api/meditation/stop', { method: 'POST' })
+                .then(function() {
+                    showConfigPanel();
+                })
+                .catch(function(err) {
+                    console.error('Meditation stop error:', err);
+                });
+        }
+
+        function showConfigPanel() {
+            document.getElementById('session-panel').classList.add('session-hidden');
+            document.getElementById('config-panel').classList.remove('session-hidden');
+        }
+
+        function formatTime(sec) {
+            sec = Math.max(0, Math.floor(sec));
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            return m + ':' + (s < 10 ? '0' : '') + s;
+        }
+
+        // Visual scale + tint for the breath ring, mirroring what the physical
+        // ring is doing: grows/lightens through Inhale+Hold, shrinks/dims
+        // through Exhale+Hold.
+        function updateBreathRing(phase) {
+            const ring = document.getElementById('breath-ring');
+            if (phase === 'Inhale') {
+                ring.style.transform = 'scale(1.35)';
+            } else if (phase === 'Hold' ) {
+                // Hold covers both HOLD_FULL and HOLD_EMPTY — keep whatever
+                // size we last animated to; CSS transition eases us there.
+            } else if (phase === 'Exhale') {
+                ring.style.transform = 'scale(1.0)';
+            }
+        }
+
+        let pollTimer = null;
+        let sessionWasActive = false;
+
+        function pollStatus() {
+            fetch('/api/meditation/status')
+                .then(function(r) { return r.json(); })
+                .then(function(status) {
+                    if (status.active) {
+                        sessionWasActive = true;
+                        document.getElementById('config-panel').classList.add('session-hidden');
+                        document.getElementById('session-panel').classList.remove('session-hidden');
+
+                        document.getElementById('breath-instruction').textContent = status.phase;
+                        updateBreathRing(status.phase);
+
+                        document.getElementById('phase-timer').textContent =
+                            status.phase + ' — ' + status.phaseSecondsLeft + 's';
+
+                        if (status.sessionSecondsRemaining >= 0) {
+                            document.getElementById('session-timer').textContent =
+                                formatTime(status.sessionSecondsRemaining) + ' remaining';
+                        } else {
+                            document.getElementById('session-timer').textContent =
+                                formatTime(status.sessionSecondsElapsed) + ' elapsed';
+                        }
+
+                        pollTimer = setTimeout(pollStatus, 500);
+                    } else {
+                        if (sessionWasActive) {
+                            // Session just ended (blink sequence finished on
+                            // the device) — return to the config screen.
+                            sessionWasActive = false;
+                            showConfigPanel();
+                        }
+                        // Not actively meditating — poll more slowly so an
+                        // idle tab doesn't hammer the device.
+                        pollTimer = setTimeout(pollStatus, 2000);
+                    }
+                })
+                .catch(function(err) {
+                    console.error('Meditation status error:', err);
+                    pollTimer = setTimeout(pollStatus, 2000);
+                });
+        }
+
+        // Kick off polling immediately so re-opening this page while a
+        // session is already running (e.g. after a phone locked/unlocked)
+        // jumps straight to the session view instead of the config screen.
+        pollStatus();
+    </script>
+
+    <!-- SVG Filters for Torn Paper Effect -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <defs>
+            <filter id="wriggly-c1">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="99" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-c2">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="42" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-c3">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="17" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-apply">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="78" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-radio">
+                <feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves="2" seed="87" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-paper-left">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="34" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="wriggly-paper-right">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="56" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
+</body>
+</html>

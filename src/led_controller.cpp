@@ -53,6 +53,27 @@ static volatile bool _configUpdated = false;
 // finished starting up (the two cores race at boot — either order is fine).
 static volatile bool _configReceived = false;
 
+// ── Meditation Mode state (Core 1 owned) ──────────────────────────────────────
+// Core 0 sends start/stop commands via a small inter-core queue (same pattern
+// as the on/off command queue above). Core 1 renders the box-breathing pattern
+// entirely inside renderMeditationFrame() and keeps a status snapshot that
+// Core 0 reads (single writer / single reader — no mutex, same rationale as
+// _currentConfig above).
+struct MeditationCmd {
+    uint8_t  cmd;              // 0 = stop, 1 = start
+    uint32_t durationSeconds;  // 0 = open-ended (only meaningful for cmd==1)
+};
+static queue_t _meditationCmdQueue;
+
+static bool     _meditationActive   = false;  // Core 1 local: session (incl. ending) in progress
+static uint32_t _medStartMs         = 0;
+static uint32_t _medDurationSec     = 0;       // 0 = open-ended
+static bool     _medEnding          = false;
+static uint32_t _medEndingStartMs   = 0;
+
+static MeditationStatus _medStatusSnapshot = {false, MeditationPhase::IDLE, 0, 0, -1};
+
+
 // ── PIO state machine initialisation ──────────────────────────────────────────
 static void ws2812_sm_init(PIO pio, uint sm, uint offset, uint pin) {
     pio_gpio_init(pio, pin);
@@ -250,15 +271,196 @@ static float pulseSignal(int i, float t, DistributionMode mode, uint8_t speed) {
     }
 }
 
+// ── Meditation Mode helpers ────────────────────────────────────────────────────
+
+static inline float smoothstep01(float x) {
+    x = constrain(x, 0.0f, 1.0f);
+    return x * x * (3.0f - 2.0f * x);
+}
+
+// Convert an HSV colour (hue in degrees, full saturation) plus an explicit
+// white byte into a packed SK6812 GRBW word. Used by the meditation renderer,
+// which drives the color and white channels with independent values per
+// pixel rather than the ColorSettings/SparkleSettings pipeline above.
+static uint32_t hsv_white_to_grbw(float hueDeg, uint8_t val, uint8_t white) {
+    uint16_t hue = (uint16_t)hueDeg % 360u;
+    uint8_t sat = 255u;
+    uint8_t region = hue / 60u;
+    uint8_t rem    = (uint8_t)((hue % 60u) * 255u / 60u);
+    uint8_t p = (uint8_t)((uint32_t)val * (255u - sat) / 255u);
+    uint8_t q = (uint8_t)((uint32_t)val * (255u - (uint32_t)sat * rem  / 255u) / 255u);
+    uint8_t t = (uint8_t)((uint32_t)val * (255u - (uint32_t)sat * (255u - rem) / 255u) / 255u);
+    uint8_t r, g, b;
+    switch (region) {
+        case 0:  r = val; g = t;   b = p;   break;
+        case 1:  r = q;   g = val; b = p;   break;
+        case 2:  r = p;   g = val; b = t;   break;
+        case 3:  r = p;   g = q;   b = val; break;
+        case 4:  r = t;   g = p;   b = val; break;
+        default: r = val; g = p;   b = q;   break;
+    }
+    return ((uint32_t)g << 24) | ((uint32_t)r << 16) | ((uint32_t)b << 8) | white;
+}
+
+// White-channel LED indices, divided into 4 interleaved groups of 4 — group g
+// lights pixels g, g+4, g+8, g+12. Matches the "1/4 of the ring per second"
+// box-breathing fill pattern described in docs/meditations.md.
+static const uint8_t MED_GROUPS[4][4] = {
+    {0, 4, 8, 12}, {1, 5, 9, 13}, {2, 6, 10, 14}, {3, 7, 11, 15}
+};
+
+static const float BREATH_CYCLE_SEC    = 16.0f;  // 4s inhale + 4s hold + 4s exhale + 4s hold
+static const float PHASE_SEC           = 4.0f;
+// Full spectrum rotation takes ~30s per docs/meditations.md; a 16s breath
+// cycle means each breath advances the settled hue by 360° * (16/30).
+static const float HUE_STEP_PER_BREATH = 360.0f * (16.0f / 30.0f);
+static const float MED_DIM_BRIGHTNESS  = 0.28f;  // color brightness while lungs are empty
+static const float MED_PEAK_BRIGHTNESS = 1.0f;   // color brightness peak, just before exhale
+
+// Renders one frame of the guided box-breathing session (Core 1). Handles
+// three states: the active 4-phase breath cycle, the fixed-duration
+// countdown that triggers the ENDING blink sequence, and the ENDING sequence
+// itself (five friendly white blinks before returning to normal animation).
+static void renderMeditationFrame() {
+    uint32_t now = millis();
+
+    if (_medEnding) {
+        const uint32_t BLINK_MS   = 600;  // one on+off cycle
+        const int      BLINK_COUNT = 5;
+        uint32_t elapsed = now - _medEndingStartMs;
+        int blinkIndex = elapsed / BLINK_MS;
+
+        if (blinkIndex >= BLINK_COUNT) {
+            // Session fully complete — hand control back to the normal
+            // animation pipeline on the very next call to updateLEDs().
+            _meditationActive = false;
+            _medEnding = false;
+            _medStatusSnapshot = MeditationStatus{false, MeditationPhase::IDLE, 0, 0, -1};
+            return;
+        }
+
+        bool on = (elapsed % BLINK_MS) < (BLINK_MS / 2);
+        uint8_t white = on ? (uint8_t)(255.0f * LED_BRIGHTNESS) : 0;
+        for (int i = 0; i < LED_COUNT; i++) put_pixel(hsv_white_to_grbw(0.0f, 0, white));
+        send_reset();
+
+        _medStatusSnapshot.active           = true;
+        _medStatusSnapshot.phase            = MeditationPhase::ENDING;
+        _medStatusSnapshot.phaseSecondsLeft = (BLINK_COUNT * BLINK_MS - elapsed) / 1000u + 1u;
+        return;
+    }
+
+    float totalElapsedSec = (float)(now - _medStartMs) / 1000.0f;
+
+    // Fixed-duration sessions (30s / 60s) transition to the ending sequence
+    // once time is up. Open-ended sessions (durationSeconds == 0) never do —
+    // they run until the user explicitly stops them from the web page.
+    if (_medDurationSec != 0 && totalElapsedSec >= (float)_medDurationSec) {
+        _medEnding = true;
+        _medEndingStartMs = now;
+        return;
+    }
+
+    float breathT     = fmodf(totalElapsedSec, BREATH_CYCLE_SEC);
+    long  breathIndex = (long)(totalElapsedSec / BREATH_CYCLE_SEC);
+
+    MeditationPhase phase;
+    uint32_t phaseSecondsLeft;
+    float whiteGroupBrightness[4];  // 0..255 per group, before LED_BRIGHTNESS scaling
+
+    if (breathT < PHASE_SEC) {                                    // INHALE
+        phase = MeditationPhase::INHALE;
+        float groupFloat = (breathT / PHASE_SEC) * 4.0f;
+        for (int g = 0; g < 4; g++) {
+            float p = constrain(groupFloat - (float)g, 0.0f, 1.0f);
+            whiteGroupBrightness[g] = smoothstep01(p) * 255.0f;
+        }
+        phaseSecondsLeft = (uint32_t)ceilf(PHASE_SEC - breathT);
+    } else if (breathT < PHASE_SEC * 2.0f) {                       // HOLD (full)
+        phase = MeditationPhase::HOLD_FULL;
+        for (int g = 0; g < 4; g++) whiteGroupBrightness[g] = 255.0f;
+        phaseSecondsLeft = (uint32_t)ceilf(PHASE_SEC * 2.0f - breathT);
+    } else if (breathT < PHASE_SEC * 3.0f) {                       // EXHALE
+        phase = MeditationPhase::EXHALE;
+        float pe = (breathT - PHASE_SEC * 2.0f) / PHASE_SEC;
+        float groupFloat = pe * 4.0f;
+        for (int g = 0; g < 4; g++) {
+            int reverseIndex = 3 - g;  // last group lit during inhale empties first
+            float p = constrain(groupFloat - (float)reverseIndex, 0.0f, 1.0f);
+            whiteGroupBrightness[g] = (1.0f - smoothstep01(p)) * 255.0f;
+        }
+        phaseSecondsLeft = (uint32_t)ceilf(PHASE_SEC * 3.0f - breathT);
+    } else {                                                       // HOLD (empty)
+        phase = MeditationPhase::HOLD_EMPTY;
+        for (int g = 0; g < 4; g++) whiteGroupBrightness[g] = 0.0f;
+        phaseSecondsLeft = (uint32_t)ceilf(PHASE_SEC * 4.0f - breathT);
+    }
+
+    // ── Colored channel: settled hue + brightness envelope ────────────────────
+    float baseHue = fmodf((float)breathIndex * HUE_STEP_PER_BREATH, 360.0f);
+    float hue = baseHue;
+
+    // Last second of the empty-lung hold: spin through the entire spectrum
+    // (plus a little extra) before landing exactly on next breath's color.
+    if (breathT >= BREATH_CYCLE_SEC - 1.0f) {
+        float p = breathT - (BREATH_CYCLE_SEC - 1.0f);  // 0..1 within that last second
+        float sweep = 360.0f + HUE_STEP_PER_BREATH;      // one full spin + the normal step
+        hue = fmodf(baseHue + sweep * p, 360.0f);
+    }
+
+    // Brightness rises through inhale+hold (0-8s), peaks right before exhale,
+    // dims back down through exhale (8-12s), then stays dim through the
+    // empty-lung hold (12-16s) until the next breath begins.
+    float brightnessNorm;
+    if (breathT < PHASE_SEC * 2.0f) {
+        float p = breathT / (PHASE_SEC * 2.0f);
+        brightnessNorm = MED_DIM_BRIGHTNESS + (MED_PEAK_BRIGHTNESS - MED_DIM_BRIGHTNESS) * smoothstep01(p);
+    } else if (breathT < PHASE_SEC * 3.0f) {
+        float p = (breathT - PHASE_SEC * 2.0f) / PHASE_SEC;
+        brightnessNorm = MED_PEAK_BRIGHTNESS - (MED_PEAK_BRIGHTNESS - MED_DIM_BRIGHTNESS) * smoothstep01(p);
+    } else {
+        brightnessNorm = MED_DIM_BRIGHTNESS;
+    }
+
+    // Gentle unison flicker on top of the envelope — reuses the same "value
+    // noise" the ambient Flicker track uses, hardcoded to a calm speed.
+    float flicker = flickerSignal(0, totalElapsedSec, DistributionMode::UNISON, 50);
+    brightnessNorm = constrain(brightnessNorm * (1.0f + flicker * 0.12f), 0.0f, 1.0f);
+
+    uint8_t colorVal = (uint8_t)(brightnessNorm * 255.0f * LED_BRIGHTNESS);
+
+    // ── Compose and send the frame ─────────────────────────────────────────────
+    uint8_t whiteArr[LED_COUNT] = {0};
+    for (int g = 0; g < 4; g++) {
+        uint8_t w = (uint8_t)(whiteGroupBrightness[g] * LED_BRIGHTNESS);
+        for (int k = 0; k < 4; k++) whiteArr[MED_GROUPS[g][k]] = w;
+    }
+
+    for (int i = 0; i < LED_COUNT; i++) {
+        put_pixel(hsv_white_to_grbw(hue, colorVal, whiteArr[i]));
+    }
+    send_reset();
+
+    // ── Status snapshot for Core 0 / web UI ────────────────────────────────────
+    _medStatusSnapshot.active                   = true;
+    _medStatusSnapshot.phase                    = phase;
+    _medStatusSnapshot.phaseSecondsLeft         = phaseSecondsLeft;
+    _medStatusSnapshot.sessionSecondsElapsed    = (uint32_t)totalElapsedSec;
+    _medStatusSnapshot.sessionSecondsRemaining  =
+        (_medDurationSec == 0) ? -1 : (int32_t)((float)_medDurationSec - totalElapsedSec);
+}
+
 // ── Public API ─────────────────────────────────────────────────────────────────
 
 
 void initLEDs() {
     queue_init(&_commandQueue, sizeof(uint8_t), 8);
+    queue_init(&_meditationCmdQueue, sizeof(MeditationCmd), 4);
 
     uint offset = pio_add_program(_pio, &ws2812_program);
     _sm = (uint)pio_claim_unused_sm(_pio, true);
     ws2812_sm_init(_pio, _sm, offset, LED_PIN);
+
 
     _ledsEnabled = true;
     // Start with the built-in Warm Flame preset — unless Core 0 has already
@@ -287,6 +489,39 @@ void setAnimationConfig(const BlossomConfig& config) {
     _configUpdated = true;
 }
 
+// ── Meditation Mode public API ────────────────────────────────────────────────
+// Called from Core 0 (web handlers). Pushes a command across the inter-core
+// queue; Core 1 picks it up inside updateLEDs() and actually starts/stops the
+// session, keeping all the timing state single-threaded on Core 1.
+void startMeditation(uint32_t durationSeconds) {
+    MeditationCmd c{1u, durationSeconds};
+    queue_try_add(&_meditationCmdQueue, &c);
+}
+
+void stopMeditation() {
+    MeditationCmd c{0u, 0u};
+    queue_try_add(&_meditationCmdQueue, &c);
+}
+
+// Safe to call from Core 0: reads the plain-struct snapshot Core 1 writes at
+// the end of every meditation frame. Small struct, no torn reads in practice
+// on this platform, and staleness by at most one frame (~17ms) is harmless
+// for a status display.
+MeditationStatus getMeditationStatus() {
+    return _medStatusSnapshot;
+}
+
+const char* meditationPhaseToString(MeditationPhase phase) {
+    switch (phase) {
+        case MeditationPhase::INHALE:     return "Inhale";
+        case MeditationPhase::HOLD_FULL:  return "Hold";
+        case MeditationPhase::EXHALE:     return "Exhale";
+        case MeditationPhase::HOLD_EMPTY: return "Hold";
+        case MeditationPhase::ENDING:     return "Done";
+        default:                          return "Idle";
+    }
+}
+
 void updateLEDs() {
     static uint32_t lastFrameMs = 0;
     static bool     wasEnabled  = true;  // matches _ledsEnabled initial value
@@ -295,6 +530,21 @@ void updateLEDs() {
     uint8_t cmd;
     while (queue_try_remove(&_commandQueue, &cmd)) {
         _ledsEnabled = (cmd != 0u);
+    }
+
+    // Drain any pending meditation start/stop commands from Core 0
+    MeditationCmd medCmd;
+    while (queue_try_remove(&_meditationCmdQueue, &medCmd)) {
+        if (medCmd.cmd == 1u) {
+            _meditationActive = true;
+            _medEnding         = false;
+            _medDurationSec    = medCmd.durationSeconds;
+            _medStartMs        = millis();
+        } else {
+            _meditationActive = false;
+            _medEnding         = false;
+            _medStatusSnapshot = MeditationStatus{false, MeditationPhase::IDLE, 0, 0, -1};
+        }
     }
 
     if (!_ledsEnabled) {
@@ -311,7 +561,17 @@ void updateLEDs() {
     if (now - lastFrameMs < 17u) return;
     lastFrameMs = now;
 
+    // While a meditation session is active (including its ending blink
+    // sequence), it takes over rendering completely — the ambient animation
+    // pipeline below is skipped and resumes automatically once the session
+    // finishes (renderMeditationFrame() clears _meditationActive itself).
+    if (_meditationActive) {
+        renderMeditationFrame();
+        return;
+    }
+
     // Running "virtual rotation" accumulator for the Spin effect (Step 4), in
+
     // pixel units. Persists across calls so Spin keeps moving smoothly instead
     // of resetting every frame.
     static float spinAccum = 0.0f;

@@ -274,6 +274,8 @@ static float pulseSignal(int i, float t, DistributionMode mode, uint8_t speed) {
 // ── Meditation Mode helpers ────────────────────────────────────────────────────
 
 static inline float smoothstep01(float x) {
+    // This smoothing function creates a nice "ease-in/ease-out" curve for 
+    // a float between 0 and 1. 
     x = constrain(x, 0.0f, 1.0f);
     return x * x * (3.0f - 2.0f * x);
 }
@@ -311,9 +313,11 @@ static const uint8_t MED_GROUPS[4][4] = {
 
 static const float BREATH_CYCLE_SEC    = 16.0f;  // 4s inhale + 4s hold + 4s exhale + 4s hold
 static const float PHASE_SEC           = 4.0f;
-// Full spectrum rotation takes ~30s per docs/meditations.md; a 16s breath
-// cycle means each breath advances the settled hue by 360° * (16/30).
-static const float HUE_STEP_PER_BREATH = 360.0f * (16.0f / 30.0f);
+// How far the settled hue advances every breath — a slow, continuous crawl
+// through the spectrum rather than a fixed "seconds per rotation" (see the
+// hue-journey comment inside renderMeditationFrame() for how this is used).
+// 18° per breath ≈ a full 360° rotation every 20 breaths (~5.3 minutes).
+static const float MED_HUE_STEP        = 18.0f;
 static const float MED_DIM_BRIGHTNESS  = 0.28f;  // color brightness while lungs are empty
 static const float MED_PEAK_BRIGHTNESS = 1.0f;   // color brightness peak, just before exhale
 
@@ -361,8 +365,16 @@ static void renderMeditationFrame() {
         return;
     }
 
-    float breathT     = fmodf(totalElapsedSec, BREATH_CYCLE_SEC);
-    long  breathIndex = (long)(totalElapsedSec / BREATH_CYCLE_SEC);
+    // Start the pattern on the "hold before inhale" phase instead of jumping
+    // straight into an inhale — this gives the user a few quiet seconds to
+    // settle their attention on the Blossom before they need to breathe.
+    // Adding a 3-phase (12s) offset before the modulo/division below simply
+    // relabels which chronological moment maps to breathT==0; the
+    // INHALE/HOLD_FULL/EXHALE/HOLD_EMPTY window checks that follow are
+    // completely unaffected and don't need to change.
+    float adjustedElapsedSec = totalElapsedSec + (BREATH_CYCLE_SEC - PHASE_SEC);
+    float breathT     = fmodf(adjustedElapsedSec, BREATH_CYCLE_SEC);
+    long  breathIndex = (long)(adjustedElapsedSec / BREATH_CYCLE_SEC);
 
     MeditationPhase phase;
     uint32_t phaseSecondsLeft;
@@ -373,12 +385,16 @@ static void renderMeditationFrame() {
         float groupFloat = (breathT / PHASE_SEC) * 4.0f;
         for (int g = 0; g < 4; g++) {
             float p = constrain(groupFloat - (float)g, 0.0f, 1.0f);
-            whiteGroupBrightness[g] = smoothstep01(p) * 255.0f;
+            whiteGroupBrightness[g] = smoothstep01(p) * 50.0f; // ramp each light 0-50
         }
         phaseSecondsLeft = (uint32_t)ceilf(PHASE_SEC - breathT);
-    } else if (breathT < PHASE_SEC * 2.0f) {                       // HOLD (full)
+    } else if (breathT < PHASE_SEC * 2.0f) { // HOLD (full)
         phase = MeditationPhase::HOLD_FULL;
-        for (int g = 0; g < 4; g++) whiteGroupBrightness[g] = 255.0f;
+        float p = (breathT - PHASE_SEC) / PHASE_SEC; 
+        float brightness = 50.0f + (smoothstep01(p) * 100.0f); // ramp up from 50 to 150
+        for (int g = 0; g < 4; g++) {
+            whiteGroupBrightness[g] = brightness;
+        }
         phaseSecondsLeft = (uint32_t)ceilf(PHASE_SEC * 2.0f - breathT);
     } else if (breathT < PHASE_SEC * 3.0f) {                       // EXHALE
         phase = MeditationPhase::EXHALE;
@@ -387,7 +403,7 @@ static void renderMeditationFrame() {
         for (int g = 0; g < 4; g++) {
             int reverseIndex = 3 - g;  // last group lit during inhale empties first
             float p = constrain(groupFloat - (float)reverseIndex, 0.0f, 1.0f);
-            whiteGroupBrightness[g] = (1.0f - smoothstep01(p)) * 255.0f;
+            whiteGroupBrightness[g] = (1.0f - smoothstep01(p)) * 150.0f; // 150 to 0
         }
         phaseSecondsLeft = (uint32_t)ceilf(PHASE_SEC * 3.0f - breathT);
     } else {                                                       // HOLD (empty)
@@ -396,17 +412,40 @@ static void renderMeditationFrame() {
         phaseSecondsLeft = (uint32_t)ceilf(PHASE_SEC * 4.0f - breathT);
     }
 
-    // ── Colored channel: settled hue + brightness envelope ────────────────────
-    float baseHue = fmodf((float)breathIndex * HUE_STEP_PER_BREATH, 360.0f);
-    float hue = baseHue;
-
-    // Last second of the empty-lung hold: spin through the entire spectrum
-    // (plus a little extra) before landing exactly on next breath's color.
-    if (breathT >= BREATH_CYCLE_SEC - 1.0f) {
-        float p = breathT - (BREATH_CYCLE_SEC - 1.0f);  // 0..1 within that last second
-        float sweep = 360.0f + HUE_STEP_PER_BREATH;      // one full spin + the normal step
-        hue = fmodf(baseHue + sweep * p, 360.0f);
+    // ── Colored channel: a slow, continuous journey through the spectrum ──────
+    // Every breath has a base color and a target color one MED_HUE_STEP farther
+    // up the spectrum. `breathIndex` increments exactly once per breath (right
+    // as INHALE begins) and directly indexes that pair:
+    //   base(idx)   = idx     * MED_HUE_STEP
+    //   target(idx) = (idx+1) * MED_HUE_STEP
+    // The hue eases forward from base to target through INHALE + HOLD_FULL
+    // (the "filling" half of the breath), eases back from target to base
+    // through EXHALE, and then — instead of a jarring full-spectrum sweep —
+    // simply eases forward from base to target *again* through HOLD_EMPTY,
+    // landing exactly on `target`. Because `breathIndex` ticks up right after
+    // that, `target` immediately becomes the *next* breath's `base`, so the
+    // next INHALE picks up right where this one left off and pushes on to a
+    // brand new target one step further up the spectrum. Net effect: a slow
+    // forward crawl through the rainbow, with a gentle back-and-forth
+    // "breathing" motion layered on top instead of a straight line.
+    // (Using unbounded, non-wrapped base/target values here — and only taking
+    // the final hue mod 360 at the very end — avoids any wraparound sign bugs
+    // in the target-minus-base interpolation math.)
+    float baseHue   = (float)breathIndex * MED_HUE_STEP;
+    float targetHue = baseHue + MED_HUE_STEP;
+    float hue;
+    if (breathT < PHASE_SEC * 2.0f) {                       // INHALE + HOLD_FULL: base -> target
+        float p = breathT / (PHASE_SEC * 2.0f);
+        hue = baseHue + (targetHue - baseHue) * smoothstep01(p);
+    } else if (breathT < PHASE_SEC * 3.0f) {                // EXHALE: target -> base
+        float p = (breathT - PHASE_SEC * 2.0f) / PHASE_SEC;
+        hue = targetHue - (targetHue - baseHue) * smoothstep01(p);
+    } else {                                                 // HOLD_EMPTY: base -> target (again)
+        float p = (breathT - PHASE_SEC * 3.0f) / PHASE_SEC;
+        hue = baseHue + (targetHue - baseHue) * smoothstep01(p);
     }
+    hue = fmodf(hue, 360.0f);
+    if (hue < 0.0f) hue += 360.0f;
 
     // Brightness rises through inhale+hold (0-8s), peaks right before exhale,
     // dims back down through exhale (8-12s), then stays dim through the
@@ -424,8 +463,9 @@ static void renderMeditationFrame() {
 
     // Gentle unison flicker on top of the envelope — reuses the same "value
     // noise" the ambient Flicker track uses, hardcoded to a calm speed.
-    float flicker = flickerSignal(0, totalElapsedSec, DistributionMode::UNISON, 50);
-    brightnessNorm = constrain(brightnessNorm * (1.0f + flicker * 0.12f), 0.0f, 1.0f);
+    // REMOVED: I found the flicker too distracting for meditation. Uncomment to re-enable.
+    //float flicker = flickerSignal(0, totalElapsedSec, DistributionMode::UNISON, 50);
+    //brightnessNorm = constrain(brightnessNorm * (1.0f + flicker * 0.12f), 0.0f, 1.0f);
 
     uint8_t colorVal = (uint8_t)(brightnessNorm * 255.0f * LED_BRIGHTNESS);
 

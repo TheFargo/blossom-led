@@ -50,11 +50,9 @@ The giant red "IRQ" phone is an exception, used for communicating directly betwe
 
 **PIOs Directly Operate the GPIO Pins**
 
-What I described as "important switches on the back wall" are the GPIO ("General-Purpose Input/Output") pins of the Raspberry Pi Pico 2W. The Pico is a microcontroller, which means its job is to control stuff. In this case, we're controlling a string of LED lights from GP16 (pin 21 on the corner of the device - See the [Wiring Guide](/docs/assembly.md#6-wiring-the-pico-2w))Our PIO will flip this switch "on" and "off" to send color data out to the LEDs. In our setup, _only_ the PIO has access to this pin. If we want the lights to do something, they talk to the PIO!
+What I described as "important switches on the back wall" are the GPIO ("General-Purpose Input/Output") pins of the Raspberry Pi Pico 2W. The Pico is a microcontroller, which means its job is to control stuff. In this case, we're controlling a string of LED lights from GP16 (pin 21 on the corner of the device - See the [Wiring Guide](/docs/assembly.md#6-wiring-the-pico-2w)). Our PIO will flip this switch "on" and "off" to send color data out to the LEDs. In our setup, _only_ the PIO has access to this pin. If we want the lights to do something, they talk to the PIO!
 
 Our "LED Controller" program is very simple and only uses one pin: It'll read data one bit at a time from the inbox, then toggle the LED data pin on and off with perfect timing. It's a super-simple job, and our little machine will do it non-stop. 32 bits of data per light, times 16 lights, 60 times a second... That's 30,720 bits of data processed every _second_. Go little machine, go!
-
-Our "PIO-eye-view" of the hardware is a little oversimplified, but it gives you a good visual of how these things work.
 
 ---
 
@@ -95,4 +93,30 @@ If you understand what's happening down there in binary, you understand how comp
 
 >[!Note]
 >That's why I wanted to make sure PIO-coding was a part of this project. These little machines are a perfect demonstration of machine code in action, and you can play around in this space on a computer that costs less than a cheeseburger meal.
+
+---
+
+# 3. Our LED Code
+
+    @rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=32)
+    def neopixel_projector():
+        """
+        Waits for a stream of colors from the main program and sends them to the
+        NeoPixel with precise timing. WS2812B timing constants: Each "pulse" is
+        0.125 microseconds (us). Total signal is 10 pulses / 1.25 us.
+        Run this machine at 8MHz (freq=8000000) for microsecond-perfect timing!
+        """
+    
+    # To send a "1", we need a high pulse of 7 cycles (T1 + T2) and a low pulse of 3 cycles (T3).
+    # To send a "0", we need a high pulse of 2 cycles (T1) and a low pulse of 8 cycles (T2 + T3).
+    # Cycle Delays: T1 = 2; T2 = 5; T3 = 3 Combine timings for 10 cycles per bit.
+    wrap_target()
+    label("bitloop")
+    out(x, 1)               .side(0) [T3 - 1]
+    jmp(not_x, "do_zero")   .side(1) [T1 - 1]
+    label("do_one")
+    jmp("bitloop")          .side(1) [T2 - 1]
+    label("do_zero")
+    nop()                   .side(0) [T2 - 1]
+    wrap()
 

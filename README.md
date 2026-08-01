@@ -13,7 +13,7 @@ Inside the handcrafted wooden case you'll find a Raspberry Pi Pico 2W connected 
 
 ## Features
 
-* **WiFI Enabled**: Blossom acts as its own web server, connecting to your local network\
+* **Wi-FI Enabled**: Blossom acts as its own web server, connecting to your local network\
 and allowing you to interact with it from any device.
 * **No Apps Required**: Use any web browser to interact with your Blossom.\
 There's nothing to download and all your data stays local.
@@ -21,7 +21,7 @@ There's nothing to download and all your data stays local.
 while the Blossom updates in real-time. 
 * **Play Meditations**: Practice mindfulness with guided breathing exercises. 
 * **Control from Any Device**: Simply connect to `blossom.local` from any web browser.\
-Saavy users can also write their own programs to update Blossom via HTTP.
+Savvy users can also write their own programs to update Blossom via HTTP.
 
 ---
 
@@ -49,7 +49,7 @@ Inside you'll find extensively commented code, build photos, and background mate
 6. [Software Installation Guide](/docs/installation.md)
 7. [Build and Upload Guide](/docs/build_and_upload.md)
 8. [Extensively Commented C++ Source](/src)
-9. [Explanation of PIO Assembly Code](Coming soon)
+9. [Explanation of PIO State Machines](/docs/pio_state_machines.md)
 10. [Using the Serial Monitor](/docs/serial_monitor.md)
 11. [Fun LED Technical Details](/docs/led_technical_details.md)
 

@@ -141,7 +141,7 @@ Think of these little state machines as teeny-tiny machine-language computers. T
 
 The PIO machines are designed to solve the exact problem of communicating with our time-sensitive LEDs. We set up one machine just to communicate to our string of lights. The CPU dumps a big pile of color data onto it - an update for the entire string of lights - and then the PIO dutifully chews through the data, typing out 1s and 0s with precise timing, until its buffer is empty. The CPU just has to drop off the data and then it moves on to other things while the PIO sends the message. 
 
-Information on how we program the PIOs is in the source code, specifically `/src/led_controller.cpp`.
+Information on how we program the PIOs can be found in our [PIO State Machines](/docs/pio_state_machines.md) documentation, or inside the source code at `/src/led_controller.cpp`.
 
 ---
 

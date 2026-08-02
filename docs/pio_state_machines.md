@@ -98,6 +98,33 @@ If you understand what's happening down there in binary, you understand how comp
 
 # 3. Our LED Code
 
+As we've seen in the [LED Technical Details](/docs/led_technical_details.md), we're using "SK6812" RGBW LEDs, which share the same data/timing specs as "WS2812" LEDs. That means our LEDs are programmed via a single data line that must transmit bits at a fixed clock speed. If we listened in on the data line while it was transmitting, an oscilloscope would show something like this:
+
+                        One bit is sent every 1.25 microseconds.                    
+    │          Divide that time into 10 "Cycles" of .125 microseconds each.        │
+    ├──────┬───────┬───────┬───────┬───────┬───────┬───────┬───────┬───────┬───────┤
+    │      │       │       │       │       │       │       │       │       │       │
+                                                                                    
+                  A "1" is a HIGH pulse of 7 cycles and a LOW pulse of 3.           
+    │███████████████████████████████████████████████████████       │       │       │
+    ├──────┬───────┬───────┬───────┬───────┬───────┬───────────────┴───────┴───────┤
+    │      │       │       │       │       │       │        ███████████████████████│
+                                                                                    
+                  A "0" is a HIGH pulse of 2 cycles and a LOW pulse of 8.           
+    │██████████████        │       │       │       │       │       │       │       │
+    ├──────┬───────────────┴───────┴───────┴───────┴───────┴───────┴───────┴───────┤
+    │      │       ████████████████████████████████████████████████████████████████│
+                                                                                    
+                              Here's another way to look at it:
+    │ Always High  │       DATA: High for 1, Low for 0     │      Always Low       |
+    │██████████████│░░░░░░░│░░░░░░░│░░░░░░░│░░░░░░░│░░░░░░░│       │       │       │
+    ├──────┬───────┼───────┼───────┼───────┼───────┼───────┼───────┴───────┴───────┤
+    │      │       │░░░░░░░│░░░░░░░│░░░░░░░│░░░░░░░│░░░░░░░│███████████████████████│
+
+Put simply, the PIO just has to flip the data pin on or off and wait a specified period of time. For each bit, we flip the data line HIGH for two cycles. If the bit is a "1" we keep the data line HIGH for the next five cycles, whereas for a "0" we turn the data line LOW for five cycles. In either case we set the line LOW for the final three cycles, and then begin again. 
+
+
+
     @rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=32)
     def neopixel_projector():
         """
@@ -106,10 +133,10 @@ If you understand what's happening down there in binary, you understand how comp
         0.125 microseconds (us). Total signal is 10 pulses / 1.25 us.
         Run this machine at 8MHz (freq=8000000) for microsecond-perfect timing!
         """
-    
     # To send a "1", we need a high pulse of 7 cycles (T1 + T2) and a low pulse of 3 cycles (T3).
     # To send a "0", we need a high pulse of 2 cycles (T1) and a low pulse of 8 cycles (T2 + T3).
-    # Cycle Delays: T1 = 2; T2 = 5; T3 = 3 Combine timings for 10 cycles per bit.
+
+    T1 = 2; T2 = 5; T3 = 3 # Cycle Delays. Combine timings for 10 cycles per bit.
     wrap_target()
     label("bitloop")
     out(x, 1)               .side(0) [T3 - 1]

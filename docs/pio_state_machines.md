@@ -123,7 +123,7 @@ As we've seen in the [LED Technical Details](/docs/led_technical_details.md), we
 
 Put simply, the PIO just has to flip the data pin on or off and wait a specified period of time. For each bit, we flip the data line HIGH for two cycles. If the bit is a "1" we keep the data line HIGH for the next five cycles, whereas for a "0" we turn the data line LOW for five cycles. In either case we set the line LOW for the final three cycles, and then begin again. 
 
-
+My original PIO code is below. The header and comments are in MicroPython format, but what you want to pay attentio to are the last 9 lines. Those are written in "Assembly," a kind of human-readable shorthand for machine code. 
 
     @rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=32)
     def neopixel_projector():
@@ -133,17 +133,64 @@ Put simply, the PIO just has to flip the data pin on or off and wait a specified
         0.125 microseconds (us). Total signal is 10 pulses / 1.25 us.
         Run this machine at 8MHz (freq=8000000) for microsecond-perfect timing!
         """
-    # To send a "1", we need a high pulse of 7 cycles (T1 + T2) and a low pulse of 3 cycles (T3).
-    # To send a "0", we need a high pulse of 2 cycles (T1) and a low pulse of 8 cycles (T2 + T3).
+    # To send a "1", we need a high pulse of 7 cycles (2 + 5) and a low pulse of 3 cycles (3).
+    # To send a "0", we need a high pulse of 2 cycles (2) and a low pulse of 8 cycles (5 + 3).
+    # Each bit will always last 10 cycles (2 + 5 + 3).
 
-    T1 = 2; T2 = 5; T3 = 3 # Cycle Delays. Combine timings for 10 cycles per bit.
-    wrap_target()
-    label("bitloop")
-    out(x, 1)               .side(0) [T3 - 1]
-    jmp(not_x, "do_zero")   .side(1) [T1 - 1]
-    label("do_one")
-    jmp("bitloop")          .side(1) [T2 - 1]
-    label("do_zero")
-    nop()                   .side(0) [T2 - 1]
-    wrap()
+    wrap_target()                           // Start here
+    label("bitloop")                        // Jump target "bitloop"
+    out(x, 1)               .side(0) [2]    // Grab the next bit, put it in "x". Pin: LOW, delay 2
+    jmp(not_x, "do_zero")   .side(1) [1]    // Jump to "do_zero" if it's zero. Pin: HIGH, delay 1
+    label("do_one")                         // Label. We're outputting a 1 next line
+    jmp("bitloop")          .side(1) [4]    // Jump back up to "bitloop." Pin: HIGH, delay 4 [Data]
+    label("do_zero")                        // Jump target "do_zero." We're outputting a 0 next line
+    nop()                   .side(0) [4]    // Do nothing... But: Pin: LOW, delay 4 [Data]
+    wrap()                                  // Go back to start
+
+If we focus on the assembly code, we see at least half of it is labels and jumps. The line where the rubber meets the road is this one:
+
+    out(x,1)                .side(0) [2]
+
+It says, "grab exactly 1 bit from the 'Output shift register' and put it into our 'x register.'"
+
+>[!TIP]
+>The Output Shift Register is one of those mailboxes that I described earlier. The MicroPython header at the top ("out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=32") defines how our PIO should handle its mailbox: Every time we run out of bits we grab 32 more.
+
+Many lines in the code say ".side(0)" or ".side(1)". This is that sweet side-setting functionality described above: When we start our PIO machine, we'll tell it that its side-set pin is the data line for our lights. .side(1) sets the line high, .side(0) sets it low.
+
+A number in brackets also appears in many lines. This is the number of cycles to delay _after_ executing the instruction. Note that it always takes _one_ cycle to perform an instruction, so to wait for exactly five cycles we would run an instruction and then delay four. This is what happens in the "do_one" or "do_zero" section of the code: We set the pin to high or low, then delay 4 cycles (for a total time of 5).
+
+See if you can follow along with the code as it processes either a 1 or a 0!
+
+---
+
+# 4. Assembly
+
+We have our list of instructions above written in a shorthand called "Assembly Language." (Technically it's a python-readable syntax of assembly.) For it to run on our PIO state machine, we have to convert those instructions into the binary 1s and 0s that we talked about in [Section 2](#2-pio-machine-language). Every instruction has to be converted into 16 bits, and every label/jump destination has to be converted into a relative memory address. 
+
+The PIO state machines are simple enough that we can imagine doing this by hand. The relevant section of the [RP2350 Datasheet](https://pip-assets.raspberrypi.com/categories/1214-rp2350/documents/RP-008373-DS-2-rp2350-datasheet.pdf) is only about a dozen pages. Similar to the way we broke down the "WAIT" instruction above, you could figure it out, line-by-line, one 16-bit instruction at a time. Once you take out all the jump targets or labels, you really only have about 4 lines of code. It's an interesting exercise for a student. It takes you back to a time when programs were entered into the front panel of a computer by manually flipping switches! But as you'd imagine, nobody really "hand assembles" anything anymore.
+
+The designers of the Raspberry Pi Pico 2W provide an SDK that includes something called the "pioasm" (PIO Assembler). This takes raw assembly code and outputs a C header (.h) file with the complete machine configuration and code. Using this, your C program can initialize a PIO with ease. Other people have written other tools that do the compiling for you: the code above was written in MicroPython. MicroPython (and the related CircuitPython language) can assemble that code on the fly and upload it to your PIO when needed.
+
+Recently, there's another way to get our final code, thanks to large language model AI. Converting this stuff to binary is a walk in the park for an advanced model, and in fact Claude looked at the MicroPython code above and converted it in one go. The results:
+
+    static const uint16_t ws2812_program_instructions[] = {
+        //        Instruction                side  delay
+        0x6221u,  // out x, 1               0     2     (pin LOW  for 3 cycles)
+        0x1123u,  // jmp !x, 3  → do_zero   1     1     (pin HIGH for 2 cycles; !x = condition 001)
+        0x1400u,  // jmp 0  (do_one→bitloop)1     4     (pin HIGH for 5 cycles)
+        0xa442u,  // mov y, y (nop/do_zero) 0     4     (pin LOW  for 5 cycles)
+    };
+
+Nobody but the computer would ever need to look at that code in binary, but fur super-fun (yeah, fun!) here's what that looks like in raw 1s and 0s:
+
+    0110 0010 0010 0001     // out x, 1     0 2 (pin LOW for 3 cycles)
+    0001 0001 0010 0011     // jmp !x, 3    1 1 (pin HIGH for 2 cycles)
+    0001 0100 0000 0000     // jmp 0        1 4 (pin HIGH for 5 cycles) 
+    1010 0100 0100 0010     // nop          0 4 (pin LOW for 5 cycles)
+
+Those 64 bits are _everything_ your PIO needs to know in order to send color data to your lights with micro-second precision timing. What a little miracle!
+
+## Revving Up the Machine
+
 

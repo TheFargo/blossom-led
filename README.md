@@ -14,7 +14,9 @@ Inside the handcrafted wooden case you'll find a Raspberry Pi Pico 2W connected 
 <table>
   <tr>
     <td width="480">
+
 https://github.com/user-attachments/assets/ee2256e5-a6fd-4887-a5ad-c2fb7382c757
+
     </td>
   </tr>
 </table>

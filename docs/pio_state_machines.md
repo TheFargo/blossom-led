@@ -93,6 +93,8 @@ Don't sweat all the details yet - learning all of these instructions and how the
 
 Your PIO starts reading an instruction and sees that the first three bits are "001." That means "Wait," so the remainder of the bits are going to tell the PIO how long to wait and what to wait on. The next five bits are customizable when we set up the machine, we'll talk about them in a second. The next bit (labelled 7) stands for the "polarity" - in other words, are we waiting for a 1? Or are we waiting for a 0? Bits 5 and 6 together tell us the "source" we're waiting on. For instance, if these two bits are "00" that means we're waiting on one of the GPIO pins, and the next five bits (labelled 0-4) will tell us which one. If bits 5 and 6 are "10" that means we're waiting on an IRQ (in our analogy above, this is like checking the status of the "Red Phone" to the CPU...)
 
+How do we know this stuff? Each and every bit is labelled and described in the [Datasheet for our CPU](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf). It takes about a page to describe the workings of each instruction.
+
 ## Customizing Your Instructions: Delays and Side-Sets
 
 When we first set up a PIO state machine, in addition to writing the instruction book and setting the clock speed, we can also tell the machine how to interpret those five "Delay / Side-Set" bits.
@@ -277,9 +279,8 @@ Hopefully the above explanation gives you an idea of how the Blossom uses the PI
 
 ## Repositories of PIO Programs
 
-The folks at Raspberry Pi created lots of [Well-Documented Sample Programs](https://github.com/raspberrypi/pico-examples/tree/master/pio/) demonstrating the use of PIO state machines to generate different signals, like this [Squarewave Example](https://github.com/raspberrypi/pico-examples/tree/master/pio/squarewave).
-
-As you might imagine, Blossom's LED driver is based off of the official [Raspberry Pi WS2812 LED Implementation](https://github.com/raspberrypi/pico-examples/tree/master/pio/ws2812). It should look pretty familiar. Good programmers copy; _Great_ programmers copy _and_ paste! 
+* [Official Raspberry Pi PIO Sample Programs](https://github.com/raspberrypi/pico-examples/tree/master/pio/) - This well-documented collection of PIO utilities demonstrate their many uses, such as this straightforward [Squarewave Example](https://github.com/raspberrypi/pico-examples/tree/master/pio/squarewave).
+* [Raspberry Pi WS2812 LED Implementation](https://github.com/raspberrypi/pico-examples/tree/master/pio/ws2812) - As you might imagine, Blossom's LED driver is based off of this. It should look pretty familiar. Good programmers copy; _Great_ programmers copy _and_ paste!
 
 ## Official Documentation
 
@@ -293,12 +294,12 @@ As you might imagine, Blossom's LED driver is based off of the official [Raspber
 * [Wokwi Raspberry Pi Pico Simulator](https://wokwi.com/pi-pico) - Play with a virtual Pico in your web browser! Among the many projects there's even a [Simulation of a 16-light LED Ring](https://wokwi.com/projects/314265138001609280) very similar to the Blossom. You can even click on the "PIO" tab to watch the PIO code in action.
 * [Gary Explains the PIO State Machines](https://www.youtube.com/watch?v=QlKtEA5XKc4) - A friendly video explanation of the above material, with lots of examples of PIO in action.
 
-## Working With AI - A Note From the Author
+## Learning With AI - A Note From the Author
 
 I first started programming LEDs with PIO State Machines in the Spring of 2025, and in my notes I expressed frustration with AI of that era. PIO programming for the Raspberry Pi chips is pretty esoteric; the language models in 2025 didn't have a lot of material to draw from, couldn't use research tools properly, and often hallucinated instructions that weren't in the PIO's tiny instruction set.
 
 The following year saw an extrordinary leap in coding agent capabilities!
 
-As I put this project together in July of 2026, AI frontier models could comfortably incorporate PIO code and even "hand-assemble" it. More than ever, coding agents will be able to handle "add the fiddly stuff" described above. As a programmer, you can focus more on what you want the PIO to do and less on the precise syntax required to get it going.
+As I put this project together in July of 2026, AI frontier models could comfortably incorporate PIO code and even "hand-assemble" it. More than ever, coding agents will be able to handle "all the fiddly stuff" described above. In theory, programmers should be able to focus more on what thay want the PIO to do and less on the precise syntax required to get it going.
 
-In order to be effective engineers in the future, it's important to understand what's going on _behind_ the code: how systems are put together and how they work. My hope is that projects such as Blossom will provide the kind of foundational knowledge that makes working and debugging with an AI model fun and educational, instead of vibey and confused.
+In order to be effective engineers in the future, it's important to understand what's going on _behind_ the code: how systems are put together and how they work. My hope is that projects such as Blossom will provide the kind of foundational knowledge that makes working and debugging with an AI model fun and educational, instead of vibey and confusing.

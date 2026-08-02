@@ -218,7 +218,8 @@ Congratulations! You're now an expert in the incredible world of _individually a
 * [Understanding the WS2812](https://cpldcpu.com/2014/01/14/light_ws2812-library-v2-0-part-i-understanding-the-ws2812/) - A very technical but foundational study of the communication protocol we talked about in part 3.
 * [PicoTech's NeoPixel Blog](https://www.picotech.com/library/articles/blog/how-do-individually-addressable-leds-work) - See how NeoPixel signalling looks through an oscilloscope.
 * [QuinLED](https://quinled.info/) - An extensive addressable LED resource, including guides, videos, and a Discord.
-* [Official Raspberry Pi "PIO" Documentation](https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf) - The primary source for programming PIO state machines. This is pretty advanced stuff.
+* [Blossom's PIO State Machine Guide](/docs/pio_state_machines.md) - A closer look at the PIO State Machines and how they're programmed, complete with code.
+* [Official Raspberry Pi "PIO" Documentation](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf) - The primary source for programming PIO state machines. This is pretty advanced stuff.
 * [Gary Explains the PIO State Machines](https://www.youtube.com/watch?v=QlKtEA5XKc4) - A friendly video explanation of the PIO documentation above.
 * [Adafruit DotStar Guide](https://learn.adafruit.com/adafruit-dotstar-leds) - The successor to the NeoPixels we use.
 * [Adafruit's LED Intro](https://learn.adafruit.com/all-about-leds) - A more basic introduction to LED technology and the many available form-factors.

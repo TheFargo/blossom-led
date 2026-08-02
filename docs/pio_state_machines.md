@@ -234,7 +234,7 @@ The exact mechanics for doing all of this vary by language, and it can be extrem
         _ledsEnabled = true;
     }
 
- Those first three lines of code tell the PIO which program its going to run and where the program is located (the "Offset.")
+ Those first lines of code tell the PIO which program its going to run and calculate where the program is located (the "Offset.")
 
 >[!TIP]
 >Up to four state machines can share the same 64-byte "instruction book." It's possible to have all four machines running the same code, or it's possible to divide up the instruction book into multiple chunks and have each machine run its own code. In order for this to work, when you initialize a state machine, you have to tell it which instruction (or "page of the book") it's supposed to start on - in the code, we call this the "offset." 
@@ -279,10 +279,7 @@ Hopefully the above explanation gives you an idea of how the Blossom uses the PI
 
 The folks at Raspberry Pi created lots of [Well-Documented Sample Programs](https://github.com/raspberrypi/pico-examples/tree/master/pio/) demonstrating the use of PIO state machines to generate different signals, like this [Squarewave Example](https://github.com/raspberrypi/pico-examples/tree/master/pio/squarewave).
 
-As you might imagine, Blossom's LED driver is based off of the official [Raspberry Pi WS2812 LED Implementation](https://github.com/raspberrypi/pico-examples/tree/master/pio/ws2812). It should look pretty familiar.
-
->[!TIP]
->Good programmers copy; _Great_ programmers copy _and_ paste! 
+As you might imagine, Blossom's LED driver is based off of the official [Raspberry Pi WS2812 LED Implementation](https://github.com/raspberrypi/pico-examples/tree/master/pio/ws2812). It should look pretty familiar. Good programmers copy; _Great_ programmers copy _and_ paste! 
 
 ## Official Documentation
 

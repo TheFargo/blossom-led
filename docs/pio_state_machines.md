@@ -138,7 +138,7 @@ As we've seen in the [LED Technical Details](/docs/led_technical_details.md), we
                                                                                     
 
                               Here's another way to look at it:
-                              
+
     │ Always High  │       DATA: High for 1, Low for 0     │      Always Low       |
     │██████████████│░░░░░░░│░░░░░░░│░░░░░░░│░░░░░░░│░░░░░░░│       │       │       │
     ├──────┬───────┼───────┼───────┼───────┼───────┼───────┼───────┴───────┴───────┤
@@ -146,7 +146,7 @@ As we've seen in the [LED Technical Details](/docs/led_technical_details.md), we
 
 Put simply, the PIO just has to flip the data pin on or off and wait a specified period of time. For each bit, we flip the data line HIGH for two cycles. If the bit is a "1" we keep the data line HIGH for the next five cycles, whereas for a "0" we turn the data line LOW for five cycles. In either case we set the line LOW for the final three cycles, and then begin again. 
 
-My original PIO code is below. The header and comments are in MicroPython format, but what you want to pay attention to are the last 9 lines. Those are written in "Assembly," a kind of human-readable shorthand for machine code. 
+My original PIO code is below. The header and comments are in MicroPython format, but what you want to pay attention to are the last 9 lines. Those are written in "Assembly," a kind of human-readable shorthand for machine code. (Technically it's a python-readable syntax of assembly.)
 
     @rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=32)
     def neopixel_projector():
@@ -189,7 +189,7 @@ See if you can follow along with the code as it processes either a 1 or a 0!
 
 # 4. Assembly
 
-We have our list of instructions above written in a shorthand called "Assembly Language." (Technically it's a python-readable syntax of assembly.) For it to run on our PIO state machine, we have to convert those instructions into the binary 1s and 0s that we talked about in [Section 2](#2-pio-machine-language). Every instruction has to be converted into 16 bits, and every label/jump destination has to be converted into a relative memory address. We call this process "Assembly" and the programs that do it "Assemblers."
+We have our list of instructions above written in a (python-readable) shorthand called "Assembly Language." For it to run on our PIO state machine, we have to convert those instructions into the binary 1s and 0s that we talked about in [Section 2](#2-pio-machine-language). Every instruction has to be converted into 16 bits, and every label/jump destination has to be converted into a relative memory address. We call this process "Assembly" and the programs that do it "Assemblers."
 
 The PIO state machines are simple enough that we can imagine doing this by hand. The relevant section of the [RP2350 Datasheet](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf) is only about a dozen pages. Similar to the way we broke down the "WAIT" instruction above, you could figure it out, line-by-line, one 16-bit instruction at a time. Once you take out all the jump targets or labels, you really only have about 4 lines of code. It's an interesting exercise for a student. It takes you back to a time when programs were entered into the front panel of a computer by manually flipping switches! But as you'd imagine, nobody really "hand assembles" anything anymore.
 

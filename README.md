@@ -11,6 +11,8 @@ Inside the handcrafted wooden case you'll find a Raspberry Pi Pico 2W connected 
 > [!TIP]
 > Support the creator! [Buy a hand-crafted pre-assembled Blossom from Etsy](http://www.etsy.com/MYFINALSTORELINK)
 
+https://github.com/user-attachments/assets/ee2256e5-a6fd-4887-a5ad-c2fb7382c757
+
 ## Features
 
 * **Wi-FI Enabled**: Blossom acts as its own web server, connecting to your local network\

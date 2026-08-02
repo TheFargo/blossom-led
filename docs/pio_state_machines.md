@@ -33,6 +33,27 @@ To understand what's happening inside the hardware, let's shrink ourselves down 
 - One or more Big Important Switches on the back wall
 - A Very Important bright red telephone labelled "IRQ"
 
+                ┌──────────────────────────────────────────────────────────────────────────────────┐    
+                │ \                                                                              / │    
+                │  ┌────────────────────────────────────────────────────────────────────────────┐  │    
+                │  │                                                                            │  │    
+                │  │  <== TO CPU                                              TO GPIO PINS ==>  │  │    
+                │  │                                                                            │  │    
+                │  │                                  _______                                   │  │    
+                │  │                                 ( CLOCK )                                  │  │    
+                │  │                                  -------                                   │  │    
+                │  │                                                                            │  │    
+                │  │   ┌──────┐   ┌──────┐                                                Big   │  │    
+                │  │   │INBOX │   │OUTBOX│                          │X Scratch           Switch──┐ │    
+            Red │┌─┐   │      │   │      │                          ├──────────               │ │├─┴────
+            Phone│IRQ  ┌──────┐   ┌──────┐    Instruction   YOU     │Y Scratch               /│ ││ GPIO 
+                │└─┘   └──────┘   └──────┘       Book     (A PIO)   └───────────            O │ │├─┬────
+                │  │                          ┌─────────┐    o                                └──┘ │    
+                │  └──────────────────────────└─^───────┘───└█┘─────────────────────────────────┘  │    
+                │ /                            Bookmark     / \                                  \ │    
+                │/                                                                                \│    
+                └──────────────────────────────────────────────────────────────────────────────────┘    
+
 Congratulations, you're a PIO! Your job is super-simple. The clock is spinning at a constant rate. Whenever it dings, you go to the instruction manual, execute the instruction given at your bookmark, then scoot your bookmark forward to the next instruction. There are less than a dozen instructions total, and every instruction is SUPER simple, like:
 
 - "Grab a number from your inbox and put it onto the Scratch X shelf."

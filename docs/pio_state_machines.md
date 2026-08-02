@@ -1,8 +1,8 @@
 # PIO State Machines: Blossom Programmable Light Display
 
-As described in the [LED Technical Details](/docs/led_technical_details.md#4-taking-advantage-of-the-pico), our Raspberry Pi Pico 2 has a bank of 12 "Programmable I/O" state machines, or "PIOs." Our hardware is built to control a lot of devices, some of which (like our LED lights!) may require specific signal timing. These little state machines are like tiny processors of their own that run independantly of the main CPUs. They're perfect for sending messages or instructions between different parts of the computer while our powerful processors are doing something else.
+As described in the [LED Technical Details](/docs/led_technical_details.md#4-taking-advantage-of-the-pico), our Raspberry Pi Pico 2 has a bank of 12 "Programmable I/O" state machines, or "PIOs." Our hardware is built to control a lot of devices, some of which (like our LED lights!) require specific signal timing. These little state machines are like tiny processors of their own that run independantly of the main CPUs. They're perfect for sending messages or instructions between different parts of the computer while our powerful processors are doing something else.
 
-Our LED lights are controlled by a single data line that requires super-specific signal timing, sending a "1" or a "0" every 1.25 microseconds. Any interruption in our data stream might corrupt the data. Rather than use a CPU to babysit the signal, this is a textbook example of what the PIO state machines are made for! In the Blossom, one of our CPUs (core 1 in this case) calculates the next frame of animation data and drops all of the color information into the PIO's buffer. The CPU is free to move on to other tasks while the PIO dutifully converts the data into a perfectly-timed signal that it types out to the lights, 1.25 microsecronds for each and every 1 or 0, until the data is sent. 
+Our LED lights are controlled by a single data line that requires super-specific signal timing, sending a "1" or a "0" every 1.25 microseconds. Any interruption in our data stream might corrupt the data. Rather than use a CPU to babysit the signal, this is a textbook example of what the PIO state machines are made for! In the Blossom, one of our CPUs (core 1 in this case) calculates the next frame of animation data and drops all of the color information into the PIO's buffer. The CPU is free to move on to other tasks while a PIO state machine dutifully converts the data into a perfectly-timed signal that it sends to the lights, 1.25 microsecronds for each and every 1 or 0, until the data is sent. 
 
 For more details about how the lights work, see the [LED Technical Details](/docs/led_technical_details). In this section, we're going to look at the PIO and how we coded it. 
 
@@ -54,7 +54,7 @@ To understand what's happening inside the hardware, let's shrink ourselves down 
                 │/                                                                                \│    
                 └──────────────────────────────────────────────────────────────────────────────────┘    
 
-Congratulations, you're a PIO! Your job is super-simple. The clock is spinning at a constant rate. Whenever it dings, you go to the instruction manual, execute the instruction given at your bookmark, then scoot your bookmark forward to the next instruction. There are less than a dozen instructions total, and every instruction is SUPER simple, like:
+Congratulations, you're a PIO state machine! Your job is super-simple. The clock is spinning at a constant rate. Whenever it dings, you go to the instruction manual, execute the instruction given at your bookmark, then scoot your bookmark forward to the next instruction. There are less than a dozen instructions total, and every instruction is SUPER simple, like:
 
 - "Grab a number from your inbox and put it onto the Scratch X shelf."
 - "Move your bookmark to a different page."
@@ -91,7 +91,7 @@ Don't sweat all the details yet - learning all of these instructions and how the
 
 ![PIO State Machine "Wait" Instruction](images/pio_wait.png)
 
-Your PIO starts reading an instruction and sees that the first three bits are "001." That means "Wait," so the remainder of the bits are going to tell the PIO how long to wait and what to wait on. The next five bits are customizable when we set up the machine, we'll talk about them in a second. The next bit (labelled 7) stands for the "polarity" - in other words, are we waiting for a 1? Or are we waiting for a 0? Bits 5 and 6 together tell us the "source" we're waiting on. For instance, if these two bits are "00" that means we're waiting on one of the GPIO pins, and the next five bits (labelled 0-4) will tell us which one. If bits 5 and 6 are "10" that means we're waiting on an IRQ (checking the status of the "Red Phone" to the CPU...)
+Your PIO starts reading an instruction and sees that the first three bits are "001." That means "Wait," so the remainder of the bits are going to tell the PIO how long to wait and what to wait on. The next five bits are customizable when we set up the machine, we'll talk about them in a second. The next bit (labelled 7) stands for the "polarity" - in other words, are we waiting for a 1? Or are we waiting for a 0? Bits 5 and 6 together tell us the "source" we're waiting on. For instance, if these two bits are "00" that means we're waiting on one of the GPIO pins, and the next five bits (labelled 0-4) will tell us which one. If bits 5 and 6 are "10" that means we're waiting on an IRQ (in our analogy above, this is like checking the status of the "Red Phone" to the CPU...)
 
 ## Customizing Your Instructions: Delays and Side-Sets
 
@@ -136,7 +136,9 @@ As we've seen in the [LED Technical Details](/docs/led_technical_details.md), we
     ├──────┬───────────────┴───────┴───────┴───────┴───────┴───────┴───────┴───────┤
     │      │       ████████████████████████████████████████████████████████████████│
                                                                                     
+
                               Here's another way to look at it:
+                              
     │ Always High  │       DATA: High for 1, Low for 0     │      Always Low       |
     │██████████████│░░░░░░░│░░░░░░░│░░░░░░░│░░░░░░░│░░░░░░░│       │       │       │
     ├──────┬───────┼───────┼───────┼───────┼───────┼───────┼───────┴───────┴───────┤

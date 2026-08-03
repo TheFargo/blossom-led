@@ -35,13 +35,27 @@ Plug your Blossom in and make sure all the lights turn on. Your Blossom can be p
 
 # 2. How Blossom Works
 
-Your Blossom is more than a bunch of pretty lights! Each Blossom is a little tiny computer that runs its own webserver and hosts its own webpages. If you connect Blossom to your Wi-Fi, you can control it from any machine on your network. 
+Your Blossom is more than a bunch of pretty lights! Each Blossom is a little tiny computer that runs its own webserver and hosts its own webpages. That means anyone with a web browser can connect to Blossom and play with it in real-time. If you connect Blossom to your Wi-Fi, you can control it from any machine on your network. 
 
-![How Blossom Works](/docs/images/instructions_how_it_works.png)
+![How Blossom Works](/docs/images/instructions_connect.png)
 
-If you don't want to give Blossom any Wi-Fi credentials, it can still be used in ["offline mode"](#4-offline-mode). When offline, the only way to control Blossom is to connect to it directly.
+If you don't want to give Blossom any Wi-Fi credentials, it can still be used in ["offline mode"](#4-offline-mode). When offline, the only way to control Blossom is to connect to it directly. 
+
+>![TIP]
+>You can take Blossom camping or off-grid! Even when there's no Internet or Wi-Fi nearby, you can still use offline mode to control Blossom from any device.
 
 ---
 
 # 3. Setup
 
+When you first power on the Blossom, it will enter *Setup Mode*. While in Setup Mode, the Blossom acts as a Wi-Fi hotspot. You can connect to it and configure it from any Wi-Fi enabled device, such as your phone or laptop.
+
+**During setup, the "Status" indicator on the bottom of the Blossom will slowly blink.**
+
+1. *Connect:* Go to the Network Settings of any device - the place where you would select a Wi-Fi network. If you're anywhere near the Blossom, you will see `Blossom_Setup` as an available network. Select it and click 'Connect!'
+
+2. *Configure:* A setup page should pop up immediately. Depending on the OS of the device you're using and its default web browser, this "captive" webpage might show up instantaneously, or it may take a moment. If it does not appear at all, open up a web browser and Blossom should jump in.
+
+3. *Credential...ize!* Blossom will display a list of nearby networks and their signal strength. Choose your network and type in the Wi-Fi password. Click `Connect to Network.`
+
+Blossom will now reboot and attempt to connect to your network with the given credentials. Once connected, 

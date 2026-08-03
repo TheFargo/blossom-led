@@ -64,7 +64,7 @@ You don't have to understand how the lights work to program pretty colors, but t
 
 ### Transmitting Data in Binary
 
-The data line is binary, meaning it can only be "on" or "off" (technically, the voltage on the wire is either high or low.) Our goal is to turn little on/off pulses into color information. There are a lot of ways to do this, but our hardware uses signal timing. That is, a short-duration high pulse represents a 0 and a long-duration high pulse represents a 1. These pulses are spaced out very precisely (1.25 microseconds each!).
+The data line is binary, meaning it can only be "on" or "off" (technically, the voltage on the wire is either high or low.) Our goal is to turn little on/off pulses into color information. There are a lot of ways to do this, but our hardware uses signal timing. That is, a short-duration high pulse represents a 0 and a long-duration high pulse represents a 1. These pulses are spaced out very precisely (1.25 microseconds each!). We'll talk more about generating those pulses in the [PIO State Machine Guide](/docs/pio_state_machines.md).
 
 ### From Binary to Colors
 
@@ -109,9 +109,9 @@ Of course, these are SK6812 lights, so they also have a white LED. Eight bits ar
 
 Each light on our string gets 32 bits of data to set its color. But how do we control a whole string of lights? That's where the little integrated circuits inside each light come into play. The chip is programmed to collect 32 bits of data into a buffer and then:
 
-* If more data keeps coming, it makes room for the new data. It empties the buffer by sending the data to the next light in the chain via the "data out" line.
+* If more data keeps coming, it passes the data to the next light in the chain via the "data out" line.
 
-* If the data stops for a specific amount of time (80 microseconds), the current data in the buffer is considered the correct color info, and it "latches in." The light now displays that color.
+* If the data stops for a specific amount of time (80 microseconds), the current data in the buffer is considered the new color info, and it "latches in." The light now displays that color.
 
 One nice thing about these lights is that they don't require constant updates: Once they are displaying a color, the on-board circuitry continues to display that color at the correct brightness until the data line pipes in new color info. 
 
@@ -141,7 +141,7 @@ Think of these little state machines as teeny-tiny machine-language computers. T
 
 The PIO machines are designed to solve the exact problem of communicating with our time-sensitive LEDs. We set up one machine just to communicate to our string of lights. The CPU dumps a big pile of color data onto it - an update for the entire string of lights - and then the PIO dutifully chews through the data, typing out 1s and 0s with precise timing, until its buffer is empty. The CPU just has to drop off the data and then it moves on to other things while the PIO sends the message. 
 
-Information on how we program the PIOs can be found in our [PIO State Machines](/docs/pio_state_machines.md) documentation, or inside the source code at `/src/led_controller.cpp`.
+Information on how we program the PIOs can be found in our [PIO State Machines](/docs/pio_state_machines.md) documentation, as well as inside the source code at `/src/led_controller.cpp`.
 
 ---
 

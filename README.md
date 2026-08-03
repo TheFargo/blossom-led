@@ -52,7 +52,7 @@ Inside you'll find extensively commented code, build photos, and background mate
 
 ## Repository Table of Contents
 
-1. [PDF Manual] (Coming soon)
+1. [Instruction Manual] (Coming soon)
 2. [API] (Coming soon) 
 3. [Animation Guide] (Coming soon)
 4. [Illustrated Assembly Instructions](/docs/assembly.md)

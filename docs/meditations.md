@@ -2,6 +2,8 @@
 
 _"Usually, people have a tendency to be caught in the worries concerning the future or in the regret concerning the past. There is some kind of energy that is pushing them to run, and they are not able to establish themselves in the present moment."_ -Thich_nhat_hanh
 
+![Being present in the moment.](/docs/images/meditations.jpg)
+
 ## Mindfulness and Breathing
 
 "Mindfulness" is the practiced art of living in the present moment. One way to focus on the here-and-now is to take a moment - literally a minute or so - to still the body, quiet the mind, and focus on breathing.
@@ -12,7 +14,7 @@ There's a breathing technique called "Box Breathing." It's easy to remember: Inh
 
 ## Blossom's Meditation Mode
 
-When you enter meditation mode, Blossom will ask how long you want to peace out. It'll guide you through 30-second, one-minute, or open-ended sessions. When a session starts, you can follow the on-screen instructions or (much better) put your phone away and just focus on the Blossom.
+When you enter meditation mode, Blossom will ask how long you want to peace out. It'll guide you through timed or open-ended sessions. When a session starts, you can follow the on-screen instructions or (much better) put your phone away and just focus on the Blossom.
 
 >[!TIP]
 >If you run Meditations on Blossom in "Offline" mode, you won't get interrupted by Internet notifications. It's a feature!

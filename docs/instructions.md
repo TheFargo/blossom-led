@@ -41,7 +41,7 @@ Your Blossom is more than a bunch of pretty lights! Each Blossom is a little tin
 
 If you don't want to give Blossom any Wi-Fi credentials, it can still be used in ["offline mode"](#4-offline-mode). When offline, the only way to control Blossom is to connect to it directly. 
 
->![TIP]
+>[!TIP]
 >You can take Blossom camping or off-grid! Even when there's no Internet or Wi-Fi nearby, you can still use offline mode to control Blossom from any device.
 
 ---
@@ -58,4 +58,8 @@ When you first power on the Blossom, it will enter *Setup Mode*. While in Setup 
 
 3. *Credential...ize!* Blossom will display a list of nearby networks and their signal strength. Choose your network and type in the Wi-Fi password. Click `Connect to Network.`
 
-Blossom will now reboot and attempt to connect to your network with the given credentials. Once connected, 
+Blossom will now reboot and attempt to connect to your network with the given credentials. If the password is correct and the network nearby, Blossom will enter Connected Mode.
+
+**During Connected Mode, the "Status" indicator on the bottom of the Blossom will remain on.**
+
+Connect to `http://blossom.local` from any device on the same Wi-Fi network to play animations and meditations!

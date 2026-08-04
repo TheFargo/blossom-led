@@ -52,17 +52,18 @@ Inside you'll find extensively commented code, build photos, and background mate
 
 ## Repository Table of Contents
 
-1. [Instruction Manual] (Coming soon)
-2. [API] (Coming soon) 
-3. [Animation Guide] (Coming soon)
-4. [Illustrated Assembly Instructions](/docs/assembly.md)
-5. [Bill of Materials](/docs/assembly.md#1-bill-of-materials)
-6. [Software Installation Guide](/docs/installation.md)
-7. [Build and Upload Guide](/docs/build_and_upload.md)
-8. [Extensively Commented C++ Source](/src)
-9. [Explanation of PIO State Machines](/docs/pio_state_machines.md)
+1. [Instruction Manual](docs/instructions.md)
+2. [Animation Guide](docs/animations.md) 
+3. [Meditation Guide](docs/meditations.md)
+4. [Web API] (Coming soon) 
+5. [Illustrated Assembly Instructions](/docs/assembly.md)
+6. [Bill of Materials](/docs/assembly.md#1-bill-of-materials)
+7. [Software Installation Guide](/docs/installation.md)
+8. [Build and Upload Guide](/docs/build_and_upload.md)
+9. [Extensively Commented C++ Source](/src)
 10. [Using the Serial Monitor](/docs/serial_monitor.md)
-11. [Fun LED Technical Details](/docs/led_technical_details.md)
+11. [Explanation of PIO State Machines](/docs/pio_state_machines.md)
+12. [Fun LED Technical Details](/docs/led_technical_details.md)
 
 ---
 

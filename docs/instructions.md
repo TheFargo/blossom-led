@@ -62,13 +62,13 @@ Blossom will now reboot and attempt to connect to your network with the given cr
 
 **During Connected Mode, the "Status" indicator on the bottom of the Blossom will remain on.**
 
-Connect to `http://blossom.local` from any device on the same Wi-Fi network to play animations and meditations!
+Once connected, point a web browser on the same wi-fi network to `http://blossom.local` to play animations and meditations!
 
 ---
 
 # 4. Offline Mode
 
-If you are nowhere near a Wi-Fi connection or want to control Blossom without using your network password, all pf Blossom's features are still available! Simply connect to the `Blossom_Setup` network as described above to bring up the captive Setup page. Click on `Offline Mode` to use the animation and meditation features.
+If you are nowhere near a Wi-Fi connection or want to control Blossom without using your network password, all of Blossom's features are still available! Simply connect to the `Blossom_Setup` network as described above to bring up the captive Setup page. Click on `Offline Mode` to use the animation and meditation features.
 
 While in Offline Mode, your device won't be connected to any other Wi-Fi network.
 
@@ -78,11 +78,11 @@ While in Offline Mode, your device won't be connected to any other Wi-Fi network
 
 Blossom has 16 colorful LED lights and an additional 16 warm white LED lights arranged in a ring. The Animations editor allows you to cusomize the ambient lighting display.
 
-**To Play Animations, go to http://blossom.local from any connected web browser.**
+**To Play Animations, go to http://blossom.local from any connected web browser. Click "Animations."**
 
 * *Colors:* Choose the primary hue of the color LEDs and the spread of the color gradient for animations.
 
-* *Sparkles:* Choose the primary brightness of the white LEDs and the brightness gradient for animatiosn.
+* *Sparkles:* Choose the primary brightness of the white LEDs and the brightness gradient for animations.
 
 * *Flicker Animation:* Apply to an LED channel to make lights flicker between colors or brightness based on a configurable noise pattern.
 
@@ -100,9 +100,9 @@ More information about how to configure and play animations can be found in our 
 
 Blossom encourages you to be present in the moment. Its gentle ambient lights can guide you through a common breathing exercise.
 
-**To Play Meditations, go to http://blossom.local from any connected web browser.**
+**To Play Meditations, go to http://blossom.local from any connected web browser. Click "Meditations."**
 
-Select how long you would like to meditate for and press `begin`. Follow the sparkles, breathing in as they fill up, holding for four seconds, and breathing out as they empty. Imagine your lungs and body are filling with a white light. Make sure to breathe deeply, and pay attention to how your body feels.
+Select your meditation duration and press `begin`. Follow the sparkles, breathing in as they fill up, holding for four seconds, and breathing out as they empty. Imagine your lungs and body are filling with a bright light. Make sure to breathe deeply, and pay attention to how your body feels.
 
 More information about mindfulness and the meditation technique used here can be found in our [Meditations Guide.](/docs/meditations.md).
 
@@ -111,6 +111,8 @@ More information about mindfulness and the meditation technique used here can be
 # 7. Factory Reset
 
 A "Reset" button is hidden inside the Blossom, accessable via a pinhole on the bottom of the sculpture. Look for the Reset location just below the Status indicator light.
+
+![Status Indicator and Hidden Reset Button](/docs/images/instructions_status_reset.jpg)
 
 To initiate a factory reset (wiping all network credentials), use a paperclip to _press and hold the Reset button for 5 seconds_. You will be able to feel the button click, and during the 5-second countdown the Status light will blink rapidly.
 

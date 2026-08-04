@@ -76,9 +76,21 @@ While in Offline Mode, your device won't be connected to any other Wi-Fi network
 
 # 5. Playing Animations
 
-Text text
+Blossom has 16 colorful LED lights and an additional 16 warm white LED lights arranged in a ring. The Animations editor allows you to cusomize the ambient lighting display.
 
 **To Play Animations, go to http://blossom.local from any connected web browser.**
+
+* *Colors:* Choose the primary hue of the color LEDs and the spread of the color gradient for animations.
+
+* *Sparkles:* Choose the primary brightness of the white LEDs and the brightness gradient for animatiosn.
+
+* *Flicker Animation:* Apply to an LED channel to make lights flicker between colors or brightness based on a configurable noise pattern.
+
+* *Pulse Animation:* Apply to an LED channel to make lights cycle between colors or brightness based on a configurable sine wave pattern.
+
+* *Spin Animation:* Apply to an LED channel to make lights rotate clockwise or counter-clockwise at a configurable speed.
+
+Animation presets can be saved by clicking `Save Preset`. Saved presets can also be made the default on boot-up, even when Blossom is disconnected.
 
 More information about how to configure and play animations can be found in our [Animation Guide.](/docs/animation_guide.md).
 
@@ -86,9 +98,11 @@ More information about how to configure and play animations can be found in our 
 
 # 6. Playing Meditations
 
-Text text
+Blossom encourages you to be present in the moment. Its gentle ambient lights can guide you through a common breathing exercise.
 
 **To Play Meditations, go to http://blossom.local from any connected web browser.**
+
+Select how long you would like to meditate for and press `begin`. Follow the sparkles, breathing in as they fill up, holding for four seconds, and breathing out as they empty. Imagine your lungs and body are filling with a white light. Make sure to breathe deeply, and pay attention to how your body feels.
 
 More information about mindfulness and the meditation technique used here can be found in our [Meditations Guide.](/docs/meditations.md).
 
@@ -106,13 +120,13 @@ After 5 seconds, the device will restart in Setup Mode with no Wi-Fi credentials
 
 # 8. Troubleshooting
 
-* *One or More Lights are Out.* Blossom's low-power ambient display should run wihtout fail for thousands of hours, but sometimes LEDs give out. If several are out, it indicates that a broken LED is also interrupting the data line (see [Blossom's LED Technical Details](/docs/led_technical_details.md)). The easiest fix is to replace the defective LED ring.
+* *One or More Lights are Out.* Blossom's low-power ambient display should run without fail for thousands of hours, but sometimes LEDs give out. If several are out, it indicates that a broken LED is also interrupting the data line (see [Blossom's LED Technical Details](/docs/led_technical_details.md)). The easiest fix is to replace the defective LED ring.
 
-* *The Ring Does Not Light Up at All.* If the Status light is operating but the LED lights are dark, this indicates a bad wiring connection. Open everything up and check the connections. If the Status light is ALSO dark, your device is getting no power; ensure that your USB cable is plugged in and powered.
+* *The Ring Does Not Light Up at All.* If the Status light is operating but the LED lights are dark, this indicates a bad wiring connection. Open everything up and check the connections. If the Status light is ALSO dark, Blossom is not getting power; ensure that the USB cable is plugged in and powered.
 
-* *Blossom_Setup Does Not Appear as a Network.* If you are trying to configure the Blossom and don't see the `Blossom_Setup` network, your Blossom may already be connected to something. Make sure the Status light is blinking to indicate connected mode. Try power-cycling the Blossom. If you see a solid light but wish to reconfigure the Blossom, do a [Factory Reset](#7-factory-reset).
+* *Blossom_Setup Does Not Appear as a Network.* If you are trying to configure the Blossom and don't see the `Blossom_Setup` network, Blossom may already be connected to something. Make sure the Status light is blinking to indicate setup mode. Try power-cycling the Blossom. If you see a solid light but wish to reconfigure the Blossom, do a [Factory Reset](#7-factory-reset).
 
-* *Cannot Connect to Blossom.Local.* Make sure Blossom is connected to the Wi-Fi by checking the Status light - if it's blinking, you'll need to re-connect it. If the light is on and you still don't see the Blossom, ensure that your devices are using the same network. Try power-cycling the Blossom to get a fresh connection. If you are using Wi-Fi extenders, not that the cheap ones may not forward local webpages.
+* *Cannot Connect to blossom.local.* Make sure Blossom is connected to the Wi-Fi by checking the Status light - if it's blinking, you'll need to re-connect it. If the light is on and you still don't see the Blossom, ensure that your devices are using the same network. Try power-cycling the Blossom to get a fresh connection. If you are using Wi-Fi extenders, note that they may not forward local webpages.
 
-* *Please contact me with other bug reports.*
+* *Please contact me with other bug reports and/or success stories!*
 

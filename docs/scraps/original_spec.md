@@ -8,8 +8,7 @@
 
 ### 1. System Overview
 
-Blossom is a network-attached, programmable ambient light display built into a translucent lotus-blossom art piece. The system leverages the Raspberry Pi Pico 2 W (powered by an RP2350 microcontroller) to serve as a headless, Wi-Fi-enabled peripheral. It exposes a local REST API that allows external clients (such as local AI agents, VS Code extensions, 
-or mobile applications) to trigger pre-configured or math-scripted illumination patterns.
+Blossom is a network-attached, programmable ambient light display built into a translucent lotus-blossom art piece. The system leverages the Raspberry Pi Pico 2 W (powered by an RP2350 microcontroller) to serve as a headless, Wi-Fi-enabled peripheral. It exposes a local REST API that allows external clients (such as local AI agents, VS Code extensions, or mobile applications) to trigger pre-configured or math-scripted illumination patterns.
 
 ### 2. Hardware & Electrical Requirements
 
@@ -19,11 +18,7 @@ Input Voltage: 5V DC via a Micro-USB connector.
 LED Power Rail: The NeoPixel RGBW LED ring must be powered directly from the VBUS pin (5V line straight from USB power) to support peak current draws up to 1A at full brightness.
 Microcontroller Power Rail: The Pico W will be powered via its internal regulator connected to VSYS.
 
-#### 2.2 Logic Level Shifting
-
-The Pico W operates on a 3.3V logic level. Because NeoPixel LEDs require a data signal of at least 70% of their supply voltage (3.5V when supplied with 5V), a hardware logic level shifter (e.g., 74AHCT125 or a dedicated N-channel MOSFET circuit) must be implemented between the Pico's GPIO output pin and the NeoPixel data input line.
-
-#### 2.3 Physical Escape Hatch (Factory Reset)
+#### 2.2 Physical Escape Hatch (Factory Reset)
 
 The enclosure must feature a precision pinhole perfectly aligned with the Pico's native BOOTSEL button (or a dedicated hardware reset pin).
 Behavior: Holding this button down via a paperclip for 5 seconds during operation will clear all stored network configurations from non-volatile memory and reboot the device back into provisioning mode.

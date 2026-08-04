@@ -14,9 +14,8 @@
 ### syntax that you'll see below. They can't do a lot, but they can do it   ###
 ### fast!                                                                   ###
 ###                                                                         ###
-### The examples below demonstrate PIOs that control the timing of our DVI  ###
-### signal, that send data to your LED monitor, or control the framerate    ###
-### of neopixel jewel animations.                                           ###
+### The examples below demonstrate PIOs that control the timing of our      ###
+### neopixel jewel animation.                                               ###
 ###############################################################################
 
 @rp2.asm_pio()

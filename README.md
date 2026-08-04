@@ -53,7 +53,7 @@ Inside you'll find extensively commented code, build photos, and background mate
 ## Repository Table of Contents
 
 1. [Instruction Manual](docs/instructions.md)
-2. [Animation Guide](docs/animations.md) 
+2. [Animation Guide](docs/animation_guide.md) 
 3. [Meditation Guide](docs/meditations.md)
 4. [Web API] (Coming soon) 
 5. [Illustrated Assembly Instructions](/docs/assembly.md)

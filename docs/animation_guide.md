@@ -9,7 +9,7 @@ The first idea keeps Blossom friendly to play with: artists can change colors or
 
 The resulting animations are generally ambient loops that emulate a colorful, magical flame.
 
-[ANIMATION CLOSE UP GOES HERE]
+https://github.com/user-attachments/assets/a1dfe79e-bccb-4c35-a51d-3a526a6722f9
 
 ---
 

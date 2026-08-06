@@ -8,6 +8,9 @@ We'll be using two tools familiar to embedded systems designers:
 
 Platform IO takes away a lot of the busy-work for you when it comes to compiling and installing your code on a device. A real time-saver when you're building stuff!
 
+>[!NOTE]
+>You only need these instructions if you've [Assembled Your Own Blossom from Scratch.](/docs/assembly.md). If you've bought a pre-built Blossom, it's already set up and good to go! Jump over to the [Instructions](/docs/instructions.md) and start Blossoming!
+
 ---
 
 ## Table of Contents

@@ -28,7 +28,7 @@ https://github.com/user-attachments/assets/a1dfe79e-bccb-4c35-a51d-3a526a6722f9
 
 Blossom's ring of light is composed of 16 RGBW LEDs. "RGBW" ("Red, Greeen, Blue, White") means that each light can be set to any color (the "red, green, and blue" part) in addition to having an additional white light on top of it. 
 
->![Tip]
+>[!TIP]
 > Take a deep-dive into the LEDs we're using and how they work in Blossom's [LED Technical Details](/docs/led_technical_details.md).
 
 Blossom's separate ring of white lights gives artists the opportunity to play one animation across the color LEDs while playing a _different_ animation on the white lights. In the interface, the two channels are treated completely separate, named *colors* and *sparkles.*
@@ -60,7 +60,7 @@ Although Blossom's animation interface will preview colors and ranges, the best 
 
 When selecting a color spectrum or sparkle brightness, you'll note a "spread" option. This determines how the lights will display the selected range.
 
->![TIP]
+>[!TIP]
 >To properly see spreads, make sure no animations are playing (deselect any flickers, pulses, or spins on either channel.) When looking at color spreads, the sparkle lights can be overpowering, so it's best to turn them off completely. (Off means brightness of 0 in addition to 0 spread!)
 
 - *Unison:* All of the lights display the selected color or brightness. 
@@ -68,7 +68,7 @@ When selecting a color spectrum or sparkle brightness, you'll note a "spread" op
 - *Looping:* Half the lights display the range, which is mirrored on the other half to create a seamless "loop."
 - *Random:* The range is "randomly" distributed among the lights. 
 
->![TIP]
+>[!TIP]
 >"Random" is actually a mathematical cris-crossing pattern that spreads out the lights all around the ring.
 
 ---

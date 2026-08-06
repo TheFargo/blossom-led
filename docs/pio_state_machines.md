@@ -54,7 +54,7 @@ To understand what's happening inside the hardware, let's shrink ourselves down 
                 │/                                                                                \│    
                 └──────────────────────────────────────────────────────────────────────────────────┘    
 
-Congratulations, you're a PIO state machine! Your job is super-simple. The clock is spinning at a constant rate. Whenever it dings, you go to the instruction manual, execute the instruction given at your bookmark, then scoot your bookmark forward to the next instruction. There are less than a dozen instructions total, and every instruction is SUPER simple, like:
+Congratulations, you're a PIO state machine! Your job is super-simple. The clock is spinning at a constant rate. Whenever it dings, you go to the instruction manual, execute the instruction given at your bookmark, then scoot your bookmark forward to the next instruction. There are less than a dozen possible instructions, and every instruction is SUPER simple, like:
 
 - "Grab a number from your inbox and put it onto the Scratch X shelf."
 - "Move your bookmark to a different page."

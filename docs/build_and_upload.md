@@ -2,7 +2,7 @@
 
 This guide walks you through using Platform IO to build and upload the firmware and file system into the **Blossom**.
 
-Be sure you've followed the steps in the [Installation Guide](installation.md) and have VS Code and Platform IO installed with the project open. 
+Be sure you've followed the steps in the [Installation Guide](installation.md) and have VS Code and Platform IO installed with the project open. If you've bought a pre-assembled Blossom, the software is already set up for you.
 
 ---
 

@@ -16,11 +16,10 @@ https://github.com/user-attachments/assets/a1dfe79e-bccb-4c35-a51d-3a526a6722f9
 ## Table of Contents
 
 1. [Sixteen Special Sparkly Lights](#1-sixteen-special-sparkly-lights)
-2. [Setting Colors and Sparkles](#2-setting-colors-and-sparkles)
-3. [Color and Sparkle Spreads](#3-color-and-sparkle-spreads)
-4. [Flickers, Pulses, and Spins](#4-flickers-pulses-and-spins)
-5. [Saving Presets](#5-saving-presets)
-6. [Controlling Blossom from Any Connected Device](#6-controlling-blossom-from-any-connected-device)
+2. [Setting Color and Sparkle Ranges](#2-setting-colors-and-sparkles)
+3. [Flickers, Pulses, and Spins](#4-flickers-pulses-and-spins)
+4. [Saving Presets](#5-saving-presets)
+5. [Controlling Blossom from Any Connected Device](#6-controlling-blossom-from-any-connected-device)
 
 ---
 
@@ -33,32 +32,26 @@ Blossom's ring of light is composed of 16 RGBW LEDs. "RGBW" ("Red, Greeen, Blue,
 
 Blossom's separate ring of white lights gives artists the opportunity to play one animation across the color LEDs while playing a _different_ animation on the white lights. In the interface, the two channels are treated completely separate, named *colors* and *sparkles.*
 
+At the top of the animation interface you'll define two ranges: a color range for the color lights, and a brightness range for the sparkles. Then, you can choose how the lights cycle through these ranges with animations. 
+
 ---
 
-# 2. Setting Colors and Sparkles
+# 2. Setting Color and Sparkle Ranges
 
-When we set the Blossom's color, we provide it with a prmary color and a range, resulting in a spectrum. Imagine a color wheel... or better yet, look at this picture of one I drew:
+When we set the Blossom's color, we provide it with a prmary color and a range, resulting in a spectrum. It's like picking a direction on a color wheel and then defining how big of an arc of colors to use.
 
 ![The Color Wheel, with primary colors (red, green, blue) highlighted](/docs/images/animation_colorwheel.png)
 
-Picking a color is like picking a direction, and selecting a range is like selecting how big of an arc you want to draw centered on that direction.
-
 - A range a 0 means that the lights won't vary from the selected color at all.
 - Selecting a small range will cause the lights to fluctuate in a narrow color band centered on the selected color. For example, selecting orange and a low range will generate a nice warm spectrum from red to yellow.
-- Moving the range slider to maximum means that Blossom's lights can cycle through the entire spectrum, with the chosen color determining the spectrum's "center."
+- Moving the range slider to maximum means that Blossom's lights can cycle through the entire color spectrum, with the chosen color determining the spectrum's "centerpoint."
 
 The white "Sparkle" lights that encircle the blossom cannot change color, only brightness. To set up sparkle animations, select a primary brightness and a range.
 
 - A range of 0 means that all sprkle lights will have the same brightness
 - A maximum range means the lights will vary from full brightness to completely off, with the selected brightness acting as the "centerpoint."
 
-Although Blossom's animation interface will preview colors and ranges, the best way to see results is on the Blossom itself. When connected, it will respond instantly to changes on the web interface. 
-
----
-
-# 3. Color and Sparkle Spreads
-
-When selecting a color spectrum or sparkle brightness, you'll note a "spread" option. This determines how the lights will display the selected range.
+Although Blossom's web-based animation interface will preview colors and ranges, the best way to see results is on the Blossom itself. When connected, it will respond instantly to changes on the web interface. 
 
 >[!TIP]
 >To properly see spreads, make sure no animations are playing (deselect any flickers, pulses, or spins on either channel.) When looking at color spreads, the sparkle lights can be overpowering, so it's best to turn them off completely. (Off means brightness of 0 in addition to 0 spread!)
@@ -71,9 +64,11 @@ When selecting a color spectrum or sparkle brightness, you'll note a "spread" op
 >[!TIP]
 >"Random" is actually a mathematical cris-crossing pattern that spreads out the lights all around the ring.
 
+Once you've locked in the color and brightness ranges, you can apply animations to cycle lights through your selections.
+
 ---
 
-# 4. Flickers, Pulses, and Spins
+# 3. Flickers, Pulses, and Spins
 
 Three different animations (or any combination thereof!) can be applied to the lights based off of the color and brightness spreads defined above. 
 
@@ -90,7 +85,7 @@ The _Synchronicity_ of the animations determines how they are played out across 
 
 ---
 
-# 5. Saving Presets
+# 4. Saving Presets
 
 Clicking "Save Preset" at the bottom of the animation interface allows artists to name and save their favorite animations. From this same interface, the "Make Default" checkbox makes the selected preset the default whenever the device is powered on - even if it's unable to connect!
 
@@ -98,7 +93,7 @@ The "Now Playing" area at the top of the animation interface lists the currently
 
 ---
 
-# 6. Controlling Blossom from Any Connected Device
+# 5. Controlling Blossom from Any Connected Device
 
 The Blossom is built to be controlled from any device on your network! If you're a maker, tinkerer, or engineer into the whole "Internet of Things," you can explore other ways of controlling Blossom aside from the provided web interface. The [TO DO! API GUIDE](/docs/api.md) explains it all.
 

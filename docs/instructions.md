@@ -122,13 +122,13 @@ After 5 seconds, the device will restart in Setup Mode with no Wi-Fi credentials
 
 # 8. Troubleshooting
 
-* *One or More Lights are Out.* Blossom's low-power ambient display should run without fail for thousands of hours, but sometimes LEDs give out. If several are out, it indicates that a broken LED is also interrupting the data line (see [Blossom's LED Technical Details](/docs/led_technical_details.md)). The easiest fix is to replace the defective LED ring.
+* **One or More Lights are Out.** Blossom's low-power ambient display should run without fail for thousands of hours, but sometimes LEDs give out. If several are out, it indicates that a broken LED is also interrupting the data line (see [Blossom's LED Technical Details](/docs/led_technical_details.md)). The easiest fix is to replace the defective LED ring.
 
-* *The Ring Does Not Light Up at All.* If the Status light is operating but the LED lights are dark, this indicates a bad wiring connection. Open everything up and check the connections. If the Status light is ALSO dark, Blossom is not getting power; ensure that the USB cable is plugged in and powered.
+* **The Ring Does Not Light Up at All.** Ensure that the LEDs are set to "enabled" in the web interface. If the Status light is operating but the LED lights are dark, this indicates a bad wiring connection. Open everything up and check the connections. If the Status light is ALSO dark, Blossom is not getting power; ensure that the USB cable is plugged in and powered.
 
-* *Blossom_Setup Does Not Appear as a Network.* If you are trying to configure the Blossom and don't see the `Blossom_Setup` network, Blossom may already be connected to something. Make sure the Status light is blinking to indicate setup mode. Try power-cycling the Blossom. If you see a solid light but wish to reconfigure the Blossom, do a [Factory Reset](#7-factory-reset).
+* **Blossom_Setup Does Not Appear as a Network.** If you are trying to configure the Blossom and don't see the `Blossom_Setup` network, Blossom may already be connected to something. Make sure the Status light is blinking to indicate setup mode. Try power-cycling the Blossom. If you see a solid light but wish to reconfigure the Blossom, do a [Factory Reset](#7-factory-reset).
 
-* *Cannot Connect to blossom.local.* Make sure Blossom is connected to the Wi-Fi by checking the Status light - if it's blinking, you'll need to re-connect it. If the light is on and you still don't see the Blossom, ensure that your devices are using the same network. Try power-cycling the Blossom to get a fresh connection. If you are using Wi-Fi extenders, note that they may not forward local webpages.
+* **Cannot Connect to blossom.local.** Make sure Blossom is connected to the Wi-Fi by checking the Status light - if it's blinking, you'll need to re-connect it. If the light is on and you still don't see the Blossom, ensure that your devices are using the same network. Try power-cycling the Blossom to get a fresh connection. If you are using Wi-Fi extenders, note that they may not forward local webpages.
 
-* *Please contact me with other bug reports and/or success stories!*
+* **Please contact me with other bug reports and/or success stories!**
 

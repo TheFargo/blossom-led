@@ -110,7 +110,7 @@ By establishing a side-set pin when you initialize a state machine, you can "dou
 
 ## Now You're Speaking Machine!
 
-Obviously it would take a long time to explain every bit of every instruction, but if you understand the concept, you have just learned how computers work at a fundamental level. Your state-of-the-art desktop CPU uses more than 16 bits per instruction, but it still processes instructions with each cycle. It has a great many more operations it can do, and scratch registers to do them on, but it's still moving numbers around between registers and into or out of memory. Any non-quantum computer _fundamentally works the same way as a PIO state machine_, converting _bits_ into _instructions_ and doing them every clock cycle.
+Obviously it would take a long time to explain every bit of every instruction, but if you understand the concept, you have just learned how computers work at a fundamental level. Your state-of-the-art desktop CPU uses more than 16 bits per instruction, but it still processes instructions with each cycle. It has a great many more operations it can do, and scratch registers to do them on, but it's still moving numbers around between registers and into or out of memory. Any non-quantum computer _fundamentally works the same way as a PIO state machine_, converting _bits_ into _instructions_ and doing them according to a set clock cycle.
 
 If you understand what's happening down there in binary, you understand the very principle of how computers operate. Congratulations! In this day and age of vibe-coding, very few humans actually comprehend what's going on at this machine level, and fewer still know how to program there.
 

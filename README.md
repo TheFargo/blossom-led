@@ -55,7 +55,7 @@ Inside you'll find extensively commented code, build photos, and background mate
 1. [Instruction Manual](docs/instructions.md)
 2. [Animation Guide](docs/animation_guide.md) 
 3. [Meditation Guide](docs/meditations.md)
-4. [Web API] (Coming soon) 
+4. [HTTP API](docs/api.md)
 5. [Illustrated Assembly Instructions](/docs/assembly.md)
 6. [Bill of Materials](/docs/assembly.md#1-bill-of-materials)
 7. [Software Installation Guide](/docs/installation.md)

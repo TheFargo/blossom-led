@@ -95,5 +95,5 @@ The "Now Playing" area at the top of the animation interface lists the currently
 
 # 5. Controlling Blossom from Any Connected Device
 
-The Blossom is built to be controlled from any device on your network! If you're a maker, tinkerer, or engineer into the whole "Internet of Things," you can explore other ways of controlling Blossom aside from the provided web interface. The [TO DO! API GUIDE](/docs/api.md) explains it all.
+The Blossom is built to be controlled from any device on your network! If you're a maker, tinkerer, or engineer into the whole "Internet of Things," you can explore other ways of controlling Blossom aside from the provided web interface. The [HTTP API Guide](/docs/api.md) explains it all.
 

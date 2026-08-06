@@ -1,8 +1,8 @@
 # HTTP API: Blossom Programmable Light Display
 
-When you use your web browser to [play animations](docs/animation_guide.md) or [kick off a meditation](docs/meditations.md), your device communicates with Blossom using "http" ("Hypertext Transfer Protocol.") This is the language computers use when they're sending web pages back and forth, making it the "lingua franca" of the Internet. 
+When you use your web browser to [play animations](docs/animation_guide.md) or [kick off a meditation](docs/meditations.md), your device communicates with Blossom using `HTTP` ("Hypertext Transfer Protocol.") This is the language computers use when they're sending web pages back and forth, making it the "lingua franca" of the Internet. 
 
-Every button or slider on the control webpage sends a little http request to the Blossom and gets a small reply back.
+Every button or slider on the control webpage sends a little HTTP request to the Blossom and gets a small reply back.
 
 This page describes how to format those requests, so that any device on your network can send instructions to the Blossom. The possibilities are endless: you can synchronize your Blossom to the colors on your TV, control it via a phone shortcut or home automation hub, use it to see the status of your servers, or even train your AI Agent to use Blossom to show when it's thinking or dreaming.
 
@@ -30,7 +30,7 @@ Every time your web browser loads a page, it sends an *HTTP request* to a server
 An "API" (Application Programming Interface) is essentially an "instruction manual" listing all the possible requests and responses and what they mean and do. Blossom runs its own web server, so you can ask it to show you web pages - this is what happens when you connect to `blossom.local.` In addition to serving ordinary web pages, Blossom has its own special instructions it understands, such as:
 
 * "What's your status?" Blossom will respond with its current state and what animations its playing. 
-* "Change your color to [color]." Blossom will alter its colors and send a confirmation back.
+* "Toggle the LEDs" Blossom will toggle its LEDs on or off and confirm.
 * "Start a 60-second meditation." Blossom will send a confirmation, flip to meditation mode and begin the sequence.
 
 These little information requests are sent back and forth in a format called "JSON." 
@@ -54,7 +54,7 @@ That's a JSON *object* with four *keys* (`status`, `ssid`, `ip`, `rssi`) and the
 - Nothing here requires an account, API key, or login. This API is designed for a private home network.
 
 >[!NOTE]
->To underscore that last point, Blossom is an open device. It'll handle any request it receives on its network. If it were connected to the Internet, any Black Hat from Sheboygan who knew your Blossom's IP address could change the colors on you.
+>To underscore that last point, Blossom is an open device. It'll handle any request it receives on its local network. If it were somehow connected to the open Internet, any Black Hat from Sheboygan who knew your Blossom's IP address could change the colors on you.
 
 ---
 
@@ -139,13 +139,12 @@ curl -X POST http://blossom.local/api/led/toggle
 
 Explicitly sets the LEDs on or off (rather than toggling).
 
-**Body:**
-```json
-{"enabled": true}
-```
-
 ```bash
 curl -X POST http://blossom.local/api/leds -H "Content-Type: application/json" -d "{\"enabled\":true}"
+```
+
+```json
+{"enabled": true}
 ```
 
 ---
@@ -281,11 +280,6 @@ A maximum of 16 presets can be saved at once. Saving a 17th (under a brand-new n
 
 Loads a saved preset by name and applies it to the LEDs immediately.
 
-**Body:**
-```json
-{"name": "Ocean Breeze"}
-```
-
 ```bash
 curl -X POST http://blossom.local/api/presets/load -H "Content-Type: application/json" -d "{\"name\":\"Ocean Breeze\"}"
 ```
@@ -302,20 +296,15 @@ These control Blossom's guided-breathing Meditation Mode, described in the [Medi
 
 Starts a meditation session.
 
-**Body:**
-```json
-{"duration": 60}
-```
-
-`duration` is in seconds. Use `0` for an open-ended session that runs until manually stopped.
-
 ```bash
 curl -X POST http://blossom.local/api/meditation/start -H "Content-Type: application/json" -d "{\"duration\":60}"
 ```
 
+`duration` is in seconds. Use `0` for an open-ended session that runs until manually stopped.
+
 ### `POST /api/meditation/stop`
 
-Ends the current session immediately (no closing light sequence — it just stops).
+Ends the current session immediately (no closing light sequence; it just stops).
 
 ```bash
 curl -X POST http://blossom.local/api/meditation/stop
@@ -339,17 +328,17 @@ curl http://blossom.local/api/meditation/status
 
 # 9. Errors and Troubleshooting
 
-- *A request seems to hang or time out:* Double-check `blossom.local` resolves on your network — try Blossom's raw IP address instead (from your router, or from `/api/status` while you still have another way to reach it).
-- *You get `{"error":"No data received"}`:* The endpoint expected a JSON body (a `POST` with data) but didn't get one. Make sure you're sending a `Content-Type: application/json` header and a valid `-d` body.
-- *A `POST /api/presets/load` returns 404 with `{"error":"Preset not found"}`:* Double check the exact spelling of the name you're loading — check `GET /api/presets` for the exact list of valid names.
-- *You changed something but the web page still shows old values:* The web page only reads the current state when it loads. Refresh it, or call `GET /api/animation` yourself to confirm the change actually landed.
-- *CORS:* Every response includes `Access-Control-Allow-Origin: *`, so you can call these endpoints directly from JavaScript running on another webpage (for example, a custom dashboard) without running into cross-origin browser restrictions.
+- **A request seems to hang or time out:** Double-check `blossom.local` resolves on your network — try Blossom's raw IP address instead (from your router, or from `/api/status` while you still have another way to reach it).
+- **You get `{"error":"No data received"}`:** The endpoint expected a JSON body (a `POST` with data) but didn't get one. Make sure you're sending a `Content-Type: application/json` header and a valid `-d` body.
+- **A `POST /api/presets/load` returns 404 with `{"error":"Preset not found"}`:** Double check the exact spelling of the name you're loading — check `GET /api/presets` for the exact list of valid names.
+- **You changed something but the web page still shows old values:** The web page only reads the current state when it loads. Refresh it, or call `GET /api/animation` yourself to confirm the change actually landed.
+- **Note on CORS:** Every response includes `Access-Control-Allow-Origin: *`, so you can call these endpoints directly from JavaScript running on another webpage (for example, a custom dashboard) without running into cross-origin browser restrictions.
 
 ---
 
 # 10. Next Steps and Further Reading
 
-This API is intentionally simple, which makes it a great low-stakes way to try your hand at home automation or IoT projects:
+This API is intentionally simple, a great way to try your hand at some lightweight home automation or IoT projects:
 
 - A phone home-screen shortcut that turns Blossom on/off with one tap
 - A script that changes Blossom's colors to match the weather, the time of day, or your calendar
@@ -362,7 +351,7 @@ If you build something cool with the Blossom, don't keep it to yourself. Share i
 
 * **[LED Technical Details](/docs/led_technical_details.md):** All about the LED lights used in this project.
 * **[Animation Guide](/docs/animation_guide.md):** Description of Blossom's Animation parameters.
-* **[Meditation Guide](/docs/led_technical_details.md):** Description of Blossom's meditation exercise.
+* **[Meditation Guide](/docs/meditations.md):** Description of Blossom's meditation exercise.
 
 ### Web & API Fundamentals
 

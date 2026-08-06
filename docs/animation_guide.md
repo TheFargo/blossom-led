@@ -32,7 +32,7 @@ Blossom's ring of light is composed of 16 RGBW LEDs. "RGBW" ("Red, Greeen, Blue,
 
 Blossom's separate ring of white lights gives artists the opportunity to play one animation across the color LEDs while playing a _different_ animation on the white lights. In the interface, the two channels are treated completely separate, named *colors* and *sparkles.*
 
-At the top of the animation interface you'll define two ranges: a color range for the color lights, and a brightness range for the sparkles. Then, you can choose how the lights cycle through these ranges with animations. 
+At the top of the animation interface artists define two ranges: a color range for the color lights, and a brightness range for the sparkles. Then, artists can choose how the lights cycle through these ranges by applying animations. 
 
 ---
 
@@ -64,7 +64,7 @@ Although Blossom's web-based animation interface will preview colors and ranges,
 >[!TIP]
 >"Random" is actually a mathematical cris-crossing pattern that spreads out the lights all around the ring.
 
-Once you've locked in the color and brightness ranges, you can apply animations to cycle lights through your selections.
+Once artists lock in the color and brightness ranges, they can apply animations to cycle Blossom's lights through their selections.
 
 ---
 

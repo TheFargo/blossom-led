@@ -9,7 +9,7 @@ _Blossom_ is a standalone interactive art piece that connects to your local netw
 Inside the handcrafted wooden case you'll find a Raspberry Pi Pico 2W connected to a 16-light RGBW NeoPixel array. For this build I've used a beautiful 20-petal capiz shell lotus blossom tealight candle holder and a frosted glass cabochon to create a cozy blend of modern tech and natural materials.
 
 > [!TIP]
-> Support the creator! [Buy a hand-crafted pre-assembled Blossom from Etsy](http://www.etsy.com/MYFINALSTORELINK)
+> Support the creator! [Buy a hand-crafted pre-assembled Blossom from Etsy](https://www.etsy.com/listing/4551815905/blossom-programmable-led-light-display)
 
 <table>
   <tr>
@@ -83,7 +83,7 @@ Hardware/Enclosure Design: Licensed under Creative Commons Attribution 4.0 Inter
 
 ## Support This Project
 
-* Buy a finished one on Etsy
+* [Buy a finished one on Etsy](https://www.etsy.com/listing/4551815905/blossom-programmable-led-light-display)
 * Grab me a Kofi!
 
 ---

@@ -30,7 +30,7 @@ Every time your web browser loads a page, it sends an *HTTP request* to a server
 An "API" (Application Programming Interface) is essentially an "instruction manual" listing all the possible requests and responses and what they mean and do. Blossom runs its own web server, so you can ask it to show you web pages - this is what happens when you connect to `blossom.local.` In addition to serving ordinary web pages, Blossom has its own special instructions it understands, such as:
 
 * "What's your status?" Blossom will respond with its current state and what animations its playing. 
-* "Toggle the LEDs" Blossom will toggle its LEDs on or off and confirm.
+* "Toggle the LEDs." Blossom will toggle its LEDs on or off and confirm.
 * "Start a 60-second meditation." Blossom will send a confirmation, flip to meditation mode and begin the sequence.
 
 These little information requests are sent back and forth in a format called "JSON." 
@@ -54,7 +54,7 @@ That's a JSON *object* with four *keys* (`status`, `ssid`, `ip`, `rssi`) and the
 - Nothing here requires an account, API key, or login. This API is designed for a private home network.
 
 >[!NOTE]
->To underscore that last point, Blossom is an open device. It'll handle any request it receives on its local network. If it were somehow connected to the open Internet, any Black Hat from Sheboygan who knew your Blossom's IP address could change the colors on you.
+>To underscore that last point, Blossom is an open device. It'll handle any request it receives on its local network without checking where it came from or who sent it. If Blossom were somehow connected to the open Internet, any Black Hat from Sheboygan who knew your Blossom's IP address could change the colors on you.
 
 ---
 
@@ -330,7 +330,7 @@ curl http://blossom.local/api/meditation/status
 
 - **A request seems to hang or time out:** Double-check `blossom.local` resolves on your network — try Blossom's raw IP address instead (from your router, or from `/api/status` while you still have another way to reach it).
 - **You get `{"error":"No data received"}`:** The endpoint expected a JSON body (a `POST` with data) but didn't get one. Make sure you're sending a `Content-Type: application/json` header and a valid `-d` body.
-- **A `POST /api/presets/load` returns 404 with `{"error":"Preset not found"}`:** Double check the exact spelling of the name you're loading — check `GET /api/presets` for the exact list of valid names.
+- **A `POST /api/presets/load` returns 404 with `{"error":"Preset not found"}`:** Double check the exact spelling of the preset you're loading. Check `GET /api/presets` for the exact list of valid names.
 - **You changed something but the web page still shows old values:** The web page only reads the current state when it loads. Refresh it, or call `GET /api/animation` yourself to confirm the change actually landed.
 - **Note on CORS:** Every response includes `Access-Control-Allow-Origin: *`, so you can call these endpoints directly from JavaScript running on another webpage (for example, a custom dashboard) without running into cross-origin browser restrictions.
 
@@ -358,9 +358,9 @@ If you build something cool with the Blossom, don't keep it to yourself. Share i
 * **[MDN Web Docs: An Overview of HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview):** Covers client-server architecture, HTTP methods (`GET`, `POST`, `PUT`), status codes, and header structures.
 * **[Postman Learning Center](https://learning.postman.com/):** A beginner-friendly introduction to testing API endpoints, formatting JSON request bodies, and observing server responses without writing frontend code.
 * **[RESTful API Design Primer (REST API Tutorial)](https://restfulapi.net/):** An accessible overview of REST constraints, request payload conventions, and resource-oriented architecture.
-* **[Adafruit Learning System: Welcome to Adafruit IO](https://learn.adafruit.com/welcome-to-adafruit-io):** Illustrates how hardware devices communicate with web APIs, manage network state, and interact with cloud feeds.
+* **[Adafruit Learning System: Welcome to Adafruit IO](https://learn.adafruit.com/welcome-to-adafruit-io):** Adafruit runs a cloud service for online electronic projects. A great next step from Blossom to more connected devices!
 
 ### Real-Time IoT Communication Protocols
 
-* **[HiveMQ MQTT Essentials](https://www.hivemq.com/mqtt/):** Introduces lightweight publish-subscribe protocols, useful for readers curious about alternatives to HTTP REST for high-frequency or real-time light syncing.
-* **[MDN Web Docs: WebSockets API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API):** Explains full-duplex communication channels for persistent connections and low-latency status updates.
+* **[HiveMQ MQTT Essentials](https://www.hivemq.com/mqtt/):** Introduces lightweight publish-subscribe protocols. This is an alternative approach to the HTTP REST method we use here, better for high-frequency updates.
+* **[MDN Web Docs: WebSockets API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API):** Step up your IoT game with this open-source API that uses full-duplex communication channels for persistent connections and low-latency status updates.

@@ -41,4 +41,4 @@ PlatformIO will automatically print the contents of the Serial Monitor after a s
 
 When the monitor is working, you'll see status updates as your Blossom searches Wifi Networks, gets and saves credentials, connects to your LAN, etc.
 
-This is a great debugging tool for seeing what your deivce is up to!
+This is a great debugging tool for seeing what your device is up to!

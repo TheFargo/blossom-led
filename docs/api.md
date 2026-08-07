@@ -1,6 +1,6 @@
 # HTTP API: Blossom Programmable Light Display
 
-When you use your web browser to [play animations](docs/animation_guide.md) or [kick off a meditation](docs/meditations.md), your device communicates with Blossom using `HTTP` ("Hypertext Transfer Protocol.") This is the language computers use when they're sending web pages back and forth, making it the "lingua franca" of the Internet. 
+When you use your web browser to [play animations](docs/animation_guide.md) or [kick off a meditation](docs/meditations.md), your device communicates with Blossom using `HTTP` ("Hypertext Transfer Protocol.") This is the language computers use when they're sending web pages back and forth, making it the "lingua franca" of the Internet.
 
 Every button or slider on the control webpage sends a little HTTP request to the Blossom and gets a small reply back.
 
@@ -43,7 +43,7 @@ JSON is just a lightweight text format for describing data, using curly braces `
 {"status":"connected","ssid":"MyHomeWifi","ip":"192.168.1.42","rssi":-58}
 ```
 
-That's a JSON *object* with four *keys* (`status`, `ssid`, `ip`, `rssi`) and their corresponding values. The nice thing about JSON is that it's "human radable" - in other words, you can look at that data packet and everything is labelled. 
+That's a JSON *object* with four *keys* (`status`, `ssid`, `ip`, `rssi`) and their corresponding values. The nice thing about JSON is that it's "human readable" - in other words, you can look at that data packet and everything is labelled. 
 
 ---
 

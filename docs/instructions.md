@@ -76,7 +76,7 @@ While in Offline Mode, your device won't be connected to any other Wi-Fi network
 
 # 5. Playing Animations
 
-Blossom has 16 colorful LED lights and an additional 16 warm white LED lights arranged in a ring. The Animations editor allows you to cusomize the ambient lighting display.
+Blossom has 16 colorful LED lights and an additional 16 warm white LED lights arranged in a ring. The Animations editor allows you to customize the ambient lighting display.
 
 **To Play Animations, go to http://blossom.local from any connected web browser. Click "Animations."**
 
@@ -110,7 +110,7 @@ More information about mindfulness and the meditation technique used here can be
 
 # 7. Factory Reset
 
-A "Reset" button is hidden inside the Blossom, accessable via a pinhole on the bottom of the sculpture. Look for the Reset location just below the Status indicator light.
+A "Reset" button is hidden inside the Blossom, accessible via a pinhole on the bottom of the sculpture. Look for the Reset location just below the Status indicator light.
 
 ![Status Indicator and Hidden Reset Button](/docs/images/instructions_status_reset.jpg)
 

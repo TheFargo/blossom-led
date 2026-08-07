@@ -25,7 +25,7 @@ https://github.com/user-attachments/assets/a1dfe79e-bccb-4c35-a51d-3a526a6722f9
 
 # 1. Sixteen Special Sparkly Lights
 
-Blossom's ring of light is composed of 16 RGBW LEDs. "RGBW" ("Red, Greeen, Blue, White") means that each light can be set to any color (the "red, green, and blue" part) in addition to having an additional white light on top of it. 
+Blossom's ring of light is composed of 16 RGBW LEDs. "RGBW" ("Red, Green, Blue, White") means that each light can be set to any color (the "red, green, and blue" part) in addition to having an additional white light on top of it. 
 
 >[!TIP]
 > Take a deep-dive into the LEDs we're using and how they work in Blossom's [LED Technical Details](/docs/led_technical_details.md).
@@ -38,7 +38,7 @@ At the top of the animation interface artists define two ranges: a color range f
 
 # 2. Setting Color and Sparkle Ranges
 
-When we set the Blossom's color, we provide it with a prmary color and a range, resulting in a spectrum. It's like picking a direction on a color wheel and then defining how big of an arc of colors to use.
+When we set the Blossom's color, we provide it with a primary color and a range, resulting in a spectrum. It's like picking a direction on a color wheel and then defining how big of an arc of colors to use.
 
 ![The Color Wheel, with primary colors (red, green, blue) highlighted](/docs/images/animation_colorwheel.png)
 
@@ -48,7 +48,7 @@ When we set the Blossom's color, we provide it with a prmary color and a range, 
 
 The white "Sparkle" lights that encircle the blossom cannot change color, only brightness. To set up sparkle animations, select a primary brightness and a range.
 
-- A range of 0 means that all sprkle lights will have the same brightness
+- A range of 0 means that all sparkle lights will have the same brightness
 - A maximum range means the lights will vary from full brightness to completely off, with the selected brightness acting as the "centerpoint."
 
 Although Blossom's web-based animation interface will preview colors and ranges, the best way to see results is on the Blossom itself. When connected, it will respond instantly to changes on the web interface. 
@@ -62,7 +62,7 @@ Although Blossom's web-based animation interface will preview colors and ranges,
 - *Random:* The range is "randomly" distributed among the lights. 
 
 >[!TIP]
->"Random" is actually a mathematical cris-crossing pattern that spreads out the lights all around the ring.
+>"Random" is actually a mathematical criss-crossing pattern that spreads out the lights all around the ring.
 
 Once artists lock in the color and brightness ranges, they can apply animations to cycle Blossom's lights through their selections.
 

@@ -1,8 +1,8 @@
 # PIO State Machines: Blossom Programmable Light Display
 
-As described in the [LED Technical Details](/docs/led_technical_details.md#4-taking-advantage-of-the-pico), our Raspberry Pi Pico 2 has a bank of 12 "Programmable I/O" state machines, or "PIOs." Our hardware is built to control a lot of devices, some of which (like our LED lights!) require specific signal timing. These little state machines are like tiny processors of their own that run independantly of the main CPUs. They're perfect for sending messages or instructions between different parts of the computer while our powerful processors are doing something else.
+As described in the [LED Technical Details](/docs/led_technical_details.md#4-taking-advantage-of-the-pico), our Raspberry Pi Pico 2 has a bank of 12 "Programmable I/O" state machines, or "PIOs." Our hardware is built to control a lot of devices, some of which (like our LED lights!) require specific signal timing. These little state machines are like tiny processors of their own that run independently of the main CPUs. They're perfect for sending messages or instructions between different parts of the computer while our powerful processors are doing something else.
 
-Our LED lights are controlled by a single data line that requires super-specific signal timing, sending a "1" or a "0" every 1.25 microseconds. Any interruption in our data stream might corrupt the data. Rather than use a CPU to babysit the signal, this is a textbook example of what the PIO state machines are made for! In the Blossom, one of our CPUs (core 1 in this case) calculates the next frame of animation data and drops all of the color information into the PIO's buffer. The CPU is free to move on to other tasks while a PIO state machine dutifully converts the data into a perfectly-timed signal that it sends to the lights, 1.25 microsecronds for each and every 1 or 0, until the data is sent. 
+Our LED lights are controlled by a single data line that requires super-specific signal timing, sending a "1" or a "0" every 1.25 microseconds. Any interruption in our data stream might corrupt the data. Rather than use a CPU to babysit the signal, this is a textbook example of what the PIO state machines are made for! In the Blossom, one of our CPUs (core 1 in this case) calculates the next frame of animation data and drops all of the color information into the PIO's buffer. The CPU is free to move on to other tasks while a PIO state machine dutifully converts the data into a perfectly-timed signal that it sends to the lights, 1.25 microseconds for each and every 1 or 0, until the data is sent.
 
 For more details about how the lights work, see the [LED Technical Details](/docs/led_technical_details). In this section, we're going to look at the PIO and how we coded it. 
 
@@ -63,7 +63,7 @@ Congratulations, you're a PIO state machine! Your job is super-simple. The clock
 
 As a PIO, you're not even expected to do _math!_ For the most part, you pretty much just conditionally move data around and flip switches.
 
-**PIOs Operate Independant of the CPU**
+**PIOs Operate Independent of the CPU**
 
 From the perspective of the computer, every PIO workshop is self-operating. The CPU drops off the instruction book, sets the bookmark, sets the clock speed, and then leaves the PIO alone to run those instructions until someone tells it to stop or the computer blows up.
 
@@ -79,7 +79,7 @@ Our "LED Controller" PIO program is very simple and only uses one pin: It'll rea
 
 # 2. PIO Machine Language
 
-Let's take a close look at what I described as a big "instruction book" with a personal bookmark. As with everything else in a computer, the instructions are saved as a bunch of ones and zeroes, stored in memory. What I desribed as a "bookmark" is called the "Program Counter," and it's really just a pointer to the memory address of the instruction you're on.
+Let's take a close look at what I described as a big "instruction book" with a personal bookmark. As with everything else in a computer, the instructions are saved as a bunch of ones and zeroes, stored in memory. What I described as a "bookmark" is called the "Program Counter," and it's really just a pointer to the memory address of the instruction you're on.
 
 Think _small_. The entirety of the instruction book is only 64 bytes. That's 512 bits. This paragraph of text is more than twice that size!
 
@@ -245,7 +245,7 @@ The data for our code is saved as "ws2812_program." We load it into our PIO data
 
 Here's what that code looks like:
 
-    // ── PIO state machine initialisation ──────────────────────────────────────────
+    // ── PIO state machine initialization ──────────────────────────────────────────
     static void ws2812_sm_init(PIO pio, uint sm, uint offset, uint pin) {
         pio_gpio_init(pio, pin);
         pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);  // pin is output
@@ -298,8 +298,8 @@ Hopefully the above explanation gives you an idea of how the Blossom uses the PI
 
 I first started programming LEDs with PIO State Machines in the Spring of 2025, and in my notes I expressed frustration with AI of that era. PIO programming for the Raspberry Pi chips is pretty esoteric; the language models in 2025 didn't have a lot of material to draw from, couldn't use research tools properly, and often hallucinated instructions that weren't in the PIO's tiny instruction set.
 
-The following year saw an extrordinary leap in coding agent capabilities!
+The following year saw an extraordinary leap in coding agent capabilities!
 
-As I put this project together in July of 2026, AI frontier models could comfortably incorporate PIO code and even "hand-assemble" it. More than ever, coding agents will be able to handle "all the fiddly stuff" described above. In theory, programmers should be able to focus more on what thay want the PIO to do and less on the precise syntax required to get it going.
+As I put this project together in July of 2026, AI frontier models could comfortably incorporate PIO code and even "hand-assemble" it. More than ever, coding agents will be able to handle "all the fiddly stuff" described above. In theory, programmers should be able to focus more on what they want the PIO to do and less on the precise syntax required to get it going.
 
 In order to be effective engineers in the future, it's important to understand what's going on _behind_ the code: how systems are put together and how they work. My hope is that projects such as Blossom will provide the kind of foundational knowledge that makes working and debugging with an AI model fun and educational, instead of vibey and confusing.

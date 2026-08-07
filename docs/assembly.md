@@ -1,4 +1,4 @@
-# Pysical Assembly Guide: Blossom Programmable Light Display
+# Physical Assembly Guide: Blossom Programmable Light Display
 
 Building your own Blossom from scratch? Great idea! This is the perfect starter/intermediate electronics and woodworking project. All of the files you need are in this repository, and all of the hardware and skills you'll need are listed below.
 
@@ -21,13 +21,13 @@ Building your own Blossom from scratch? Great idea! This is the perfect starter/
 
 | Item | Qty | Est. Price (USD) | Vendor Ideas | Notes |
 | :--- | :---: | ---: | :--- | :--- |
-| **Raspberry Pi Pico 2W** | 1 | $7.00 | [Adafruit](https://www.adafruit.com/product/6087) [Microcenter](https://www.microcenter.com/product/687384/raspberry-pi-pico-2-w) | Our heroic Microcontroller! Make sure to get the "2W." |
+| **Raspberry Pi Pico 2W** | 1 | $7.00 | [Adafruit](https://www.adafruit.com/product/6087) [Microcenter](https://www.microcenter.com/product/687384/raspberry-pi-pico-2-w) | Our heroic microcontroller! Make sure to get the "2W." |
 | **Adafruit NeoPixel Ring (16-pixel) RGBW** | 1 | $11.95 | [Adafruit](https://www.adafruit.com/product/2854) | Beautiful pre-assembled circular array of RGBW LEDs. I prefer warm-white. |
 | **Capiz-Shell Decorative Lotus Art** | 1 | ~$10.00+ | (See notes) | Any decorative tea-light holder will work; See notes below for sourcing the beautiful capiz-shell assembly shown.  |
-| **50mm Frosted-Glass Cabochon** | 1 | ~$1.50+ | [Amazon](https://www.amazon.com/dp/B07JKZP1Z6) | This acts as a diffuser to bounce our LED lights around; a 50mm translucent acyrlic circle is an inexpensive alternative. |
+| **50mm Frosted-Glass Cabochon** | 1 | ~$1.50+ | [Amazon](https://www.amazon.com/dp/B07JKZP1Z6) | This acts as a diffuser to bounce our LED lights around; a 50mm translucent acrylic circle is an inexpensive alternative. |
 | **3mm (1/8-in) Basswood or Birch Plywood** | 1 | ~$4.00 | Local Lumber / Craft Store | You'll need roughly 8"x12" of wood for laser cutting the case. |
 | **Micro-USB Cable (3ft to 6ft)** | 1 | ~$3.00 | Generic / Amazon [Example](https://www.amazon.com/Charging-Transfer-Android-Trustable-MYFON/dp/B098DW7485/) | For power and programming. Ensure it's a data cable, not just power! |
-| **5V 1A USB Power Adapter** | 1 | ~$8.00 | Generic / Amazon [Example](https://www.amazon.com/Certified-Charger-Universal-Portable-Adapter/dp/B017TXGM4I/) | Standard phone charger wall brick to power the Blossom independant of a computer. |
+| **5V 1A USB Power Adapter** | 1 | ~$8.00 | Generic / Amazon [Example](https://www.amazon.com/Certified-Charger-Universal-Portable-Adapter/dp/B017TXGM4I/) | Standard phone charger wall brick to power the Blossom independent of a computer. |
 | **M2 Screws (6mm)** | 4 | $.40 | [Amazon](https://www.amazon.com/HVAZI-Metric-Notebook-Computer-Assortment/dp/B075C6C4YR/) / [McMaster-Carr](https://www.mcmaster.com/91698A202/) / [MicroConnectors](https://www.microconnectors.com/assorted-laptop-screws-set-250-pcs-scw-250lp/)| For securing the Pico 2W to the wooden base. |
 | **#6 Wood Screws (1/2in)** | 3 | $.75 | [Amazon](https://www.amazon.com/TPOHH-Stainless-Phillips-Threaded-5x12SS18-8/dp/B092Q87W39/) / [McMaster-Carr](https://www.mcmaster.com/90031A552/) | For fastening the two halves of the base enclosure. |
 | **Rubber Feet (Self-Adhesive)** | 3 | $1.00 | [Adafruit](https://www.adafruit.com/product/550) [Amazon](https://www.amazon.com/dp/B074PXFWPK/ref=twister_B092W7TL7Y) | These little guys really elevate your build. (Looks directly at camera.) |
@@ -61,13 +61,13 @@ The files you need for cutting and engraving the wooden case and lighting spindl
 
 ![The Enclosure Before Prep and Assembly](images/laser_cut_parts.jpg)
 
-Essentially, we're cutting out a "six-pack" of wooden disks. We'll glue three of these together to form the bottom half of the base with pre-printed instructions. The other three layers will be glued together to form the top half of the base, which holds the heart of the project: the blossom artwork, the lighting spindle, and the micontroller. Once assembled and wired, we will screw both halves together to enclose the hardware and wires in a small hollow cavity.
+Essentially, we're cutting out a "six-pack" of wooden disks. We'll glue three of these together to form the bottom half of the base with pre-printed instructions. The other three layers will be glued together to form the top half of the base, which holds the heart of the project: the blossom artwork, the lighting spindle, and the microcontroller. Once assembled and wired, we will screw both halves together to enclose the hardware and wires in a small hollow cavity.
 
 1. **Download the Design.** Download the correct files for the hardware you're using.
 
 - `\enclosure\blossom.svg` is a general-purpose file in "scalable vector graphics" format, or .svg. Import these files into your tool of choice (like LightBurn or Glowforge) and make sure your settings are correct (cut red lines, score blue lines, engrave black lines.) The .svg file features a friendly calibration cube that you can use to ensure you're cutting exactly the right size.
 
-- `\enclosure\blossom.xs` is the "xTool Studio" file used for the original design and the prototypes made in the photographs. If you're using xTool hardware and like using their propretiary software, this is the file you want. The machine used was an xTool D1 Pro with a 5W laser. The settings for 3mm birch plywood should already be configured in this file, but you should still double-check the settings and scale for your machine. 
+- `\enclosure\blossom.xs` is the "xTool Studio" file used for the original design and the prototypes made in the photographs. If you're using xTool hardware and like using their proprietary software, this is the file you want. The machine used was an xTool D1 Pro with a 5W laser. The settings for 3mm birch plywood should already be configured in this file, but you should still double-check the settings and scale for your machine. 
 
 2. **Laser-Cut Your Material.** The pictured build uses 3mm (1/8") birch plywood. Do some tests to make sure your configuration is spot-on.
 
@@ -89,7 +89,7 @@ Ensure your tea-candle holder/art display fits into the round holes on top - it'
 
 5. **Stain!** Once smooth, unscrew both halves and stain them. Remove the instruction insert before staining to get a nice two-tone finish. I prefer a dark stain: The pictured build uses Varathane Classic Penetrating Wood Stain in Red Oak. Glue the instruction insert back onto the bottom after the stain dries.
 
-6. **Finish!** If you want your wood to feel silky smooth and look professional, hit it with some finish! I like Danish Oil for a natural feel. Generously rub the oil onto all the exterior surfaces. I ususally use a couple coats. It'll feel a little sticky for a day or so as the oil seeps into the wood; just keep handling it and soon the wood will be soft and smooth with just a hint of gloss. 
+6. **Finish!** If you want your wood to feel silky smooth and look professional, hit it with some finish! I like Danish Oil for a natural feel. Generously rub the oil onto all the exterior surfaces. I usually use a couple coats. It'll feel a little sticky for a day or so as the oil seeps into the wood; just keep handling it and soon the wood will be soft and smooth with just a hint of gloss.
 
 ![Finishing with Danish Oil.](images/assembly_danish_oil.jpg)
 

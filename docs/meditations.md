@@ -1,6 +1,6 @@
 # Meditations: Blossom Programmable Light Display
 
-_"Usually, people have a tendency to be caught in the worries concerning the future or in the regret concerning the past. There is some kind of energy that is pushing them to run, and they are not able to establish themselves in the present moment."_ -Thich_nhat_hanh
+_"Usually, people have a tendency to be caught in the worries concerning the future or in the regret concerning the past. There is some kind of energy that is pushing them to run, and they are not able to establish themselves in the present moment."_ -Thich Nhat Hanh
 
 ![Being present in the moment.](/docs/images/meditations.jpg)
 

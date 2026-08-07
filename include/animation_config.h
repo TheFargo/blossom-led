@@ -58,29 +58,29 @@ inline BlossomConfig getDefaultConfig() {
     BlossomConfig config = {};
     
     // Warm orange-yellow flame colors
-    config.color.primary = 21;      // ~30° hue (orange)
-    config.color.spread = 25;       // subtle yellow-to-red variation
-    config.color.brightness = 200;  // fairly bright
-    config.color.mode = DistributionMode::RANDOM;
+    config.color.primary = 7;       // Orange hue (7/255 ≈ 10°)
+    config.color.spread = 19;       // subtle yellow-to-red variation
+    config.color.brightness = 165;  // mellow, not overpowering
+    config.color.mode = DistributionMode::ORDERED;
     
     // Soft white sparkles
-    config.sparkles.brightness = 100;
-    config.sparkles.spread = 80;
+    config.sparkles.brightness = 8; // Low - sparkles can be overwhelming
+    config.sparkles.spread = 58;    // Moderate spread
     config.sparkles.mode = DistributionMode::RANDOM;
     
-    // Gentle flicker on both channels
+    // Gentle flicker on the color channel, all in unison
     config.flicker.apply_to_color = true;
-    config.flicker.apply_to_sparkles = true;
-    config.flicker.speed = 60;
-    config.flicker.amplitude = 120;
-    config.flicker.mode = DistributionMode::RANDOM;
+    config.flicker.apply_to_sparkles = false;
+    config.flicker.speed = 41;
+    config.flicker.amplitude = 165;
+    config.flicker.mode = DistributionMode::UNISON;
     
-    // Slow pulse on color only
-    config.pulse.apply_to_color = true;
-    config.pulse.apply_to_sparkles = false;
-    config.pulse.speed = 30;
-    config.pulse.amplitude = 80;
-    config.pulse.mode = DistributionMode::LOOPING;
+    // Sparkles will pulse randomly (and fairly fast)
+    config.pulse.apply_to_color = false;
+    config.pulse.apply_to_sparkles = true;
+    config.pulse.speed = 87;
+    config.pulse.amplitude = 169;
+    config.pulse.mode = DistributionMode::RANDOM;
     
     // No spin by default
     config.spin.apply_to_color = false;

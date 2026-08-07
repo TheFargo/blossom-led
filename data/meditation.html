@@ -265,10 +265,55 @@
             background: radial-gradient(circle, #ffffff 0%, #c9e4ff 100%);
             transition: transform 4s ease-in-out, background 1s linear;
         }
+
+        /* --- Offline Mode Stamp --- */
+        .offline-stamp {
+            position: relative;
+            text-align: center;
+            padding: 16px;
+            color: #c62828;
+            margin-bottom: 20px;
+            font-family: 'Fredoka', Arial, sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: none; /* Hidden by default, shown via JS if offline */
+            z-index: 1;
+        }
+
+        .offline-stamp::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ffebee;
+            border: 3px solid #c62828;
+            border-radius: 10px;
+            filter: url('#wriggly-c1');
+            transform: rotate(-1deg);
+            z-index: -1;
+        }
+
+        .offline-stamp a {
+            color: #1565c0;
+            text-decoration: underline;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .offline-stamp a:hover {
+            color: #0d47a1;
+        }
     </style>
 </head>
 <body>
     <div class="main-container">
+        <!-- Offline Mode Indicator: shown when device is in AP offline mode -->
+        <div class="offline-stamp" id="offline-stamp">
+             OFFLINE MODE <br>
+            <span style="font-size: 0.9rem; font-weight: 500;">
+                Not connected to Wi-Fi &middot; <a href="/setup">Back to Setup</a>
+            </span>
+        </div>
+
         <!-- Container 1: Logo and Nav -->
         <div class="container c1">
             <h1>🪷 Blossom 🪷</h1>
@@ -421,6 +466,20 @@
         // session is already running (e.g. after a phone locked/unlocked)
         // jumps straight to the session view instead of the config screen.
         pollStatus();
+
+        // --- Offline Mode detection -------------------------------------------
+        // Check /api/status to see if we're in offline mode (provisioning AP)
+        // and show the red stamp if so.
+        fetch('/api/status')
+            .then(function(r) { return r.json(); })
+            .then(function(status) {
+                if (status.offline === true) {
+                    document.getElementById('offline-stamp').style.display = 'block';
+                }
+            })
+            .catch(function(err) {
+                console.error('Status check error:', err);
+            });
     </script>
 
     <!-- SVG Filters for Torn Paper Effect -->

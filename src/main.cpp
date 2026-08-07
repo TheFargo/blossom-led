@@ -300,8 +300,13 @@ void loop() {
 
   // #################### Main Mode Handling ####################
   if (currentMode == MODE_PROVISIONING) {
-    // While provisioning, process requests
-    dnsServer.processNextRequest();
+    // While provisioning, answer DNS queries. processNextRequest() handles at
+    // most ONE UDP packet per call, but devices doing captive-portal detection
+    // (especially iOS) fire bursts of lookups at once — drain a few per loop
+    // so probe DNS never has to wait for extra loop iterations.
+    for (int i = 0; i < 4; i++) {
+      dnsServer.processNextRequest();
+    }
     // Blink LED slowly to indicate provisioning mode
     if (!bootselPressed) {
       static unsigned long lastBlink = 0;

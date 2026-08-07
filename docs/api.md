@@ -14,12 +14,13 @@ This page describes how to format those requests, so that any device on your net
 2. [Before You Start](#2-before-you-start)
 3. [Trying It Out with curl](#3-trying-it-out-with-curl)
 4. [Status Endpoints](#4-status-endpoints)
-5. [Controlling the LEDs](#5-controlling-the-leds)
-6. [Animation Endpoints](#6-animation-endpoints)
-7. [Preset Endpoints](#7-preset-endpoints)
-8. [Meditation Endpoints](#8-meditation-endpoints)
-9. [Errors and Troubleshooting](#9-errors-and-troubleshooting)
-10. [Next Steps and Further Reading](#10-next-steps-and-further-reading)
+5. [Offline Mode](#5-offline-mode)
+6. [Controlling the LEDs](#6-controlling-the-leds)
+7. [Animation Endpoints](#7-animation-endpoints)
+8. [Preset Endpoints](#8-preset-endpoints)
+9. [Meditation Endpoints](#9-meditation-endpoints)
+10. [Errors and Troubleshooting](#10-errors-and-troubleshooting)
+11. [Next Steps and Further Reading](#11-next-steps-and-further-reading)
 
 ---
 
@@ -55,6 +56,9 @@ That's a JSON *object* with four *keys* (`status`, `ssid`, `ip`, `rssi`) and the
 
 >[!NOTE]
 >To underscore that last point, Blossom is an open device. It'll handle any request it receives on its local network without checking where it came from or who sent it. If Blossom were somehow connected to the open Internet, any Black Hat from Sheboygan who knew your Blossom's IP address could change the colors on you.
+
+>[!TIP]
+>You can use Blossom in **[Offline Mode](#5-offline-mode)** by connecting directly to its `Blossom_Setup` access point. In this mode, all animation and meditation features work, but you access Blossom at `http://192.168.4.1` instead of `blossom.local`.
 
 ---
 
@@ -101,15 +105,64 @@ Returns basic connection info: current WiFi network, IP address, and signal stre
 curl http://blossom.local/api/status
 ```
 
+**Connected mode response:**
 ```json
-{"status":"connected","ssid":"MyHomeWifi","ip":"192.168.1.42","rssi":-58}
+{"status":"connected","offline":false,"ssid":"MyHomeWifi","ip":"192.168.1.42","rssi":-58}
 ```
 
-`rssi` is signal strength in dBm. Closer to 0 is a stronger signal. Typical WiFi ranges from about -30 (excellent) to -80 (weak).
+**Offline mode response (when using Blossom_Setup AP):**
+```json
+{"status":"offline","offline":true,"ssid":"Blossom_Setup","ip":"192.168.4.1","rssi":0}
+```
+
+- `status`: Either `"connected"` (on WiFi network) or `"offline"` (in AP mode).
+- `offline`: Boolean flag indicating whether Blossom is in Offline Mode (true) or connected to a network (false).
+- `rssi`: Signal strength in dBm when connected. Closer to 0 is stronger. Typical WiFi ranges from about -30 (excellent) to -80 (weak). Always 0 in offline mode.
 
 ---
 
-# 5. Controlling the LEDs
+# 5. Offline Mode
+
+Blossom can operate in **Offline Mode**, allowing full animation and meditation control without connecting to a Wi-Fi network. This is useful when you're off-grid, camping, or want to avoid giving Blossom your Wi-Fi credentials.
+
+### How Offline Mode Works
+
+1. When Blossom starts in provisioning mode (the `Blossom_Setup` access point), connect to it from your device.
+2. The setup page at `http://192.168.4.1` will show a network list and "Offline Mode" button.
+3. Clicking "Offline Mode" switches the root page from setup to full animation/meditation controls.
+4. You can return to the setup page by clicking "Back to Setup" on the offline stamp.
+
+### Navigation Routes
+
+These routes control which UI is shown while in provisioning AP mode:
+
+#### `GET /offline`
+
+Enters Offline Mode. Sets a server-side flag so `/` serves the animation control page instead of the provisioning page. Redirects back to `/`.
+
+```bash
+curl http://192.168.4.1/offline
+```
+
+No JSON response; performs a 302 redirect to `/`.
+
+#### `GET /setup`
+
+Returns to Setup Mode. Clears the offline flag so `/` serves the provisioning page again. Redirects back to `/`.
+
+```bash
+curl http://192.168.4.1/setup
+```
+
+No JSON response; performs a 302 redirect to `/`.
+
+### API Availability
+
+In Offline Mode, **all animation, preset, LED control, and meditation endpoints work exactly as they do in connected mode**. The only difference is you access them at `http://192.168.4.1` instead of `http://blossom.local`.
+
+---
+
+# 6. Controlling the LEDs
 
 These endpoints turn the entire LED ring on or off.
 
@@ -149,7 +202,7 @@ curl -X POST http://blossom.local/api/leds -H "Content-Type: application/json" -
 
 ---
 
-# 6. Animation Endpoints
+# 7. Animation Endpoints
 
 This API controls color, sparkles, flicker, pulse, and spin, using the same parameters described in the [Animation Guide](/docs/animation_guide.md).
 
@@ -239,7 +292,7 @@ curl -X POST http://blossom.local/api/animation ^
 
 ---
 
-# 7. Preset Endpoints
+# 8. Preset Endpoints
 
 Presets are named, saved animation configurations (see [Saving Presets](/docs/animation_guide.md#5-saving-presets) in the Animation Guide). These endpoints let you list, save, and load presets remotely.
 
@@ -288,7 +341,7 @@ The response is the full config JSON of the preset that was just loaded (same sh
 
 ---
 
-# 8. Meditation Endpoints
+# 9. Meditation Endpoints
 
 These control Blossom's guided-breathing Meditation Mode, described in the [Meditation Guide](/docs/meditations.md). Functionally, it temporarily takes over the LEDs to run a breathing cycle (inhale / hold / exhale / hold), independent of whatever animation was playing before.
 
@@ -326,7 +379,7 @@ curl http://blossom.local/api/meditation/status
 
 ---
 
-# 9. Errors and Troubleshooting
+# 10. Errors and Troubleshooting
 
 - **A request seems to hang or time out:** Double-check `blossom.local` resolves on your network — try Blossom's raw IP address instead (from your router, or from `/api/status` while you still have another way to reach it).
 - **You get `{"error":"No data received"}`:** The endpoint expected a JSON body (a `POST` with data) but didn't get one. Make sure you're sending a `Content-Type: application/json` header and a valid `-d` body.
@@ -336,7 +389,7 @@ curl http://blossom.local/api/meditation/status
 
 ---
 
-# 10. Next Steps and Further Reading
+# 11. Next Steps and Further Reading
 
 This API is intentionally simple, a great way to try your hand at some lightweight home automation or IoT projects:
 

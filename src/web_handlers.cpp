@@ -6,6 +6,11 @@
 #include <LittleFS.h>
 #include <WiFi.h>
 
+// Offline Mode session flag: when true, provisioning AP serves connected.html
+// at root instead of provisioning.html, giving full animation/meditation control
+// without leaving AP mode. Reset to false on boot or via /setup route.
+static bool offlineMode = false;
+
 // Stream a file from LittleFS to the client
 static void serveFile(const char* path, const char* contentType) {
   File file = LittleFS.open(path, "r");
@@ -17,8 +22,22 @@ static void serveFile(const char* path, const char* contentType) {
   }
 }
 
+// Fonts are big (~500KB combined) and never change; let clients cache them so
+// captive-portal sheets and browsers only pay the transfer cost once. This
+// matters a lot on iOS, where the portal WebView re-opens frequently.
+static void serveCachedFile(const char* path, const char* contentType) {
+  server.sendHeader("Cache-Control", "public, max-age=86400, immutable");
+  serveFile(path, contentType);
+}
+
 static void handleProvisioningRoot() {
-  serveFile("/provisioning.html", "text/html");
+  // Conditional root serving: if offline mode is active in provisioning AP,
+  // serve the connected page so users get animation/meditation controls.
+  if (offlineMode) {
+    serveFile("/connected.html", "text/html");
+  } else {
+    serveFile("/provisioning.html", "text/html");
+  }
 }
 
 static void handleConnectedRoot() {
@@ -31,11 +50,29 @@ static void handleMeditationRoot() {
 
 
 static void handleGlutenFont() {
-  serveFile("/fonts/Gluten.ttf", "font/ttf");
+  serveCachedFile("/fonts/Gluten.ttf", "font/ttf");
 }
 
 static void handleFredokaFont() {
-  serveFile("/fonts/Fredoka.ttf", "font/ttf");
+  serveCachedFile("/fonts/Fredoka.ttf", "font/ttf");
+}
+
+// Offline Mode entry: sets offline flag and redirects to root, which will now
+// serve connected.html while staying in provisioning AP mode.
+static void handleOffline() {
+  offlineMode = true;
+  Serial.println("Entered Offline Mode (AP remains active)");
+  server.sendHeader("Location", "/", true);
+  server.send(302, "text/plain", "");
+}
+
+// Setup Mode return: clears offline flag and redirects to root, which will now
+// serve provisioning.html again, allowing users to scan/connect without reboot.
+static void handleSetup() {
+  offlineMode = false;
+  Serial.println("Returned to Setup Mode");
+  server.sendHeader("Location", "/", true);
+  server.send(302, "text/plain", "");
 }
 
 static void handleConnect() {
@@ -80,15 +117,29 @@ static void handleConnect() {
 
 static void handleStatus() {
   String json = "{";
-  json += "\"status\":\"connected\",";
-  json += "\"ssid\":\"";
-  json += WiFi.SSID();
-  json += "\",";
-  json += "\"ip\":\"";
-  json += WiFi.localIP().toString();
-  json += "\",";
-  json += "\"rssi\":";
-  json += String(WiFi.RSSI());
+  
+  // Report mode context so UI can detect offline vs connected state.
+  // In offline mode (provisioning AP), we're not connected to a network.
+  if (offlineMode) {
+    json += "\"status\":\"offline\",";
+    json += "\"offline\":true,";
+    json += "\"ssid\":\"Blossom_Setup\",";  // AP SSID
+    json += "\"ip\":\"";
+    json += WiFi.softAPIP().toString();  // AP IP (192.168.4.1)
+    json += "\",";
+    json += "\"rssi\":0";  // No RSSI in AP mode
+  } else {
+    json += "\"status\":\"connected\",";
+    json += "\"offline\":false,";
+    json += "\"ssid\":\"";
+    json += WiFi.SSID();
+    json += "\",";
+    json += "\"ip\":\"";
+    json += WiFi.localIP().toString();
+    json += "\",";
+    json += "\"rssi\":";
+    json += String(WiFi.RSSI());
+  }
   json += "}";
 
   server.sendHeader("Access-Control-Allow-Origin", "*");
@@ -240,14 +291,18 @@ static void handlePresetLoad() {
   }
 }
 
-static void handleScan() {
-  Serial.println("WiFi scan requested...");
+// ── Async WiFi scan ───────────────────────────────────────────────────────────
+// WiFi.scanNetworks() (blocking form) freezes Core 0 for 2-5 seconds: no DNS
+// replies, no HTTP responses. That's fatal for captive portals — iOS keeps
+// re-probing hotspot-detect.html while its portal sheet is open, and if those
+// probes time out it declares the network dead. So we run the scan
+// asynchronously: the first GET /api/scan kicks off a background scan and
+// returns {"scanning":true}; the page polls until results are ready.
 
-  int numNetworks = WiFi.scanNetworks();
-  Serial.print("Scan complete. Found ");
-  Serial.print(numNetworks);
-  Serial.println(" networks.");
+static bool scanInProgress = false;
 
+// Build the {"networks":[...]} JSON from the completed scan results.
+static String buildScanJson(int numNetworks) {
   String json = "{\"networks\":[";
   bool firstNetwork = true;
   String addedSSIDs[50];
@@ -279,12 +334,36 @@ static void handleScan() {
   }
 
   json += "]}";
+  return json;
+}
 
-  //Serial.print("Filtered to ");
-  //Serial.print(addedCount);
-  //Serial.println(" unique networks");
-
+static void handleScan() {
   server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.sendHeader("Cache-Control", "no-store");
+
+  if (!scanInProgress) {
+    // Kick off a non-blocking scan and tell the client to poll back.
+    Serial.println("WiFi scan started (async)...");
+    WiFi.scanDelete();
+    WiFi.scanNetworks(true);  // async=true: returns immediately
+    scanInProgress = true;
+    server.send(200, "application/json", "{\"scanning\":true}");
+    return;
+  }
+
+  int numNetworks = WiFi.scanComplete();
+  if (numNetworks < 0) {
+    // Still scanning — client should poll again shortly.
+    server.send(200, "application/json", "{\"scanning\":true}");
+    return;
+  }
+
+  Serial.print("Scan complete. Found ");
+  Serial.print(numNetworks);
+  Serial.println(" networks.");
+
+  String json = buildScanJson(numNetworks);
+  scanInProgress = false;
   server.send(200, "application/json", json);
   WiFi.scanDelete();
 }
@@ -341,19 +420,95 @@ static void handleMeditationStatus() {
   server.send(200, "application/json", json);
 }
 
-static void handleNotFound() {
+// Captive portal detection: when devices get anything other than the expected
+// "success" response from their probe URLs, they know they're behind a captive
+// portal and show the login UI.
+//
+// Windows and Android are happy chasing a 302 redirect, but Apple's Captive
+// Network Assistant (CNA) on iOS is noticeably slower and flakier with
+// redirects: the background probe triggers the sheet, then the CNA WebView
+// re-fetches the SAME probe URL and must follow the redirect (new TCP
+// connection, new request) before anything paints. On a single-connection
+// web server that round-trip contends with iOS's parallel re-probes and can
+// stall for seconds. Instead, we answer Apple probes with a tiny 200 page
+// that paints instantly in the CNA sheet and immediately hops to the portal.
 
+static const char APPLE_CNA_PAGE[] =
+  "<!DOCTYPE html><html><head>"
+  "<meta charset=\"UTF-8\">"
+  "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+  "<meta http-equiv=\"refresh\" content=\"0;url=http://192.168.4.1/\">"
+  "<title>Blossom Setup</title></head>"
+  "<body style=\"font-family:-apple-system,sans-serif;text-align:center;padding-top:60px\">"
+  "<p>Opening Blossom setup&hellip;</p>"
+  "<p><a href=\"http://192.168.4.1/\">Tap here if nothing happens</a></p>"
+  "</body></html>";
+
+// iOS/macOS probe endpoints: 200 + instant mini-page (fast CNA popup)
+static void handleAppleCaptiveDetect() {
+  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  server.send(200, "text/html", APPLE_CNA_PAGE);
+}
+
+// Windows/Android probe endpoints: 302 redirect (proven fast on those OSes)
+static void handleCaptiveDetect() {
+  server.sendHeader("Location", "http://192.168.4.1/", true);
+  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  server.send(302, "text/plain", "");
+}
+
+static void handleNotFound() {
   // Redirect all unknown routes to root — helps with captive portal detection
-  server.sendHeader("Location", "/", true);
+  server.sendHeader("Location", "http://192.168.4.1/", true);
+  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   server.send(302, "text/plain", "");
 }
 
 void setupProvisioningRoutes() {
+  // Root serves provisioning.html normally, or connected.html when offline flag is set
   server.on("/", handleProvisioningRoot);
+  
+  // Offline Mode control routes
+  server.on("/offline", handleOffline);  // Enter offline mode
+  server.on("/setup",   handleSetup);    // Return to setup mode
+  
+  // Captive portal detection endpoints - trigger the OS portal UI
+  // iOS/macOS detection: 200 + instant mini-page (see handleAppleCaptiveDetect)
+  server.on("/hotspot-detect.html", handleAppleCaptiveDetect);
+  server.on("/library/test/success.html", handleAppleCaptiveDetect);
+  server.on("/success.txt", handleAppleCaptiveDetect);
+  // Windows detection
+  server.on("/connecttest.txt", handleCaptiveDetect);
+  server.on("/redirect", handleCaptiveDetect);
+  server.on("/ncsi.txt", handleCaptiveDetect);
+  // Android/Chrome detection
+  server.on("/generate_204", handleCaptiveDetect);
+  server.on("/gen_204", handleCaptiveDetect);
+  
+  // Pages and assets (shared across setup and offline modes)
+  server.on("/meditation.html", handleMeditationRoot);
   server.on("/fonts/Gluten.ttf",  handleGlutenFont);
   server.on("/fonts/Fredoka.ttf", handleFredokaFont);
+  
+  // Setup-specific APIs (credential provisioning)
   server.on("/api/scan",    handleScan);
   server.on("/api/connect", HTTP_POST, handleConnect);
+  
+  // Connected-mode APIs (needed when offline mode is active in provisioning AP)
+  // These allow animation/meditation control while AP is running
+  server.on("/api/status", handleStatus);
+  server.on("/api/led", HTTP_GET, handleLedStatus);
+  server.on("/api/led/toggle", HTTP_POST, handleLedToggle);
+  server.on("/api/leds", HTTP_POST, handleLeds);
+  server.on("/api/animation", HTTP_GET,  handleAnimationGet);
+  server.on("/api/animation", HTTP_POST, handleAnimation);
+  server.on("/api/presets",      HTTP_GET,  handlePresetList);
+  server.on("/api/presets/save", HTTP_POST, handlePresetSave);
+  server.on("/api/presets/load", HTTP_POST, handlePresetLoad);
+  server.on("/api/meditation/start",  HTTP_POST, handleMeditationStart);
+  server.on("/api/meditation/stop",   HTTP_POST, handleMeditationStop);
+  server.on("/api/meditation/status", HTTP_GET,  handleMeditationStatus);
+  
   server.onNotFound(handleNotFound);
   server.begin();
   //Serial.println("✓ Web server started on port 80");

@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blossom Setup</title>
     <style>
+        /* font-display: swap lets the page render immediately with fallback
+           fonts while the big TTF files stream in over the AP link. This is
+           key for the iOS captive-portal sheet, which otherwise sits blank
+           waiting on ~500KB of fonts from a tiny embedded web server. */
         @font-face {
             font-family: 'Gluten';
             src: url('/fonts/Gluten.ttf') format('truetype');
             font-weight: 100 900;
             font-style: normal;
+            font-display: swap;
         }
 
         @font-face {
@@ -17,6 +22,7 @@
             src: url('/fonts/Fredoka.ttf') format('truetype');
             font-weight: 300 700;
             font-style: normal;
+            font-display: swap;
         }
 
         * {
@@ -248,6 +254,18 @@
             background-color: #ff858d; /* Coral */
         }
 
+        button.offline {
+            padding: 14px 24px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        button.offline::before {
+            filter: url('#wriggly-btn-1');
+            transform: rotate(0.5deg);
+            background-color: #ffd966; /* Yellow */
+        }
+
         button:hover {
             transform: scale(1.05) translateY(-2px);
         }
@@ -361,6 +379,7 @@
                 <input type="password" id="wifi-password" placeholder="Network Password">
             </div>
             <button class="connect" onclick="connectWiFi()">Connect to Network</button>
+            <button class="offline" onclick="enterOfflineMode()">Offline Mode</button>
         </div>
     </div>
 
@@ -398,10 +417,26 @@
             scanNetworks();
         }
 
-        function scanNetworks() {
+        // The scan API is asynchronous: the device starts a background scan
+        // (a blocking scan would freeze its DNS + web server for seconds,
+        // which breaks captive portal detection, especially on iOS) and
+        // returns {"scanning":true} until results are ready. Poll until we
+        // get the network list.
+        const SCAN_POLL_MS = 750;
+        const SCAN_MAX_POLLS = 20;  // ~15s safety cap
+
+        function scanNetworks(pollCount = 0) {
             fetch('/api/scan')
                 .then(response => response.json())
                 .then(data => {
+                    if (data.scanning) {
+                        if (pollCount >= SCAN_MAX_POLLS) {
+                            throw new Error('Scan timed out');
+                        }
+                        setTimeout(() => scanNetworks(pollCount + 1), SCAN_POLL_MS);
+                        return;
+                    }
+
                     const tbody = document.getElementById('network-list');
                     tbody.innerHTML = '';
 
@@ -481,6 +516,12 @@
                 statusEl.style.color = '#d32f2f';
                 statusEl.textContent = '✗ Could not reach device - please try again';
             });
+        }
+
+        function enterOfflineMode() {
+            // Navigate to /offline, which sets the server-side flag and redirects
+            // back to /, where connected.html will be served instead of provisioning.html
+            window.location.href = '/offline';
         }
     </script>
 

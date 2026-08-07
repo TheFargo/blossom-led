@@ -62,5 +62,19 @@
         "timestamp": "2026-07-29T18:58:40.987Z"
       }
     }
+  },
+  {
+    "id": "ab44eea7-474d-44eb-912c-a8a0d5d0d1aa",
+    "commandDesc": "MCP Tool: build_project",
+    "timestamp": 1786077304386,
+    "status": "error",
+    "tasks": [],
+    "mcpRequest": {
+      "projectDir": "c:\\Users\\fargo\\source\\repos\\blossom_programmable_light_display"
+    },
+    "mcpToolName": "build_project",
+    "mcpResponse": {
+      "error": "Failed to build project: Error: spawn pio ENOENT"
+    }
   }
 ]

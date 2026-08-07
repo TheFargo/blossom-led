@@ -102,6 +102,8 @@ On boot, the system:
 
 **Credential preservation rule:** Only ever call `clearCredentials()` on an explicit `WL_CONNECT_FAILED`. Never clear on timeout or SSID-not-found — those are transient network conditions, not credential errors.
 
+**Offline Mode**: A web-routing sub-state within MODE_PROVISIONING. When the user clicks "Offline Mode" from the setup page, a file-local `offlineMode` flag in `web_handlers.cpp` is set to true, causing `/` to serve `connected.html` instead of `provisioning.html` while the device remains in AP mode. All animation/meditation APIs are registered in `setupProvisioningRoutes()` so they work in both setup and offline contexts. The flag resets to false on boot or via the `/setup` route. No main.cpp state-machine changes are needed — this keeps the implementation minimal and avoids any WiFi radio-mode complexity.
+
 ### mDNS Implementation
 - Requires `#include <LEAmDNS.h>` (not ESP8266mDNS.h)
 - Hostname: `blossom.local`
@@ -111,18 +113,23 @@ On boot, the system:
 ### API Endpoints
 
 **Provisioning Mode:**
-- `GET /` - Serves provisioning HTML page
-- `GET /api/scan` - Returns JSON list of WiFi networks
+- `GET /` - Serves provisioning HTML page (or connected HTML if offline flag is set)
+- `GET /offline` - Enters Offline Mode (sets flag, redirects to /)
+- `GET /setup` - Returns to Setup Mode (clears flag, redirects to /)
+- `GET /api/scan` - Asynchronous WiFi scan: first call starts a background scan and returns `{"scanning":true}`; the page polls until it receives `{"networks":[...]}`. (A blocking scan would freeze DNS/HTTP for seconds and break iOS captive portal detection.)
 - `POST /api/connect` - Accepts `{ssid, password}`, saves credentials to flash, schedules deferred reboot
+- All connected-mode APIs below are also available in provisioning AP (for Offline Mode)
 
 **Connected Mode:**
-- `GET /` - Serves "Hello World" status page
-- `GET /api/status` - Returns JSON with `{status, ssid, ip, rssi}`
+- `GET /` - Serves connected HTML page
+- `GET /api/status` - Returns JSON with `{status, offline, ssid, ip, rssi}` (offline flag added for UI detection)
 - `GET /api/animation` - Returns the currently running config (flat keys) plus `"name"` (now-playing preset name or "Custom")
 - `POST /api/animation` - Accepts flat-key config JSON, applies it, sets now-playing to "Custom"
 - `GET /api/presets` - Returns `{current, default, presets:[...]}` — display names, built-in "Warm Flame" always listed
 - `POST /api/presets/save` - Accepts `{name, makeDefault, ...config}`; saves to `/presets/<safe-name>.json`, optionally sets boot default
 - `POST /api/presets/load` - Accepts `{name}`; applies the preset and returns its stored config JSON
+- `GET /meditation.html` - Serves meditation page
+- `POST /api/meditation/start`, `POST /api/meditation/stop`, `GET /api/meditation/status` - Meditation control
 
 ### Animation Presets
 - Module: `include/presets.h` / `src/presets.cpp` — all preset storage, JSON helpers, and "now playing" bookkeeping

@@ -54,7 +54,10 @@ When you first power on the Blossom, it will enter *Setup Mode*. While in Setup 
 
 1. *Connect:* Go to the Network Settings of any device - the place where you would select a Wi-Fi network. If you're anywhere near the Blossom, you will see `Blossom_Setup` as an available network. Select it and click 'Connect!'
 
-2. *Configure:* A setup page should pop up immediately. Depending on the OS of the device you're using and its default web browser, this "captive" webpage might show up instantaneously, or it may take a moment. If it does not appear at all, open up a web browser and Blossom should jump in.
+2. *Configure:* A setup page should pop up immediately. Depending on the OS of the device you're using and its default web browser, this "captive" webpage might show up instantaneously, or it may take a moment. If it does not appear at all, open up a web browser, type `192.168.4.1` into the address bar, and press Go — the setup page will appear.
+
+>[!TIP]
+>**On iPhone/iPad:** after tapping `Blossom_Setup`, stay on the Wi-Fi settings screen and give it a few seconds — the setup sheet slides up on its own. If it doesn't, tap the `Blossom_Setup` row again, or open Safari and go to `192.168.4.1`. If iOS asks whether to keep using the network without internet, choose **"Use Without Internet"** — Blossom is a local device and never needs internet access.
 
 3. *Credential...ize!* Blossom will display a list of nearby networks and their signal strength. Choose your network and type in the Wi-Fi password. Click `Connect to Network.`
 
@@ -128,7 +131,8 @@ After 5 seconds, the device will restart in Setup Mode with no Wi-Fi credentials
 
 * **Blossom_Setup Does Not Appear as a Network.** If you are trying to configure the Blossom and don't see the `Blossom_Setup` network, Blossom may already be connected to something. Make sure the Status light is blinking to indicate setup mode. Try power-cycling the Blossom. If you see a solid light but wish to reconfigure the Blossom, do a [Factory Reset](#7-factory-reset).
 
+* **The Setup Page Doesn't Pop Up on my Phone.** Some devices (especially iPhones) are picky about captive setup pages. Stay connected to `Blossom_Setup`, open a web browser, and go to `192.168.4.1` directly — the setup page is always available at that address. If your phone offers to disconnect because the network "has no internet," choose to stay connected / use without internet.
+
 * **Cannot Connect to blossom.local.** Make sure Blossom is connected to the Wi-Fi by checking the Status light - if it's blinking, you'll need to re-connect it. If the light is on and you still don't see the Blossom, ensure that your devices are using the same network. Try power-cycling the Blossom to get a fresh connection. If you are using Wi-Fi extenders, note that they may not forward local webpages.
 
 * **Please contact me with other bug reports and/or success stories!**
-

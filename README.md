@@ -83,8 +83,8 @@ Hardware/Enclosure Design: Licensed under Creative Commons Attribution 4.0 Inter
 
 ## Support This Project
 
-* [Buy a finished one on Etsy](https://www.etsy.com/listing/4551815905/blossom-programmable-led-light-display)
-* Grab me a Kofi!
+* [Buy a finished Blossom on Etsy](https://www.etsy.com/listing/4551815905/blossom-programmable-led-light-display)
+* [Grab me a Ko-fi!](https://ko-fi.com/thefargo)
 
 ---
 

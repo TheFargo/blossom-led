@@ -183,7 +183,7 @@ static float valueNoise(uint32_t seed, float t) {
 
 // speed (0-255) → noise update rate in Hz-ish units. Tuned by ear/eye, not physics.
 static inline float flickerSpeedToRate(uint8_t speed) {
-    const float FLICKER_MIN_RATE = 0.5f;
+    const float FLICKER_MIN_RATE = 0.1f;
     const float FLICKER_MAX_RATE = 8.0f;
     return FLICKER_MIN_RATE + ((float)speed / 255.0f) * (FLICKER_MAX_RATE - FLICKER_MIN_RATE);
 }
@@ -228,7 +228,7 @@ static float flickerSignal(int i, float t, DistributionMode mode, uint8_t speed)
 // speed (0-255) → pulse frequency in Hz. Deliberately slow — this is meant to
 // read as a gentle "breathing" motion, not a strobe.
 static inline float pulseSpeedToHz(uint8_t speed) {
-    const float PULSE_MIN_HZ = 0.05f;
+    const float PULSE_MIN_HZ = 0.01f;
     const float PULSE_MAX_HZ = 1.5f;
     return PULSE_MIN_HZ + ((float)speed / 255.0f) * (PULSE_MAX_HZ - PULSE_MIN_HZ);
 }
